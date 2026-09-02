@@ -1,0 +1,1592 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía de Scripts — Sesión 3</title>
+<style>
+:root {
+  --bg: #0f1115;
+  --panel: #171a21;
+  --panel-border: #262a33;
+  --text: #e8eaed;
+  --text-dim: #9aa0ac;
+  --accent: #7c5cff;
+  --accent-dim: #4b3aa8;
+  --code-bg: #0b0d12;
+  --success: #33c481;
+  --warn: #ffb454;
+  --warn-bg: rgba(255,180,84,0.08);
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.topbar {
+  border-bottom: 1px solid var(--panel-border);
+  padding: 2rem 1.5rem 1.5rem;
+  background: linear-gradient(180deg, rgba(124,92,255,0.08), transparent);
+}
+
+.topbar-inner { max-width: 1180px; margin: 0 auto; }
+
+.badge {
+  display: inline-block;
+  background: var(--accent);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+}
+
+.topbar h1 { margin: 0 0 0.3rem; font-size: 1.8rem; }
+.subtitle { margin: 0 0 0.9rem; color: var(--text-dim); }
+
+.real-world-btn {
+  background: linear-gradient(135deg, var(--accent), #5a3fd6);
+  color: white;
+  border: none;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(124,92,255,0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.real-world-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(124,92,255,0.45); }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6,7,10,0.72);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 100;
+}
+.modal-overlay[hidden] { display: none; }
+
+.modal {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  max-width: 720px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: modal-in 0.2s ease-out;
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.3rem;
+  border-bottom: 1px solid var(--panel-border);
+  flex-shrink: 0;
+}
+.modal-head h2 { margin: 0; font-size: 1.15rem; }
+
+.modal-close {
+  background: var(--panel-border);
+  color: var(--text);
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.modal-close:hover { background: var(--accent-dim); }
+
+.modal-body {
+  padding: 1.2rem 1.3rem 1.5rem;
+  overflow-y: auto;
+}
+.modal-body > p { color: var(--text-dim); font-size: 0.9rem; margin-top: 0; }
+
+.rw-card {
+  background: var(--code-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.8rem;
+}
+.rw-card h3 { margin: 0 0 0.5rem; font-size: 0.92rem; color: var(--accent); }
+.rw-card p { margin: 0 0 0.4rem; font-size: 0.85rem; color: var(--text); line-height: 1.5; }
+.rw-card p:last-child { margin-bottom: 0; }
+.rw-card .rw-why { color: var(--text-dim); }
+.rw-card.rw-closing { border-color: var(--accent-dim); background: rgba(124,92,255,0.06); }
+.rw-card.rw-closing h3 { color: var(--text); }
+
+.layout {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 720px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+.stepper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  position: sticky;
+  top: 1.5rem;
+  align-self: start;
+}
+
+@media (max-width: 720px) {
+  .stepper {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  color: var(--text-dim);
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.9rem;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+.step:hover { border-color: var(--accent-dim); color: var(--text); }
+
+.step.active {
+  background: rgba(124,92,255,0.12);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--panel-border);
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.step.active .step-num { background: var(--accent); color: white; }
+
+.content { min-width: 0; }
+
+.panel {
+  display: none;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  animation: fade 0.2s ease;
+}
+
+.panel.active { display: block; }
+
+@keyframes fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel-tag {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+  color: var(--accent);
+  background: rgba(124,92,255,0.1);
+  border: 1px solid var(--accent-dim);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  margin-bottom: 0.8rem;
+}
+
+.panel h2 { margin-top: 0; }
+
+.checklist {
+  padding-left: 1.2rem;
+  color: var(--text-dim);
+}
+.checklist li { margin-bottom: 0.35rem; }
+.checklist code { color: var(--text); }
+
+.steps-list {
+  padding-left: 1.2rem;
+  margin: 0.4rem 0;
+}
+.steps-list li { margin-bottom: 0.4rem; }
+.steps-list code { color: var(--accent); }
+
+.context-box {
+  background: rgba(124,92,255,0.05);
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  margin: 1rem 0 1.2rem;
+}
+
+.context-box h3 {
+  margin: 0 0 0.6rem;
+  font-size: 1rem;
+  color: var(--accent);
+}
+
+.context-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.2rem;
+}
+.context-head h3 { margin-bottom: 0; flex: 1 1 auto; min-width: 200px; }
+
+.scenario-toggle {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent-dim);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.scenario-toggle:hover { background: rgba(124,92,255,0.15); }
+
+.scenario[hidden] { display: none; }
+
+.context-box p {
+  margin: 0 0 0.7rem;
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.context-box ul {
+  margin: 0 0 0.9rem;
+  padding-left: 1.2rem;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+.context-box ul:last-child { margin-bottom: 0; }
+.context-box li { margin-bottom: 0.45rem; }
+.context-box li strong { color: var(--text); }
+.context-box code { color: var(--accent); }
+
+.codeblock {
+  background: var(--code-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.codeblock-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--panel-border);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.head-actions { display: flex; gap: 0.4rem; flex-shrink: 0; flex-wrap: wrap; }
+
+.copy-btn {
+  background: var(--panel-border);
+  color: var(--text);
+  border: none;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.copy-btn:hover { background: var(--accent-dim); }
+.copy-btn.copied { background: var(--success); color: #06251a; }
+
+.explain-btn {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent-dim);
+  padding: 0.24rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.explain-btn:hover { background: rgba(124,92,255,0.12); }
+.explain-btn[aria-expanded="true"] { background: var(--accent); color: white; border-color: var(--accent); }
+
+.explain-panel {
+  background: var(--code-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  margin: -0.4rem 0 1rem;
+  padding: 0.9rem 1rem;
+  max-height: 420px;
+  overflow-y: auto;
+}
+.explain-panel[hidden] { display: none; }
+
+.explain-toggle-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.8rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.explain-group + .explain-group { margin-top: 1rem; }
+
+.explain-group-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.explain-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 0.4rem 1rem;
+  padding: 0.35rem 0;
+  border-top: 1px solid var(--panel-border);
+  font-size: 0.82rem;
+}
+.explain-row:first-child { border-top: none; }
+
+@media (max-width: 640px) {
+  .explain-row { grid-template-columns: 1fr; gap: 0.15rem; }
+}
+
+.explain-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.76rem;
+  color: var(--accent);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.explain-note { color: var(--text-dim); }
+
+/* bloque SQL: la acción principal — esto SÍ se pega en el cuadro SQL de phpMyAdmin */
+.codeblock.sql { border-color: var(--accent-dim); }
+.codeblock.sql .codeblock-head {
+  background: rgba(124,92,255,0.08);
+  color: var(--accent);
+  font-weight: 600;
+}
+.codeblock.sql pre { max-height: 320px; overflow-y: auto; }
+
+/* bloque de terminal: acción alternativa — NUNCA se pega en phpMyAdmin */
+.codeblock.terminal { border-color: rgba(255,180,84,0.35); }
+.codeblock.terminal .codeblock-head {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.codeblock.terminal .warn-text {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--warn);
+  background: var(--warn-bg);
+  border-top: 1px solid rgba(255,180,84,0.25);
+  padding: 0.5rem 0.7rem;
+}
+
+pre {
+  margin: 0;
+  padding: 0.8rem;
+  overflow-x: auto;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+}
+
+p.note, p.expect {
+  font-size: 0.85rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  margin: 0.8rem 0;
+}
+
+p.note {
+  background: rgba(255,255,255,0.03);
+  color: var(--text-dim);
+  border: 1px solid var(--panel-border);
+}
+
+p.expect {
+  background: rgba(51,196,129,0.08);
+  border: 1px solid rgba(51,196,129,0.35);
+  color: var(--text);
+}
+
+/* Acordeón genérico (desplegable <details>/<summary>) — reutilizable en cualquier sesión */
+.accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0.9rem 0;
+}
+
+.accordion-item {
+  background: var(--code-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.accordion-item[open] { border-color: var(--accent-dim); }
+
+.accordion-summary {
+  cursor: pointer;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--text);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.accordion-summary::-webkit-details-marker { display: none; }
+
+.accordion-summary::after {
+  content: "+";
+  flex-shrink: 0;
+  color: var(--accent);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.accordion-item[open] .accordion-summary::after { content: "\2212"; }
+
+.accordion-summary:hover { color: var(--accent); }
+
+.accordion-tag {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.accordion-body {
+  padding: 0 1rem 1rem;
+  border-top: 1px solid var(--panel-border);
+  padding-top: 0.8rem;
+  animation: fade 0.15s ease;
+}
+
+.accordion-body p {
+  margin: 0 0 0.6rem;
+  font-size: 0.87rem;
+  color: var(--text-dim);
+  line-height: 1.55;
+}
+.accordion-body p:last-child { margin-bottom: 0; }
+.accordion-body strong { color: var(--text); }
+.accordion-body code { color: var(--accent); }
+
+.accordion-note {
+  margin: 0.8rem 0 0;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+/* Bloques lado a lado, para simular dos pestañas/sesiones concurrentes */
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin: 1rem 0;
+  align-items: start;
+  min-width: 0;
+}
+
+@media (max-width: 820px) {
+  .split { grid-template-columns: 1fr; }
+}
+
+.split-col { min-width: 0; }
+.split-col .codeblock { margin: 0; }
+
+.split-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  margin-bottom: 0.4rem;
+}
+
+/* Simulador de concurrencia interactivo (Paso 3) */
+.sim-box {
+  background: var(--code-bg);
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.2rem;
+  margin: 1.2rem 0;
+}
+
+.sim-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+.sim-head h3 { margin: 0; font-size: 1rem; color: var(--accent); }
+
+.sim-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.sim-toggle input { accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer; }
+.sim-toggle code { color: var(--accent); }
+.sim-toggle input:disabled { cursor: not-allowed; }
+
+.sim-intro {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  margin: 0 0 1rem;
+}
+
+.sim-code {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  margin-bottom: 0.6rem;
+  overflow-x: auto;
+}
+.sim-code pre {
+  margin: 0;
+  padding: 0.6rem;
+}
+.sim-code code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.76rem;
+  color: var(--text);
+  white-space: pre;
+}
+
+.sim-run-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent), #5a3fd6);
+  color: white;
+  border: none;
+  padding: 0.55rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s;
+}
+.sim-run-btn:hover:not(:disabled) { transform: translateY(-1px); }
+.sim-run-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.sim-result {
+  margin-top: 0.6rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--panel-border);
+  color: var(--text-dim);
+  min-height: 1.4em;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.sim-result.pending { color: var(--warn); border-color: rgba(255,180,84,0.35); background: var(--warn-bg); }
+.sim-result.success { color: var(--success); border-color: rgba(51,196,129,0.35); background: rgba(51,196,129,0.08); }
+.sim-result.rejected { color: #ff8080; border-color: rgba(255,92,92,0.35); background: rgba(255,92,92,0.08); }
+
+.sim-timeline {
+  margin-top: 1rem;
+  border-top: 1px solid var(--panel-border);
+  padding-top: 0.8rem;
+}
+
+.sim-timeline-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  margin-bottom: 0.5rem;
+}
+
+.sim-timeline-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.sim-timeline-log li {
+  font-size: 0.8rem;
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  line-height: 1.4;
+}
+.sim-timeline-log li .t { color: var(--accent); margin-right: 0.5rem; }
+.sim-timeline-log li.success { color: var(--success); }
+.sim-timeline-log li.rejected { color: #ff8080; }
+.sim-timeline-log:empty::after {
+  content: "Todavía no ejecutaste nada — pulsa \"Ejecutar\" en alguna columna.";
+  color: var(--text-dim);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.82rem;
+}
+
+.sim-reset-btn {
+  margin-top: 1rem;
+  background: transparent;
+  border: 1px solid var(--panel-border);
+  color: var(--text-dim);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.sim-reset-btn:hover { border-color: var(--accent-dim); color: var(--text); }
+
+.foot {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  padding: 2rem 1rem;
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <span class="badge">Sesión 3 · MySQL / phpMyAdmin</span>
+    <h1>Tráfico Masivo y Concurrencia</h1>
+    <p class="subtitle">Guía visual de uso de los scripts SQL — cambios sin downtime y compras concurrentes sin duplicados</p>
+    <button id="real-world-btn" class="real-world-btn" aria-haspopup="dialog">💼 ¿Dónde se usa esto en el mundo real?</button>
+  </div>
+</header>
+
+<div class="modal-overlay" id="real-world-modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="real-world-title">
+    <div class="modal-head">
+      <h2 id="real-world-title">💼 Estos comandos, fuera del aula</h2>
+      <button class="modal-close" id="real-world-close" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Un servidor que no puede apagarse y miles de personas queriendo lo mismo al mismo instante — eso no es un caso hipotético, es el día a día de cualquier sistema con éxito. Esta es una lista corta de incidentes reales y muy documentados, uno por cada concepto de esta sesión.</p>
+
+      <div class="rw-card">
+        <h3>ALTER TABLE sin bloquear — migraciones con el servidor encendido</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> empresas como GitHub y Stripe documentan públicamente cómo evitan bloquear tablas de producción con millones de filas: usan herramientas como <code>gh-ost</code> o <code>pt-online-schema-change</code>, construidas sobre la misma idea que <code>ALGORITHM=INSTANT</code> — cambiar la estructura sin detener el tráfico.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> una migración mal planeada en una tabla grande puede tumbar un sitio entero durante minutos u horas — y eso, en un negocio real, se traduce directamente en dinero perdido.</p>
+      </div>
+
+      <div class="rw-card">
+        <h3>Condición de carrera — vender lo mismo dos veces</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> el lanzamiento de zapatillas limitadas de Nike (SNKRS) y el drop de boletos de una gira mundial en Ticketmaster (2022) sufrieron el mismo problema técnico: miles de compras simultáneas contra un stock limitado, sin un control de concurrencia lo bastante robusto, terminaron en ventas dobles, errores masivos y cobertura de prensa negativa.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> cualquier producto con inventario limitado y alta demanda (zapatillas, boletos, ediciones especiales de un juego) enfrenta este mismo riesgo el día de su lanzamiento.</p>
+      </div>
+
+      <div class="rw-card">
+        <h3>SELECT ... FOR UPDATE — no vender el mismo asiento dos veces</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> los sistemas de reservas de aerolíneas y hoteles bloquean la fila del asiento o la habitación exacta que alguien está a punto de reservar, para que ninguna otra persona pueda tomarla hasta que la primera transacción termine (se confirme o se cancele). Es exactamente el mismo mecanismo que usa <code>comprar_item_unico</code> con el item legendario.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> es una de las primeras soluciones que se esperan de un desarrollador backend cuando dos usuarios "compiten" por el mismo recurso.</p>
+      </div>
+
+      <div class="rw-card">
+        <h3>Deadlocks — cuando dos transacciones se bloquean mutuamente</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> en sistemas bancarios, transferir dinero entre dos cuentas requiere bloquear ambas filas. Si dos transferencias ocurren al mismo tiempo en direcciones cruzadas (A→B y B→A), cada una puede quedar esperando a la otra para siempre — un <em>deadlock</em>. Los motores de bases de datos como MySQL detectan esto automáticamente y cancelan una de las dos transacciones para que la otra pueda continuar.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> el código de aplicación debe estar preparado para que una transacción falle por deadlock y reintentarla — no es un error del programador, es parte normal de sistemas concurrentes.</p>
+      </div>
+
+      <div class="rw-card rw-closing">
+        <h3>Un adelanto de por qué se simulan "eventos de lanzamiento"</h3>
+        <p class="rw-case">Lanzamientos de videojuegos como Diablo IV o New World sufrieron públicamente colas de espera y caídas de servidor por la cantidad de jugadores conectándose el primer día. Diseñar la base de datos pensando en picos de tráfico —y no solo en el uso promedio— es lo que separa un lanzamiento exitoso de uno que se convierte en noticia por las razones equivocadas.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="layout">
+  <nav class="stepper" id="stepper" aria-label="Pasos de la sesión">
+    <button class="step active" data-target="paso-0">
+      <span class="step-num">0</span>
+      <span class="step-label">Abrir phpMyAdmin</span>
+    </button>
+    <button class="step" data-target="paso-1">
+      <span class="step-num">1</span>
+      <span class="step-label">Cambios sin downtime</span>
+    </button>
+    <button class="step" data-target="paso-2">
+      <span class="step-num">2</span>
+      <span class="step-label">Procedimiento con bloqueo</span>
+    </button>
+    <button class="step" data-target="paso-3">
+      <span class="step-num">3</span>
+      <span class="step-label">Simular concurrencia</span>
+    </button>
+  </nav>
+
+  <section class="content">
+
+    <article class="panel active" id="paso-0">
+      <h2>Paso 0 · Abrir phpMyAdmin</h2>
+      <p>Esta sesión continúa sobre la base <code>juego_online</code> de las Sesiones 1 y 2. Para la simulación de concurrencia del Paso 3 vas a necesitar <strong>dos pestañas del navegador abiertas al mismo tiempo</strong>, ambas sobre phpMyAdmin.</p>
+      <ol class="steps-list">
+        <li>Entra a phpMyAdmin (normalmente <code>http://localhost/phpmyadmin</code>) en una pestaña.</li>
+        <li>Abre una <strong>segunda pestaña</strong> del navegador con la misma URL — la usarás en el Paso 3 para simular a un segundo jugador comprando al mismo tiempo.</li>
+        <li>En ambas, selecciona la base <code>juego_online</code> y ve a la pestaña <strong>SQL</strong>.</li>
+      </ol>
+      <p class="note">Requiere tablas <strong>InnoDB</strong> (ya lo son, desde la Sesión 1) — es el motor que soporta bloqueo de filas con <code>FOR UPDATE</code>, necesario en el Paso 2.</p>
+    </article>
+
+    <article class="panel" id="paso-1">
+      <div class="panel-tag">scripts/01_alter_tables_sin_downtime.sql</div>
+      <h2>Paso 1 · Cambios de estructura sin apagar el servidor</h2>
+      <p>Agrega dos columnas nuevas a <code>Items</code> — <code>es_unico</code> y <code>vendido</code> — para marcar un item especial de "evento de lanzamiento" que solo puede venderse una sola vez en todo el juego, sin bloquear la tabla mientras miles de jugadores siguen conectados.</p>
+      <ul class="checklist">
+        <li>Usa <code>ADD COLUMN IF NOT EXISTS</code>: se puede volver a ejecutar sin error.</li>
+        <li>En InnoDB, agregar una columna con <code>DEFAULT</code> es una operación <strong>instant</strong> (<code>ALGORITHM=INSTANT</code>) desde MySQL 8.0.12+/MariaDB 10.3+: no reescribe la tabla completa ni bloquea lecturas/escrituras.</li>
+        <li>Marca la "Skin Dragon Dorado" como el item único de este evento.</li>
+      </ul>
+      <div class="codeblock">
+        <div class="codeblock-head">
+          <span>en phpMyAdmin</span>
+        </div>
+        <ol class="steps-list">
+          <li>Pestaña <strong>SQL</strong> → pega el bloque de abajo (botón <em>Copiar SQL</em>).</li>
+          <li>Pulsa <strong>Continuar</strong>.</li>
+        </ol>
+      </div>
+      <div class="codeblock sql">
+        <div class="codeblock-head">
+          <span>SQL — pégalo en la pestaña SQL de phpMyAdmin</span>
+          <span class="head-actions">
+            <button class="explain-btn" data-explain-target="#explain-paso1" aria-expanded="false">Explicar código</button>
+            <button class="copy-btn" data-copy-target="#sql-paso1">Copiar SQL</button>
+          </span>
+        </div>
+        <pre><code id="sql-paso1">-- Sesión 3: Cambios de estructura sin interrumpir el servicio ("evento de lanzamiento")
+-- Motor: MySQL 8.0.29+ / MariaDB 10.0.2+ (soportan ADD COLUMN IF NOT EXISTS)
+USE juego_online;
+
+-- Marca si un item es único (solo puede existir 1 en todo el juego, ej: skin legendaria de evento)
+ALTER TABLE Items
+    ADD COLUMN IF NOT EXISTS es_unico BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- Marca si el item único ya fue vendido (evita doble venta)
+ALTER TABLE Items
+    ADD COLUMN IF NOT EXISTS vendido BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- Nota: en InnoDB, agregar una columna con DEFAULT es una operación "instant" (ALGORITHM=INSTANT)
+-- desde MySQL 8.0.12+/MariaDB 10.3+, por lo que no bloquea la tabla ni la reescribe completa
+-- (el evento de lanzamiento puede seguir recibiendo tráfico mientras se aplica este cambio).
+-- Puedes forzarlo explícitamente así:
+-- ALTER TABLE Items ADD COLUMN es_unico BOOLEAN NOT NULL DEFAULT FALSE, ALGORITHM=INSTANT;
+
+-- Marcamos el item "Skin Dragon Dorado" como único para el evento de lanzamiento
+UPDATE Items SET es_unico = TRUE WHERE nombre = 'Skin Dragon Dorado';</code></pre>
+      </div>
+      <div class="explain-panel" id="explain-paso1" hidden></div>
+      <p class="expect"><strong>Resultado esperado:</strong> la tabla <code>Items</code> muestra dos columnas nuevas (<code>es_unico</code>, <code>vendido</code>) y el item "Skin Dragon Dorado" queda con <code>es_unico = 1</code>.</p>
+      <p class="note">Requiere que la Sesión 1 se haya ejecutado antes (la tabla <code>Items</code> y el item "Skin Dragon Dorado" deben existir).</p>
+    </article>
+
+    <article class="panel" id="paso-2">
+      <div class="panel-tag">scripts/02_control_transacciones_deadlocks.sql</div>
+      <h2>Paso 2 · Procedimiento con bloqueo de filas</h2>
+
+      <div class="context-box">
+        <div class="context-head">
+          <h3>¿Qué es una condición de carrera y por qué SELECT normal no basta?</h3>
+          <button class="scenario-toggle" data-label-to-food="🍕 Ver el mismo problema con comida" data-label-to-game="🎮 Volver al ejemplo del videojuego">🍕 Ver el mismo problema con comida</button>
+        </div>
+
+        <div class="scenario" data-scenario="game">
+          <p>Imagina que dos jugadores hacen clic en "comprar" el item único casi al mismo tiempo. El procedimiento hace dos cosas por separado: primero <em>lee</em> si el item ya fue vendido, y después, en un paso distinto, lo <em>marca</em> como vendido. Entre esas dos acciones hay una ventana de tiempo minúscula — unas milésimas de segundo — donde algo puede salir mal.</p>
+          <p>Mira la línea de tiempo si <strong>no existiera ningún bloqueo</strong>:</p>
+          <ul>
+            <li><strong>t = 0.001s:</strong> Jugador A pulsa "Comprar" → el sistema revisa: <code>vendido</code> = FALSE. "¡Genial, todavía está disponible!"</li>
+            <li><strong>t = 0.002s:</strong> Jugador B pulsa "Comprar" casi al mismo instante → como A todavía no terminó, el sistema también le revisa a B: <code>vendido</code> sigue en FALSE. "¡A B también le toca!"</li>
+            <li><strong>t = 0.003s:</strong> El sistema termina de procesar a A: marca <code>vendido = TRUE</code> y le entrega el item.</li>
+            <li><strong>t = 0.004s:</strong> El sistema termina de procesar a B, que nunca se enteró del cambio de A: también marca <code>vendido = TRUE</code> y le entrega el mismo item.</li>
+          </ul>
+          <p>Resultado: <strong>dos jugadores tienen el mismo item "único"</strong> en su inventario, algo que por definición no debería poder pasar. A esto se le llama <strong>condición de carrera</strong>: dos procesos "compitiendo" por el mismo dato, y ambos ganan por culpa del mal momento.</p>
+          <p>La solución es <code>SELECT ... FOR UPDATE</code> dentro de una transacción: en cuanto A empieza a leer la fila del item, la deja bloqueada con un candado invisible hasta que termine (<code>COMMIT</code> o <code>ROLLBACK</code>). Cuando B intenta leer esa misma fila con <code>FOR UPDATE</code>, el sistema lo obliga a <strong>esperar en fila</strong> — no puede seguir hasta que A termine. Para cuando le toca su turno, B ya ve <code>vendido = TRUE</code> y es rechazado correctamente.</p>
+        </div>
+
+        <div class="scenario" data-scenario="food" hidden>
+          <p>Imagina un food truck con un solo plato especial del día — el último "Lomo Saltado XL" — y dos clientes pidiéndolo casi al mismo tiempo por una app de delivery. El sistema hace dos cosas por separado: primero <em>revisa</em> si el plato sigue disponible, y después, en un paso distinto, lo <em>marca</em> como vendido. Entre esas dos acciones hay una ventana de tiempo minúscula donde algo puede salir mal.</p>
+          <p>Mira la línea de tiempo si <strong>no existiera ningún bloqueo</strong> en la cocina:</p>
+          <ul>
+            <li><strong>t = 0.001s:</strong> Cliente A pide el Lomo Saltado XL → la app revisa: "disponible = sí". "¡Perfecto, se lo preparamos!"</li>
+            <li><strong>t = 0.002s:</strong> Cliente B pide el mismo plato casi al mismo instante → como la orden de A todavía no se registró, la app también le dice a B: "disponible = sí". "¡A B también se lo preparamos!"</li>
+            <li><strong>t = 0.003s:</strong> La cocina termina de anotar el pedido de A: marca el plato como "vendido" y lo empieza a cocinar.</li>
+            <li><strong>t = 0.004s:</strong> La cocina termina de anotar el pedido de B, que nunca se enteró del pedido de A: también intenta prepararle el mismo plato... que ya no existe.</li>
+          </ul>
+          <p>Resultado: <strong>dos clientes pagaron por el mismo plato único</strong>, pero la cocina solo puede preparar uno. Eso es una condición de carrera aplicada a un restaurante — el mismo problema que sufren apps reales de delivery en horas pico.</p>
+          <p>La solución es la misma idea que <code>SELECT ... FOR UPDATE</code>: en cuanto la cocina empieza a atender el pedido de A, "aparta" ese plato con un candado invisible hasta terminar de confirmarlo (cobrar y anotar, o cancelar). Cuando llega el pedido de B por el mismo plato, tiene que <strong>esperar su turno</strong> — y cuando por fin la cocina lo revisa, ya ve que el plato se acabó, y le avisa a B a tiempo, antes de cobrarle por algo que no existe.</p>
+        </div>
+
+        <ul>
+          <li><strong>START TRANSACTION / COMMIT / ROLLBACK:</strong> agrupan varias operaciones para que se apliquen todas juntas o ninguna — lo que se conoce como <strong>atomicidad</strong>. En el juego: nunca se cobra el precio sin entregar el item, ni se entrega el item sin cobrar. En el restaurante: nunca se cobra la cuenta sin servir el plato, ni se sirve el plato sin cobrarlo.</li>
+          <li><strong>FOR UPDATE:</strong> convierte una simple lectura en una lectura "con candado", exclusiva para la transacción actual — como poner un cartel de "reservado" sobre el último plato mientras se confirma la orden, para que nadie más lo tome mientras tanto.</li>
+          <li><strong>ON DUPLICATE KEY UPDATE:</strong> si el jugador ya tenía ese item (o el cliente ya había pedido ese plato antes), suma la cantidad en vez de crear una fila duplicada — como sumar "x2" a un pedido en vez de abrir un ticket nuevo para lo mismo.</li>
+        </ul>
+      </div>
+
+      <div class="codeblock">
+        <div class="codeblock-head">
+          <span>en phpMyAdmin</span>
+        </div>
+        <ol class="steps-list">
+          <li>Pestaña <strong>SQL</strong> → pega el bloque de abajo, incluido el <code>DELIMITER // ... //</code>.</li>
+          <li>Pulsa <strong>Continuar</strong>. El procedimiento queda guardado en <strong>Rutinas</strong>.</li>
+        </ol>
+      </div>
+      <div class="codeblock sql">
+        <div class="codeblock-head">
+          <span>SQL — pégalo en la pestaña SQL de phpMyAdmin</span>
+          <span class="head-actions">
+            <button class="explain-btn" data-explain-target="#explain-paso2" aria-expanded="false">Explicar código</button>
+            <button class="copy-btn" data-copy-target="#sql-paso2">Copiar SQL</button>
+          </span>
+        </div>
+        <pre><code id="sql-paso2">-- Sesión 3: Control de transacciones para evitar doble compra de un item único
+-- Motor: MySQL 8.0+ / MariaDB (tablas InnoDB, requerido para SELECT ... FOR UPDATE)
+--
+-- El procedimiento maneja su propia transacción (START TRANSACTION / COMMIT / ROLLBACK),
+-- así que el bloqueo funciona aunque el autocommit del cliente esté activado (por defecto en MySQL).
+--
+-- Prueba de concurrencia: abre DOS pestañas/ventanas de phpMyAdmin (o dos sesiones de
+-- mysql CLI) y ejecuta el mismo CALL casi al mismo tiempo con jugadores distintos.
+
+USE juego_online;
+
+DROP PROCEDURE IF EXISTS comprar_item_unico;
+
+DELIMITER //
+
+CREATE PROCEDURE comprar_item_unico(
+    IN p_jugador_id INT,
+    IN p_item_id INT,
+    OUT p_resultado VARCHAR(255)
+)
+BEGIN
+    DECLARE v_vendido  BOOLEAN;
+    DECLARE v_precio   INT;
+    DECLARE v_monedas  INT;
+
+    START TRANSACTION;
+
+    -- FOR UPDATE bloquea la fila hasta que esta transacción termine (COMMIT/ROLLBACK),
+    -- evitando que dos compras concurrentes lean "vendido = false" al mismo tiempo.
+    SELECT vendido, precio_monedas INTO v_vendido, v_precio
+    FROM Items
+    WHERE item_id = p_item_id AND es_unico = TRUE
+    FOR UPDATE;
+
+    IF v_vendido THEN
+        SET p_resultado = 'RECHAZADO: el item único ya fue vendido a otro jugador.';
+        ROLLBACK;
+    ELSE
+        SELECT monedas INTO v_monedas FROM Jugadores WHERE jugador_id = p_jugador_id;
+
+        IF v_monedas < v_precio THEN
+            SET p_resultado = 'RECHAZADO: monedas insuficientes.';
+            ROLLBACK;
+        ELSE
+            UPDATE Items SET vendido = TRUE WHERE item_id = p_item_id;
+            UPDATE Jugadores SET monedas = monedas - v_precio WHERE jugador_id = p_jugador_id;
+            INSERT INTO Inventario_Items (jugador_id, item_id, cantidad)
+                VALUES (p_jugador_id, p_item_id, 1)
+                ON DUPLICATE KEY UPDATE cantidad = cantidad + 1;
+
+            SET p_resultado = CONCAT('EXITO: item unico vendido al jugador ', p_jugador_id);
+            COMMIT;
+        END IF;
+    END IF;
+END //
+
+DELIMITER ;
+
+-- Prueba (ejecutar en dos pestañas de phpMyAdmin / dos sesiones mysql, casi al mismo tiempo,
+-- con jugador_id distinto y el MISMO item_id único = 1):
+CALL comprar_item_unico(2, 1, @resultado_a);
+SELECT @resultado_a AS resultado;
+
+-- En la otra sesión:
+-- CALL comprar_item_unico(5, 1, @resultado_b);
+-- SELECT @resultado_b AS resultado;
+-- Resultado esperado: solo una de las dos llamadas retorna EXITO.</code></pre>
+      </div>
+      <div class="explain-panel" id="explain-paso2" hidden></div>
+      <p class="expect"><strong>Resultado esperado:</strong> al ejecutar el bloque completo, la primera llamada (<code>CALL comprar_item_unico(2, 1, ...)</code>) retorna <code>EXITO: item unico vendido al jugador 2</code>.</p>
+      <p class="note">Requiere haber ejecutado el Paso 1 antes (las columnas <code>es_unico</code>/<code>vendido</code> deben existir).</p>
+    </article>
+
+    <article class="panel" id="paso-3">
+      <h2>Paso 3 · Simular el "Evento de Lanzamiento"</h2>
+      <p>Ahora reproduce el escenario real: dos jugadores distintos intentando comprar el <strong>mismo item único</strong> casi al mismo instante, usando las dos pestañas de phpMyAdmin que abriste en el Paso 0.</p>
+
+      <div class="split">
+        <div class="split-col">
+          <div class="split-label">Pestaña A · Jugador 2 (ShadowNinja)</div>
+          <div class="codeblock sql">
+            <div class="codeblock-head">
+              <span>pegar y ejecutar</span>
+              <button class="copy-btn" data-copy="CALL comprar_item_unico(2, 1, @resultado_a);&#10;SELECT @resultado_a AS resultado;">Copiar</button>
+            </div>
+            <pre><code>CALL comprar_item_unico(2, 1, @resultado_a);
+SELECT @resultado_a AS resultado;</code></pre>
+          </div>
+        </div>
+        <div class="split-col">
+          <div class="split-label">Pestaña B · Jugador 5 (RocketFox)</div>
+          <div class="codeblock sql">
+            <div class="codeblock-head">
+              <span>pegar y ejecutar</span>
+              <button class="copy-btn" data-copy="CALL comprar_item_unico(5, 1, @resultado_b);&#10;SELECT @resultado_b AS resultado;">Copiar</button>
+            </div>
+            <pre><code>CALL comprar_item_unico(5, 1, @resultado_b);
+SELECT @resultado_b AS resultado;</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <ol class="steps-list">
+        <li>Ten ambos bloques ya pegados (uno en cada pestaña), listos para pulsar <strong>Continuar</strong>.</li>
+        <li>Pulsa <strong>Continuar</strong> en la Pestaña A y, lo más rápido posible, en la Pestaña B.</li>
+        <li>Revisa el resultado (<code>@resultado_a</code> y <code>@resultado_b</code>) en cada pestaña.</li>
+      </ol>
+
+      <p class="expect"><strong>Resultado esperado:</strong> una de las dos pestañas muestra <code>EXITO: item unico vendido al jugador ...</code> y la otra muestra <code>RECHAZADO: el item único ya fue vendido a otro jugador.</code> — nunca las dos "EXITO" a la vez.</p>
+
+      <div class="sim-box" id="concurrency-sim">
+        <div class="sim-head">
+          <h3>🧪 Simulador: pruébalo sin necesitar dos pestañas reales</h3>
+          <label class="sim-toggle">
+            <input type="checkbox" id="sim-lock-toggle" checked>
+            <span>Con <code>FOR UPDATE</code> (protegido)</span>
+          </label>
+        </div>
+        <p class="sim-intro">Este simulador imita, paso a paso y con tiempos reales, lo que hace <code>comprar_item_unico</code> por dentro — sin tocar la base de datos de verdad. Pulsa "Ejecutar" en la Columna A y, justo después, lo más rápido que puedas, en la Columna B (como si fueran las dos pestañas del Paso 0). Mira la línea de tiempo para ver exactamente qué leyó y qué escribió cada una.</p>
+
+        <div class="split">
+          <div class="split-col">
+            <div class="split-label">Columna A · Jugador 2 (ShadowNinja)</div>
+            <div class="sim-code"><pre><code>CALL comprar_item_unico(2, 1, @resultado_a);
+SELECT @resultado_a AS resultado;</code></pre></div>
+            <button class="sim-run-btn" type="button" data-player="A" data-name="ShadowNinja" data-jugador-id="2">▶ Ejecutar en Columna A</button>
+            <div class="sim-result" data-result="A">Esperando ejecución…</div>
+          </div>
+          <div class="split-col">
+            <div class="split-label">Columna B · Jugador 5 (RocketFox)</div>
+            <div class="sim-code"><pre><code>CALL comprar_item_unico(5, 1, @resultado_b);
+SELECT @resultado_b AS resultado;</code></pre></div>
+            <button class="sim-run-btn" type="button" data-player="B" data-name="RocketFox" data-jugador-id="5">▶ Ejecutar en Columna B</button>
+            <div class="sim-result" data-result="B">Esperando ejecución…</div>
+          </div>
+        </div>
+
+        <div class="sim-timeline">
+          <div class="sim-timeline-title">Línea de tiempo de la simulación</div>
+          <ol class="sim-timeline-log" id="sim-timeline-log"></ol>
+        </div>
+
+        <button class="sim-reset-btn" type="button" id="sim-reset">🔄 Reiniciar simulación (el item vuelve a estar disponible)</button>
+
+        <p class="note">Prueba esto: con la casilla <strong>marcada</strong> (protegido), ejecuta A y B lo más rápido posible — siempre gana solo uno. Ahora <strong>desmárcala</strong>, reinicia, y vuelve a ejecutar ambas casi al mismo tiempo: vas a ver el error real — <strong>las dos columnas pueden mostrar EXITO</strong>. Esa es la condición de carrera ocurriendo frente a tus ojos.</p>
+      </div>
+
+      <div class="accordion">
+        <details class="accordion-item">
+          <summary class="accordion-summary"><span>🤔 ¿Qué pasaría sin FOR UPDATE?</span><span class="accordion-tag">condición de carrera</span></summary>
+          <div class="accordion-body">
+            <p>Si la línea <code>FOR UPDATE</code> no existiera, el <code>SELECT vendido ...</code> sería una lectura "libre": ambas transacciones podrían leer <code>vendido = FALSE</code> casi al mismo tiempo, antes de que cualquiera de las dos alcance a escribir el <code>UPDATE</code>. Las dos entrarían al bloque <code>ELSE</code>, y el item legendario terminaría vendido a <strong>dos jugadores distintos</strong> — exactamente el problema que sufrieron sistemas reales de venta de boletos y zapatillas limitadas cuando su control de concurrencia falló.</p>
+          </div>
+        </details>
+
+        <details class="accordion-item">
+          <summary class="accordion-summary"><span>🔁 ¿Qué es exactamente un deadlock, y puede pasar aquí?</span><span class="accordion-tag">bloqueo mutuo</span></summary>
+          <div class="accordion-body">
+            <p>Un <em>deadlock</em> ocurre cuando dos transacciones se bloquean <strong>mutuamente</strong>: la Transacción A espera un recurso que tiene bloqueado la Transacción B, y la B espera uno que tiene bloqueado la A — ninguna puede avanzar. En este procedimiento es poco probable porque cada llamada solo bloquea una fila de <code>Items</code> a la vez, en el mismo orden. El riesgo de deadlock aparece cuando una transacción bloquea varias filas o tablas en <strong>órdenes distintos</strong> (por ejemplo, primero <code>Jugadores</code> y luego <code>Items</code> en una llamada, y al revés en otra). MySQL detecta los deadlocks automáticamente y cancela una de las dos transacciones con un error, para que la aplicación la reintente.</p>
+          </div>
+        </details>
+
+        <details class="accordion-item">
+          <summary class="accordion-summary"><span>⏱️ ¿Por qué la segunda pestaña no falla, solo espera?</span><span class="accordion-tag">bloqueo, no error</span></summary>
+          <div class="accordion-body">
+            <p>Mientras la primera transacción no termine (<code>COMMIT</code> o <code>ROLLBACK</code>), la segunda llamada a <code>FOR UPDATE</code> sobre la misma fila queda "congelada" esperando su turno — no es un error, es el motor asegurando que las dos peticiones se procesen una después de la otra. Apenas la primera transacción termina, la segunda continúa automáticamente y ve el dato ya actualizado (<code>vendido = TRUE</code>), por eso responde <code>RECHAZADO</code> en vez de vender el item dos veces.</p>
+          </div>
+        </details>
+      </div>
+
+      <p class="note">Tip para clase: pide a dos estudiantes que ejecuten cada uno una pestaña, contando "1, 2, 3, ya" en voz alta — es la forma más simple de sentir la concurrencia real sin herramientas de carga.</p>
+    </article>
+
+  </section>
+</main>
+
+<footer class="foot">
+  <p>Guía de uso — Sesión 3: Tráfico Masivo y Concurrencia · Taller de Base de Datos (MySQL / phpMyAdmin)</p>
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const steps = document.querySelectorAll(".step");
+  const panels = document.querySelectorAll(".panel");
+
+  function activate(targetId) {
+    steps.forEach(s => s.classList.toggle("active", s.dataset.target === targetId));
+    panels.forEach(p => p.classList.toggle("active", p.id === targetId));
+    window.location.hash = targetId;
+  }
+
+  steps.forEach(step => {
+    step.addEventListener("click", () => activate(step.dataset.target));
+  });
+
+  const initial = window.location.hash.replace("#", "");
+  if (initial && document.getElementById(initial)) {
+    activate(initial);
+  }
+
+  /* ---------------------------------------------------------------
+     Modal: "¿Dónde se usa esto en el mundo real?"
+  --------------------------------------------------------------- */
+  const rwBtn = document.getElementById("real-world-btn");
+  const rwModal = document.getElementById("real-world-modal");
+  const rwClose = document.getElementById("real-world-close");
+
+  if (rwBtn && rwModal && rwClose) {
+    const openModal = () => {
+      rwModal.hidden = false;
+      rwClose.focus();
+    };
+    const closeModal = () => {
+      rwModal.hidden = true;
+      rwBtn.focus();
+    };
+
+    rwBtn.addEventListener("click", openModal);
+    rwClose.addEventListener("click", closeModal);
+    rwModal.addEventListener("click", (e) => {
+      if (e.target === rwModal) closeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !rwModal.hidden) closeModal();
+    });
+  }
+
+  /* ---------------------------------------------------------------
+     Botón "cambiar ejemplo" (videojuego <-> comida) en los context-box
+  --------------------------------------------------------------- */
+  document.querySelectorAll(".scenario-toggle").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const box = btn.closest(".context-box");
+      if (!box) return;
+
+      const scenarios = box.querySelectorAll(".scenario");
+      const currentlyShown = box.querySelector(".scenario:not([hidden])");
+      const currentMode = currentlyShown ? currentlyShown.dataset.scenario : "game";
+      const nextMode = currentMode === "game" ? "food" : "game";
+
+      scenarios.forEach(s => { s.hidden = s.dataset.scenario !== nextMode; });
+
+      btn.textContent = nextMode === "food" ? btn.dataset.labelToGame : btn.dataset.labelToFood;
+    });
+  });
+
+  /* ---------------------------------------------------------------
+     Explicación línea por línea del SQL
+  --------------------------------------------------------------- */
+  const explainData = {
+    paso1: [
+      {
+        title: "🧾 Encabezado — la ficha del archivo",
+        lines: [
+          ["-- Sesión 3: Cambios de estructura sin interrumpir el servicio (\"evento de lanzamiento\")", "Esto es un comentario, como una notita pegada en el código. Todo lo que empieza con -- lo ignora la base de datos por completo; es solo para que un humano entienda qué hace el archivo."],
+          ["-- Motor: MySQL 8.0.29+ / MariaDB 10.0.2+ (soportan ADD COLUMN IF NOT EXISTS)", "Otra notita: avisa qué versión del programa de base de datos necesitas para que este script funcione — como cuando un juego pide una versión mínima de tu consola."],
+          ["USE juego_online;", "Le dice a la base de datos: \"a partir de ahora, trabaja dentro del juego_online\" — como elegir de qué partida guardada vas a seguir jugando."]
+        ]
+      },
+      {
+        title: "🆕 Columna 1: es_unico — ¿este item es especial?",
+        lines: [
+          ["-- Marca si un item es único (solo puede existir 1 en todo el juego, ej: skin legendaria de evento)", "Notita que explica para qué sirve la columna que se va a crear."],
+          ["ALTER TABLE Items", "ALTER TABLE significa \"voy a cambiarle algo a esta tabla\". Aquí se elige la tabla Items, la que ya tiene todos los objetos del juego guardados."],
+          ["ADD COLUMN IF NOT EXISTS es_unico BOOLEAN NOT NULL DEFAULT FALSE;", "Agrega una columna nueva llamada es_unico. BOOLEAN quiere decir que solo puede valer verdadero o falso — como un interruptor de luz: encendido o apagado, sin punto medio. DEFAULT FALSE significa que, si no dices lo contrario, todos los items empiezan como \"no es único\" (interruptor apagado). Y el IF NOT EXISTS es un seguro: si por accidente ejecutas esta línea dos veces, no se rompe nada."]
+        ]
+      },
+      {
+        title: "🏷️ Columna 2: vendido — ¿ya se lo llevó alguien?",
+        lines: [
+          ["-- Marca si el item único ya fue vendido (evita doble venta)", "Notita: esta columna es la que evita que el mismo item legendario se venda dos veces."],
+          ["ALTER TABLE Items", "Otra vez le vamos a agregar algo a la misma tabla Items."],
+          ["ADD COLUMN IF NOT EXISTS vendido BOOLEAN NOT NULL DEFAULT FALSE;", "Crea la columna vendido: otro interruptor verdadero/falso. Empieza en FALSE (\"todavía nadie lo compró\"). Cuando alguien lo compre, este interruptor se pondrá en TRUE — como el cartel de \"AGOTADO\" que aparece en una tienda cuando ya no queda stock."]
+        ]
+      },
+      {
+        title: "⚡ ¿Por qué esto no apaga el servidor mientras se hace?",
+        lines: [
+          ["-- Nota: en InnoDB, agregar una columna con DEFAULT es una operación \"instant\" (ALGORITHM=INSTANT)", "Explica el truco que usa la base de datos para hacer este cambio sin que nadie lo note."],
+          ["-- desde MySQL 8.0.12+/MariaDB 10.3+, por lo que no bloquea la tabla ni la reescribe completa", "Piensa en la tabla Items como una estantería enorme llena de cajas (filas). Antes, agregar una columna era como vaciar TODA la estantería y volver a acomodar cada caja una por una — algo lento, y mientras tanto nadie podía comprar nada. La versión \"instant\" es como pegar una etiqueta nueva en la estantería misma, sin tocar ni una sola caja."],
+          ["-- (el evento de lanzamiento puede seguir recibiendo tráfico mientras se aplica este cambio).", "Por eso los jugadores conectados en ese momento ni se enteran de que se hizo un cambio — para ellos, el juego sigue funcionando normal, sin cortes ni pantallas de carga."],
+          ["-- Puedes forzarlo explícitamente así:", "Avisa que existe una forma de pedirle a la base de datos, con toda seguridad, que use ese truco rápido."],
+          ["-- ALTER TABLE Items ADD COLUMN es_unico BOOLEAN NOT NULL DEFAULT FALSE, ALGORITHM=INSTANT;", "Ejemplo (apagado, no se ejecuta) de cómo pedirlo de forma explícita: si por algún motivo el truco rápido no fuera posible, la base de datos avisaría con un error en vez de hacer el cambio lento sin decir nada."]
+        ]
+      },
+      {
+        title: "✨ Elegir el item legendario del evento",
+        lines: [
+          ["-- Marcamos el item \"Skin Dragon Dorado\" como único para el evento de lanzamiento", "Notita que explica qué va a pasar en la siguiente línea: por fin vamos a usar el interruptor es_unico."],
+          ["UPDATE Items SET es_unico = TRUE WHERE nombre = 'Skin Dragon Dorado';", "UPDATE significa \"actualiza algo que ya existe\". Aquí le dice a la base de datos: busca el item que se llama exactamente 'Skin Dragon Dorado' (creado en la Sesión 1) y pon su interruptor es_unico en TRUE. Ese es el item por el que los jugadores van a \"pelear\" en el Paso 3, porque solo hay uno en todo el juego."]
+        ]
+      }
+    ],
+    paso1_food: [
+      {
+        title: "🧾 Encabezado — la nota en el pizarrón de la cocina",
+        lines: [
+          ["-- Sesión 3: Cambios de estructura sin interrumpir el servicio (\"evento de lanzamiento\")", "Es como la nota que un cocinero pega en el pizarrón de la cocina explicando qué se va a preparar hoy. El sistema ignora por completo estas líneas; son solo para que el personal humano entienda qué está pasando."],
+          ["-- Motor: MySQL 8.0.29+ / MariaDB 10.0.2+ (soportan ADD COLUMN IF NOT EXISTS)", "Otra nota en el pizarrón: avisa qué versión del sistema de la cocina necesitas — como cuando una receta pide un horno con cierta función mínima para funcionar."],
+          ["USE juego_online;", "Le dice al sistema: \"a partir de ahora, trabajamos con el menú de ESTE restaurante\" — como elegir en qué sucursal vas a cocinar antes de tocar cualquier ingrediente."]
+        ]
+      },
+      {
+        title: "🆕 Columna 1: es_unico — ¿este plato es especial?",
+        lines: [
+          ["-- Marca si un item es único (solo puede existir 1 en todo el juego, ej: skin legendaria de evento)", "Nota que explica para qué sirve la casilla nueva que se va a agregar al menú."],
+          ["ALTER TABLE Items", "ALTER TABLE significa \"voy a cambiarle algo a este menú\". Aquí se elige la lista de Platos (Items), la que ya tiene todo lo que se puede pedir."],
+          ["ADD COLUMN IF NOT EXISTS es_unico BOOLEAN NOT NULL DEFAULT FALSE;", "Agrega una casilla nueva llamada es_unico a cada plato del menú. BOOLEAN es como una casilla de verificación: marcada o sin marcar, no hay término medio. DEFAULT FALSE significa que, si no dices lo contrario, ningún plato empieza marcado como especial. Y el IF NOT EXISTS es un seguro: si el cocinero pega la misma nota dos veces en el pizarrón, no pasa nada malo."]
+        ]
+      },
+      {
+        title: "🏷️ Columna 2: vendido — ¿ya se lo llevó algún cliente?",
+        lines: [
+          ["-- Marca si el item único ya fue vendido (evita doble venta)", "Nota: esta casilla es la que evita que el mismo plato especial se sirva dos veces."],
+          ["ALTER TABLE Items", "Otra vez le agregamos algo al mismo menú."],
+          ["ADD COLUMN IF NOT EXISTS vendido BOOLEAN NOT NULL DEFAULT FALSE;", "Crea la casilla vendido en cada plato: otra marca de sí/no. Empieza sin marcar (\"todavía nadie lo pidió\"). Cuando alguien lo pida, esta casilla se marca — como el cartel de \"¡SE ACABÓ!\" que el mesero cuelga cuando ya no queda ese plato del día."]
+        ]
+      },
+      {
+        title: "⚡ ¿Por qué esto no cierra la cocina mientras se hace?",
+        lines: [
+          ["-- Nota: en InnoDB, agregar una columna con DEFAULT es una operación \"instant\" (ALGORITHM=INSTANT)", "Explica el truco que usa el sistema para hacer este cambio sin interrumpir el servicio de la noche."],
+          ["-- desde MySQL 8.0.12+/MariaDB 10.3+, por lo que no bloquea la tabla ni la reescribe completa", "Piensa en el menú como un cuaderno enorme con una fila por cada plato. Antes, agregar una columna era como volver a copiar el cuaderno ENTERO a mano, plato por plato — lento, y mientras tanto nadie podía pedir nada. La versión \"instant\" es como pegar una columna nueva en el margen del cuaderno ya existente, sin volver a copiar ni una sola fila."],
+          ["-- (el evento de lanzamiento puede seguir recibiendo tráfico mientras se aplica este cambio).", "Por eso los comensales que están cenando en ese momento ni se enteran del cambio — para ellos, el servicio sigue normal, sin que la cocina cierre ni un segundo."],
+          ["-- Puedes forzarlo explícitamente así:", "Avisa que existe una forma de pedirle al sistema, con toda seguridad, que use ese truco rápido."],
+          ["-- ALTER TABLE Items ADD COLUMN es_unico BOOLEAN NOT NULL DEFAULT FALSE, ALGORITHM=INSTANT;", "Ejemplo (apagado, no se ejecuta) de cómo pedirlo de forma explícita: si por algún motivo el truco rápido no fuera posible, el sistema avisaría con un error en vez de hacer el cambio lento sin decir nada — como pedirle a un mesero \"solo tráelo si puedes traerlo rapidísimo, si no, mejor avísame antes\"."]
+        ]
+      },
+      {
+        title: "✨ Elegir el plato especial de la noche",
+        lines: [
+          ["-- Marcamos el item \"Skin Dragon Dorado\" como único para el evento de lanzamiento", "Nota que explica qué va a pasar en la siguiente línea: por fin vamos a usar la casilla es_unico."],
+          ["UPDATE Items SET es_unico = TRUE WHERE nombre = 'Skin Dragon Dorado';", "UPDATE significa \"actualiza algo que ya existe\". Aunque el nombre real en el menú de este restaurante siga siendo \"Skin Dragon Dorado\" (el código no cambia, solo la forma de imaginarlo), la idea es la misma: busca ese plato específico y marca su casilla es_unico. Ese es el plato por el que los clientes van a \"competir\" en el Paso 3, porque esta noche solo se va a preparar una sola porción en todo el restaurante."]
+        ]
+      }
+    ],
+    paso2: [
+      {
+        title: "Encabezado",
+        lines: [
+          ["-- Sesión 3: Control de transacciones para evitar doble compra de un item único", "Comentario descriptivo del archivo."],
+          ["-- Motor: MySQL 8.0+ / MariaDB (tablas InnoDB, requerido para SELECT ... FOR UPDATE)", "Aclara el requisito técnico: solo InnoDB soporta bloqueo de filas."],
+          ["-- El procedimiento maneja su propia transacción (START TRANSACTION / COMMIT / ROLLBACK),", "Explica una decisión de diseño importante."],
+          ["-- así que el bloqueo funciona aunque el autocommit del cliente esté activado (por defecto en MySQL).", "Aclara que no depende de la configuración del cliente que llama al procedimiento."],
+          ["USE juego_online;", "Selecciona la base de datos donde se creará el procedimiento."]
+        ]
+      },
+      {
+        title: "Preparar el procedimiento",
+        lines: [
+          ["DROP PROCEDURE IF EXISTS comprar_item_unico;", "Borra una versión anterior del procedimiento si existía, para poder recrearlo sin error."],
+          ["DELIMITER //", "Cambia temporalmente el carácter que separa sentencias (de ; a //): el procedimiento tiene varios ; adentro y no queremos que MySQL lo corte a la mitad."]
+        ]
+      },
+      {
+        title: "Firma del procedimiento y variables",
+        lines: [
+          ["CREATE PROCEDURE comprar_item_unico(", "Empieza a crear el procedimiento con ese nombre."],
+          ["IN p_jugador_id INT,", "Parámetro de entrada: qué jugador está comprando."],
+          ["IN p_item_id INT,", "Parámetro de entrada: qué item quiere comprar."],
+          ["OUT p_resultado VARCHAR(255)", "Parámetro de salida: aquí el procedimiento deja el mensaje de éxito o rechazo, para que quien lo llamó lo pueda leer después."],
+          [")", "Cierra la lista de parámetros."],
+          ["BEGIN", "Empieza el cuerpo del procedimiento."],
+          ["DECLARE v_vendido  BOOLEAN;", "Variable temporal: si el item ya fue vendido."],
+          ["DECLARE v_precio   INT;", "Variable temporal: cuánto cuesta el item."],
+          ["DECLARE v_monedas  INT;", "Variable temporal: cuántas monedas tiene el jugador."]
+        ]
+      },
+      {
+        title: "Bloquear la fila con FOR UPDATE",
+        lines: [
+          ["START TRANSACTION;", "Abre una transacción: todo lo que viene a continuación se aplicará junto (COMMIT) o se deshará por completo (ROLLBACK)."],
+          ["-- FOR UPDATE bloquea la fila hasta que esta transacción termine (COMMIT/ROLLBACK),", "Explica el efecto de la cláusula que sigue."],
+          ["-- evitando que dos compras concurrentes lean \"vendido = false\" al mismo tiempo.", "Es la clave para evitar la doble venta: nadie más puede leer esta misma fila con FOR UPDATE hasta que termine esta transacción."],
+          ["SELECT vendido, precio_monedas INTO v_vendido, v_precio", "Lee el estado actual del item y lo guarda en las variables."],
+          ["FROM Items", "Consulta la tabla Items."],
+          ["WHERE item_id = p_item_id AND es_unico = TRUE", "Filtra por el item recibido, verificando además que sea uno marcado como único."],
+          ["FOR UPDATE;", "Bloquea esa fila específica para cualquier otra transacción que también use FOR UPDATE sobre ella, hasta que esta transacción haga COMMIT o ROLLBACK."]
+        ]
+      },
+      {
+        title: "Si ya fue vendido: rechazar",
+        lines: [
+          ["IF v_vendido THEN", "Comprueba si el item ya estaba marcado como vendido cuando esta transacción lo leyó."],
+          ["SET p_resultado = 'RECHAZADO: el item único ya fue vendido a otro jugador.';", "Prepara el mensaje de rechazo."],
+          ["ROLLBACK;", "Deshace la transacción — no se hizo ningún cambio, solo se leyó, así que libera el bloqueo de inmediato."]
+        ]
+      },
+      {
+        title: "Si no ha sido vendido: validar monedas y vender",
+        lines: [
+          ["ELSE", "Si el item todavía no estaba vendido…"],
+          ["SELECT monedas INTO v_monedas FROM Jugadores WHERE jugador_id = p_jugador_id;", "Consulta cuántas monedas tiene el jugador que está comprando."],
+          ["IF v_monedas < v_precio THEN", "Verifica si el jugador no tiene monedas suficientes para pagar el precio del item."],
+          ["SET p_resultado = 'RECHAZADO: monedas insuficientes.';", "Prepara el mensaje de rechazo por falta de saldo."],
+          ["ROLLBACK;", "Deshace la transacción: no se cobra nada ni se entrega el item."],
+          ["ELSE", "Si sí tiene monedas suficientes…"],
+          ["UPDATE Items SET vendido = TRUE WHERE item_id = p_item_id;", "Marca el item como vendido — a partir de aquí, cualquier otra transacción que estaba esperando por el FOR UPDATE verá este cambio apenas se libere el bloqueo."],
+          ["UPDATE Jugadores SET monedas = monedas - v_precio WHERE jugador_id = p_jugador_id;", "Descuenta el precio del item de las monedas del jugador."],
+          ["INSERT INTO Inventario_Items (jugador_id, item_id, cantidad)", "Empieza a entregar el item al inventario del jugador."],
+          ["VALUES (p_jugador_id, p_item_id, 1)", "Con cantidad 1, ya que es un item único."],
+          ["ON DUPLICATE KEY UPDATE cantidad = cantidad + 1;", "Si por algún motivo el jugador ya tuviera una fila para ese item, suma la cantidad en vez de crear una fila duplicada (recuerda la restricción UNIQUE de la Sesión 1)."],
+          ["SET p_resultado = CONCAT('EXITO: item unico vendido al jugador ', p_jugador_id);", "Prepara el mensaje de éxito, incluyendo el id del jugador que ganó la compra."],
+          ["COMMIT;", "Confirma todos los cambios de esta transacción de forma definitiva y libera el bloqueo de la fila."],
+          ["END IF;", "Cierra el condicional de monedas suficientes."],
+          ["END IF;", "Cierra el condicional principal de vendido/no vendido."],
+          ["END //", "Cierra el cuerpo del procedimiento (usando el delimitador // definido arriba)."]
+        ]
+      },
+      {
+        title: "Restaurar el delimitador y probar",
+        lines: [
+          ["DELIMITER ;", "Devuelve el delimitador normal (;) para que las siguientes instrucciones funcionen como de costumbre."],
+          ["CALL comprar_item_unico(2, 1, @resultado_a);", "Llama al procedimiento: el jugador 2 intenta comprar el item 1 (el único marcado en el Paso 1)."],
+          ["SELECT @resultado_a AS resultado;", "Muestra el mensaje que el procedimiento dejó en la variable de salida."]
+        ]
+      }
+    ]
+  };
+
+  // Pasos que tienen una segunda versión de su explicación con otro tema (cocina en vez de videojuego)
+  const EXPLAIN_FOOD_VARIANTS = { paso1: "paso1_food" };
+
+  function renderExplainGroups(container, groups) {
+    container.innerHTML = "";
+    groups.forEach(group => {
+      const groupEl = document.createElement("div");
+      groupEl.className = "explain-group";
+
+      const titleEl = document.createElement("div");
+      titleEl.className = "explain-group-title";
+      titleEl.textContent = group.title;
+      groupEl.appendChild(titleEl);
+
+      group.lines.forEach(([code, note]) => {
+        const row = document.createElement("div");
+        row.className = "explain-row";
+
+        const codeEl = document.createElement("div");
+        codeEl.className = "explain-code";
+        codeEl.textContent = code;
+
+        const noteEl = document.createElement("div");
+        noteEl.className = "explain-note";
+        noteEl.textContent = note;
+
+        row.appendChild(codeEl);
+        row.appendChild(noteEl);
+        groupEl.appendChild(row);
+      });
+
+      container.appendChild(groupEl);
+    });
+  }
+
+  document.querySelectorAll(".explain-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const panel = document.querySelector(btn.dataset.explainTarget);
+      if (!panel) return;
+
+      const isOpen = !panel.hidden;
+      if (isOpen) {
+        panel.hidden = true;
+        btn.setAttribute("aria-expanded", "false");
+        btn.textContent = "Explicar código";
+        return;
+      }
+
+      if (!panel.dataset.rendered) {
+        const key = btn.dataset.explainTarget.replace("#explain-", "");
+        const foodKey = EXPLAIN_FOOD_VARIANTS[key];
+
+        const groupsContainer = document.createElement("div");
+        groupsContainer.className = "explain-groups";
+
+        if (foodKey) {
+          const toggleBar = document.createElement("div");
+          toggleBar.className = "explain-toggle-bar";
+
+          const toggleBtn = document.createElement("button");
+          toggleBtn.type = "button";
+          toggleBtn.className = "scenario-toggle";
+          toggleBtn.dataset.mode = "game";
+          toggleBtn.textContent = "🍳 Ver el mismo código con cocina";
+          toggleBtn.addEventListener("click", () => {
+            const nextMode = toggleBtn.dataset.mode === "game" ? "food" : "game";
+            toggleBtn.dataset.mode = nextMode;
+            toggleBtn.textContent = nextMode === "food"
+              ? "🎮 Volver al ejemplo del videojuego"
+              : "🍳 Ver el mismo código con cocina";
+            renderExplainGroups(groupsContainer, explainData[nextMode === "food" ? foodKey : key] || []);
+          });
+
+          toggleBar.appendChild(toggleBtn);
+          panel.appendChild(toggleBar);
+        }
+
+        panel.appendChild(groupsContainer);
+        renderExplainGroups(groupsContainer, explainData[key] || []);
+        panel.dataset.rendered = "true";
+      }
+
+      panel.hidden = false;
+      btn.setAttribute("aria-expanded", "true");
+      btn.textContent = "Ocultar explicación";
+    });
+  });
+
+  document.querySelectorAll(".copy-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      let text = btn.dataset.copy;
+      if (text === undefined && btn.dataset.copyTarget) {
+        const target = document.querySelector(btn.dataset.copyTarget);
+        text = target ? target.textContent : "";
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (err) {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+      const original = btn.textContent;
+      btn.textContent = "Copiado";
+      btn.classList.add("copied");
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove("copied");
+      }, 1200);
+    });
+  });
+
+  /* ---------------------------------------------------------------
+     Simulador de concurrencia (Paso 3): imita comprar_item_unico
+     sin tocar una base de datos real, con o sin el candado FOR UPDATE.
+  --------------------------------------------------------------- */
+  const simBox = document.getElementById("concurrency-sim");
+  if (simBox) {
+    const lockToggle = document.getElementById("sim-lock-toggle");
+    const timelineLog = document.getElementById("sim-timeline-log");
+    const resetBtn = document.getElementById("sim-reset");
+    const runBtns = simBox.querySelectorAll(".sim-run-btn");
+    const resultBoxes = {
+      A: simBox.querySelector('.sim-result[data-result="A"]'),
+      B: simBox.querySelector('.sim-result[data-result="B"]')
+    };
+
+    const PROCESS_MS = 900; // tiempo simulado que tarda la transacción en "escribir"
+
+    let itemVendido = false;
+    let lockHeld = false;
+    let lockQueue = [];
+    let simStartTime = null;
+
+    function elapsed() {
+      if (simStartTime === null) simStartTime = performance.now();
+      return Math.max(0, Math.round(performance.now() - simStartTime));
+    }
+
+    function log(text, cls) {
+      const li = document.createElement("li");
+      if (cls) li.className = cls;
+      const t = document.createElement("span");
+      t.className = "t";
+      t.textContent = `+${elapsed()}ms`;
+      li.appendChild(t);
+      li.appendChild(document.createTextNode(text));
+      timelineLog.appendChild(li);
+      timelineLog.scrollTop = timelineLog.scrollHeight;
+    }
+
+    function setResult(player, text, cls) {
+      const box = resultBoxes[player];
+      box.textContent = text;
+      box.className = "sim-result" + (cls ? " " + cls : "");
+    }
+
+    function disableRunButton(player) {
+      runBtns.forEach(b => {
+        if (b.dataset.player === player) b.disabled = true;
+      });
+    }
+
+    function finishPurchase(player, name, jugadorId, sawVendido) {
+      let resultText, cls;
+      if (sawVendido) {
+        resultText = "RECHAZADO: el item único ya fue vendido a otro jugador.";
+        cls = "rejected";
+        log(`Columna ${player} — Jugador ${jugadorId} (${name}): COMMIT → el item ya estaba vendido. Resultado: RECHAZADO`, "rejected");
+      } else {
+        itemVendido = true;
+        resultText = `EXITO: item unico vendido al jugador ${jugadorId}`;
+        cls = "success";
+        log(`Columna ${player} — Jugador ${jugadorId} (${name}): COMMIT → marca vendido = TRUE. Resultado: EXITO`, "success");
+      }
+      setResult(player, resultText, cls);
+    }
+
+    function runLocked(player, name, jugadorId) {
+      if (lockHeld) {
+        log(`Columna ${player} — Jugador ${jugadorId} (${name}): pide el candado (FOR UPDATE), pero la fila ya está bloqueada → esperando…`);
+        setResult(player, "Esperando a que la otra transacción termine (FOR UPDATE)…", "pending");
+        lockQueue.push(() => acquireLock(player, name, jugadorId));
+        return;
+      }
+      acquireLock(player, name, jugadorId);
+    }
+
+    function acquireLock(player, name, jugadorId) {
+      lockHeld = true;
+      const sawVendido = itemVendido;
+      log(`Columna ${player} — Jugador ${jugadorId} (${name}): adquiere el candado y lee vendido = ${sawVendido ? "TRUE" : "FALSE"}`);
+      setResult(player, "Transacción en curso (fila bloqueada)…", "pending");
+      setTimeout(() => {
+        finishPurchase(player, name, jugadorId, sawVendido);
+        lockHeld = false;
+        if (lockQueue.length) {
+          const next = lockQueue.shift();
+          next();
+        }
+      }, PROCESS_MS);
+    }
+
+    function runUnlocked(player, name, jugadorId) {
+      const sawVendido = itemVendido;
+      log(`Columna ${player} — Jugador ${jugadorId} (${name}): lee vendido = ${sawVendido ? "TRUE" : "FALSE"} (lectura libre, sin candado)`);
+      setResult(player, "Transacción en curso (sin candado)…", "pending");
+      setTimeout(() => {
+        finishPurchase(player, name, jugadorId, sawVendido);
+      }, PROCESS_MS);
+    }
+
+    runBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const player = btn.dataset.player;
+        const name = btn.dataset.name;
+        const jugadorId = btn.dataset.jugadorId;
+        disableRunButton(player);
+        if (lockToggle) lockToggle.disabled = true;
+        log(`Columna ${player} — Jugador ${jugadorId} (${name}) pulsa "Comprar" (CALL comprar_item_unico(${jugadorId}, 1, ...))`);
+        if (lockToggle && lockToggle.checked) {
+          runLocked(player, name, jugadorId);
+        } else {
+          runUnlocked(player, name, jugadorId);
+        }
+      });
+    });
+
+    if (resetBtn) {
+      resetBtn.addEventListener("click", () => {
+        itemVendido = false;
+        lockHeld = false;
+        lockQueue = [];
+        simStartTime = null;
+        timelineLog.innerHTML = "";
+        runBtns.forEach(b => { b.disabled = false; });
+        if (lockToggle) lockToggle.disabled = false;
+        setResult("A", "Esperando ejecución…", "");
+        setResult("B", "Esperando ejecución…", "");
+      });
+    }
+  }
+});
+</script>
+</body>
+</html>
