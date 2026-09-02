@@ -1,0 +1,1364 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía de Scripts — Sesión 1</title>
+<style>
+:root {
+  --bg: #0f1115;
+  --panel: #171a21;
+  --panel-border: #262a33;
+  --text: #e8eaed;
+  --text-dim: #9aa0ac;
+  --accent: #7c5cff;
+  --accent-dim: #4b3aa8;
+  --code-bg: #0b0d12;
+  --success: #33c481;
+  --warn: #ffb454;
+  --warn-bg: rgba(255,180,84,0.08);
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.topbar {
+  border-bottom: 1px solid var(--panel-border);
+  padding: 2rem 1.5rem 1.5rem;
+  background: linear-gradient(180deg, rgba(124,92,255,0.08), transparent);
+}
+
+.topbar-inner { max-width: 960px; margin: 0 auto; }
+
+.badge {
+  display: inline-block;
+  background: var(--accent);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+}
+
+.topbar h1 { margin: 0 0 0.3rem; font-size: 1.8rem; }
+.subtitle { margin: 0 0 0.9rem; color: var(--text-dim); }
+
+.real-world-btn {
+  background: linear-gradient(135deg, var(--accent), #5a3fd6);
+  color: white;
+  border: none;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(124,92,255,0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.real-world-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(124,92,255,0.45); }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6,7,10,0.72);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 100;
+}
+.modal-overlay[hidden] { display: none; }
+
+.modal {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  max-width: 720px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: modal-in 0.2s ease-out;
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.3rem;
+  border-bottom: 1px solid var(--panel-border);
+  flex-shrink: 0;
+}
+.modal-head h2 { margin: 0; font-size: 1.15rem; }
+
+.modal-close {
+  background: var(--panel-border);
+  color: var(--text);
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.modal-close:hover { background: var(--accent-dim); }
+
+.modal-body {
+  padding: 1.2rem 1.3rem 1.5rem;
+  overflow-y: auto;
+}
+.modal-body > p { color: var(--text-dim); font-size: 0.9rem; margin-top: 0; }
+
+.rw-card {
+  background: var(--code-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.8rem;
+}
+.rw-card h3 { margin: 0 0 0.5rem; font-size: 0.92rem; color: var(--accent); }
+.rw-card p { margin: 0 0 0.4rem; font-size: 0.85rem; color: var(--text); line-height: 1.5; }
+.rw-card p:last-child { margin-bottom: 0; }
+.rw-card .rw-why { color: var(--text-dim); }
+.rw-card.rw-closing { border-color: var(--accent-dim); background: rgba(124,92,255,0.06); }
+.rw-card.rw-closing h3 { color: var(--text); }
+
+.layout {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 720px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+.stepper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  position: sticky;
+  top: 1.5rem;
+  align-self: start;
+}
+
+@media (max-width: 720px) {
+  .stepper {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  color: var(--text-dim);
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.9rem;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+.step:hover { border-color: var(--accent-dim); color: var(--text); }
+
+.step.active {
+  background: rgba(124,92,255,0.12);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--panel-border);
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.step.active .step-num { background: var(--accent); color: white; }
+
+.content { min-width: 0; }
+
+.panel {
+  display: none;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  animation: fade 0.2s ease;
+}
+
+.panel.active { display: block; }
+
+@keyframes fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel-tag {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+  color: var(--accent);
+  background: rgba(124,92,255,0.1);
+  border: 1px solid var(--accent-dim);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  margin-bottom: 0.8rem;
+}
+
+.panel h2 { margin-top: 0; }
+
+.checklist {
+  padding-left: 1.2rem;
+  color: var(--text-dim);
+}
+.checklist li { margin-bottom: 0.35rem; }
+.checklist code { color: var(--text); }
+
+.steps-list {
+  padding-left: 1.2rem;
+  margin: 0.4rem 0;
+}
+.steps-list li { margin-bottom: 0.4rem; }
+.steps-list code { color: var(--accent); }
+
+.context-box {
+  background: rgba(124,92,255,0.05);
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  margin: 1rem 0 1.2rem;
+}
+
+.context-box h3 {
+  margin: 0 0 0.6rem;
+  font-size: 1rem;
+  color: var(--accent);
+}
+
+.context-box p {
+  margin: 0 0 0.7rem;
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.context-box ul {
+  margin: 0 0 0.9rem;
+  padding-left: 1.2rem;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+.context-box ul:last-child { margin-bottom: 0; }
+.context-box li { margin-bottom: 0.45rem; }
+.context-box li strong { color: var(--text); }
+.context-box code { color: var(--accent); }
+
+.codeblock {
+  background: var(--code-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.codeblock-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0.7rem;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--panel-border);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.head-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
+
+.copy-btn {
+  background: var(--panel-border);
+  color: var(--text);
+  border: none;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.copy-btn:hover { background: var(--accent-dim); }
+.copy-btn.copied { background: var(--success); color: #06251a; }
+
+.explain-btn {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent-dim);
+  padding: 0.24rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.explain-btn:hover { background: rgba(124,92,255,0.12); }
+.explain-btn[aria-expanded="true"] { background: var(--accent); color: white; border-color: var(--accent); }
+
+.explain-panel {
+  background: var(--code-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  margin: -0.4rem 0 1rem;
+  padding: 0.9rem 1rem;
+  max-height: 420px;
+  overflow-y: auto;
+}
+.explain-panel[hidden] { display: none; }
+
+.explain-group + .explain-group { margin-top: 1rem; }
+
+.explain-group-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.explain-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 0.4rem 1rem;
+  padding: 0.35rem 0;
+  border-top: 1px solid var(--panel-border);
+  font-size: 0.82rem;
+}
+.explain-row:first-child { border-top: none; }
+
+@media (max-width: 640px) {
+  .explain-row { grid-template-columns: 1fr; gap: 0.15rem; }
+}
+
+.explain-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.76rem;
+  color: var(--accent);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.explain-note { color: var(--text-dim); }
+
+/* bloque SQL: la acción principal — esto SÍ se pega en el cuadro SQL de phpMyAdmin */
+.codeblock.sql { border-color: var(--accent-dim); }
+.codeblock.sql .codeblock-head {
+  background: rgba(124,92,255,0.08);
+  color: var(--accent);
+  font-weight: 600;
+}
+.codeblock.sql pre { max-height: 320px; overflow-y: auto; }
+
+/* bloque de terminal: acción alternativa — NUNCA se pega en phpMyAdmin */
+.codeblock.terminal { border-color: rgba(255,180,84,0.35); }
+.codeblock.terminal .codeblock-head {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.codeblock.terminal .warn-text {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--warn);
+  background: var(--warn-bg);
+  border-top: 1px solid rgba(255,180,84,0.25);
+  padding: 0.5rem 0.7rem;
+}
+
+pre {
+  margin: 0;
+  padding: 0.8rem;
+  overflow-x: auto;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+}
+
+p.note, p.expect {
+  font-size: 0.85rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  margin: 0.8rem 0;
+}
+
+p.note {
+  background: rgba(255,255,255,0.03);
+  color: var(--text-dim);
+  border: 1px solid var(--panel-border);
+}
+
+p.expect {
+  background: rgba(51,196,129,0.08);
+  border: 1px solid rgba(51,196,129,0.35);
+  color: var(--text);
+}
+
+.foot {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  padding: 2rem 1rem;
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <span class="badge">Sesión 1 · MySQL / phpMyAdmin</span>
+    <h1>Base de Datos del Juego</h1>
+    <p class="subtitle">Guía visual de uso de los scripts SQL — orden, propósito y pasos en phpMyAdmin</p>
+    <button id="real-world-btn" class="real-world-btn" aria-haspopup="dialog">💼 ¿Dónde se usa esto en el mundo real?</button>
+  </div>
+</header>
+
+<div class="modal-overlay" id="real-world-modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="real-world-title">
+    <div class="modal-head">
+      <h2 id="real-world-title">💼 Estos comandos, fuera del aula</h2>
+      <button class="modal-close" id="real-world-close" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Lo que acabas de escribir — <code>PRIMARY KEY</code>, <code>FOREIGN KEY</code>, <code>UNIQUE</code>, <code>INDEX</code>, <code>JOIN</code>, procedimientos almacenados — no son ejercicios de clase. Son las mismas piezas que sostienen sistemas que mueven miles de millones de dólares, y que cuando fallan, se vuelven noticia mundial. Esta es una lista corta de casos reales, uno por cada concepto de esta sesión.</p>
+
+      <div class="rw-card">
+        <h3>PRIMARY KEY / AUTO_INCREMENT — identificar sin ambigüedad</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> los sistemas bancarios y de tarjetas de pago dependen de un identificador único e irrepetible por cada transacción; sin él, sería imposible distinguir un pago real de uno duplicado o fraudulento.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> cualquier sistema que registre "eventos" (compras, citas médicas, envíos) necesita esta idea — suele ser de las primeras preguntas en una entrevista técnica de bases de datos.</p>
+      </div>
+
+      <div class="rw-card">
+        <h3>FOREIGN KEY — que los datos no puedan "mentir"</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> SABRE, creado en los años 60 por American Airlines e IBM, fue uno de los primeros sistemas de reservas en tiempo real de la historia de la computación, construido después de años de vuelos con overbooking y reservas perdidas por procesos en papel. La regla de que un boleto no puede existir sin un vuelo válido detrás es, en esencia, una llave foránea.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> cualquier industria con inventario, reservas o citas (aerolíneas, hospitales, hoteles) se apoya en esta misma garantía de integridad.</p>
+      </div>
+
+      <div class="rw-card">
+        <h3>UNIQUE + control de concurrencia — no vender el mismo asiento dos veces</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> en 2022, la altísima demanda por boletos de una gira mundial saturó los sistemas de Ticketmaster: miles de compras fallaron o se duplicaron, con cobertura masiva en medios y hasta una audiencia en el Senado de EE. UU. Es el mismo problema que resolverás en la Sesión 3, bloqueando una fila para que dos jugadores no compren el mismo item único a la vez.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> comercio electrónico, boletería y videojuegos en vivo viven o mueren según resuelvan bien este problema.</p>
+      </div>
+
+      <div class="rw-card">
+        <h3>INDEX — la diferencia entre segundos y milisegundos</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> Stack Overflow documentó públicamente durante años que atendía millones de visitas diarias con sorprendentemente pocos servidores SQL Server, gracias sobre todo a un diseño de índices y consultas cuidadosamente optimizado — no a fuerza bruta de más máquinas.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> saber indexar bien puede ahorrarle a una empresa servidores completos (y mucho dinero en la nube).</p>
+      </div>
+
+      <div class="rw-card">
+        <h3>JOIN + GROUP BY (leaderboards y reportes) — de datos crudos a decisiones</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> estudios como Riot Games (League of Legends) documentan públicamente cómo construyen sus sistemas de leaderboards, estadísticas de partidas y matchmaking sobre infraestructura de datos — exactamente el mismo patrón de consultas que armaste en el Paso 3.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> todo panel de administración, reporte de ventas o dashboard de negocio nace de un JOIN + GROUP BY bien escrito.</p>
+      </div>
+
+      <div class="rw-card">
+        <h3>Procedimientos almacenados — reglas de negocio que no se pueden saltar</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> bancos y aseguradoras suelen centralizar reglas críticas (como el cálculo de intereses o la validación de una póliza) directamente en la base de datos mediante procedimientos almacenados, para que ninguna aplicación externa pueda saltárselas por error o accidente.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> es una de las razones por las que a los DBA y desarrolladores backend se les paga bien — son quienes garantizan que esas reglas nunca se rompan.</p>
+      </div>
+
+      <div class="rw-card rw-closing">
+        <h3>Un adelanto de por qué vas a aprender respaldos (Sesión 6)</h3>
+        <p class="rw-case">En 2017, un ingeniero de GitLab borró por error la base de datos de producción de gitlab.com. La empresa narró el incidente públicamente en tiempo real, y perdieron horas de datos porque sus respaldos automáticos llevaban tiempo fallando en silencio, sin que nadie lo notara. Sigue siendo uno de los casos más citados en la industria del software sobre por qué los respaldos no son opcionales — y por qué hay que probarlos, no solo configurarlos.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="layout">
+  <nav class="stepper" id="stepper" aria-label="Pasos de la sesión">
+    <button class="step active" data-target="paso-0">
+      <span class="step-num">0</span>
+      <span class="step-label">Abrir phpMyAdmin</span>
+    </button>
+    <button class="step" data-target="paso-1">
+      <span class="step-num">1</span>
+      <span class="step-label">Crear tablas</span>
+    </button>
+    <button class="step" data-target="paso-2">
+      <span class="step-num">2</span>
+      <span class="step-label">Datos de prueba</span>
+    </button>
+    <button class="step" data-target="paso-3">
+      <span class="step-num">3</span>
+      <span class="step-label">Consultas leaderboard</span>
+    </button>
+    <button class="step" data-target="paso-4">
+      <span class="step-num">4</span>
+      <span class="step-label">Subir nivel</span>
+    </button>
+  </nav>
+
+  <section class="content">
+
+    <article class="panel active" id="paso-0">
+      <h2>Paso 0 · Abrir phpMyAdmin</h2>
+      <p>No necesitas crear la base de datos a mano: el script del Paso 1 incluye <code>CREATE DATABASE IF NOT EXISTS juego_online</code>, así que se crea sola la primera vez que lo ejecutes.</p>
+      <ol class="steps-list">
+        <li>Entra a phpMyAdmin (normalmente <code>http://localhost/phpmyadmin</code>).</li>
+        <li>Ve a la pestaña <strong>SQL</strong> en la barra superior — ahí pegarás cada script.</li>
+      </ol>
+      <p class="note">Requiere MySQL 8.0.16+ o MariaDB 10.5+ (por las restricciones <code>CHECK</code> que se usan más adelante, en la Sesión 4).</p>
+    </article>
+
+    <article class="panel" id="paso-1">
+      <div class="panel-tag">scripts/01_crear_tablas.sql</div>
+      <h2>Paso 1 · Crear las tablas</h2>
+      <p>Define el modelo relacional completo: <strong>Jugadores</strong>, <strong>Juegos</strong>, <strong>Items</strong>, <strong>Inventario_Items</strong>, <strong>Partidas</strong> y <strong>Logros</strong>, con sus llaves primarias, foráneas e índices básicos.</p>
+      <ul class="checklist">
+        <li>Crea la base <code>juego_online</code> y 6 tablas relacionadas entre sí.</li>
+        <li>Agrega índices sobre <code>Partidas.jugador_id</code> e <code>Inventario_Items.jugador_id</code>.</li>
+        <li>Usa <code>DROP TABLE IF EXISTS</code> al inicio: se puede volver a ejecutar sin errores.</li>
+      </ul>
+      <div class="codeblock">
+        <div class="codeblock-head">
+          <span>en phpMyAdmin</span>
+        </div>
+        <ol class="steps-list">
+          <li>Pestaña <strong>SQL</strong> → pega el bloque de abajo (botón <em>Copiar SQL</em>).</li>
+          <li>Pulsa <strong>Continuar</strong>.</li>
+          <li>En el panel izquierdo aparecerá la base <code>juego_online</code> con sus 6 tablas.</li>
+        </ol>
+      </div>
+      <div class="codeblock sql">
+        <div class="codeblock-head">
+          <span>SQL — pégalo en la pestaña SQL de phpMyAdmin</span>
+          <span class="head-actions">
+            <button class="explain-btn" data-explain-target="#explain-paso1" aria-expanded="false">Explicar código</button>
+            <button class="copy-btn" data-copy-target="#sql-paso1">Copiar SQL</button>
+          </span>
+        </div>
+        <pre><code id="sql-paso1">-- Sesión 1: Modelo relacional de la plataforma de juego online
+-- Motor: MySQL / MariaDB (compatible con phpMyAdmin)
+-- Requiere MySQL 8.0.16+ o MariaDB 10.5+ (soporte de restricciones CHECK)
+
+CREATE DATABASE IF NOT EXISTS juego_online CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE juego_online;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS Logros;
+DROP TABLE IF EXISTS Partidas;
+DROP TABLE IF EXISTS Inventario_Items;
+DROP TABLE IF EXISTS Items;
+DROP TABLE IF EXISTS Juegos;
+DROP TABLE IF EXISTS Jugadores;
+SET FOREIGN_KEY_CHECKS = 1;
+
+CREATE TABLE Jugadores (
+    jugador_id      INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_usuario  VARCHAR(50)  NOT NULL UNIQUE,
+    email           VARCHAR(100) NOT NULL UNIQUE,
+    nivel           INT NOT NULL DEFAULT 1,
+    experiencia     INT NOT NULL DEFAULT 0,
+    monedas         INT NOT NULL DEFAULT 0,
+    region          VARCHAR(20) NOT NULL DEFAULT 'AMERICA',
+    fecha_registro  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE Juegos (
+    juego_id        INT AUTO_INCREMENT PRIMARY KEY,
+    nombre          VARCHAR(80) NOT NULL,
+    genero          VARCHAR(40),
+    fecha_lanzamiento DATE
+) ENGINE=InnoDB;
+
+CREATE TABLE Items (
+    item_id         INT AUTO_INCREMENT PRIMARY KEY,
+    nombre          VARCHAR(80) NOT NULL,
+    tipo            VARCHAR(30) NOT NULL,
+    rareza          VARCHAR(20) NOT NULL DEFAULT 'comun',
+    precio_monedas  INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB;
+
+CREATE TABLE Inventario_Items (
+    inventario_id   INT AUTO_INCREMENT PRIMARY KEY,
+    jugador_id      INT NOT NULL,
+    item_id         INT NOT NULL,
+    cantidad        INT NOT NULL DEFAULT 1,
+    fecha_obtencion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_jugador_item (jugador_id, item_id),
+    CONSTRAINT fk_inv_jugador FOREIGN KEY (jugador_id) REFERENCES Jugadores(jugador_id),
+    CONSTRAINT fk_inv_item    FOREIGN KEY (item_id) REFERENCES Items(item_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE Partidas (
+    partida_id      INT AUTO_INCREMENT PRIMARY KEY,
+    jugador_id      INT NOT NULL,
+    juego_id        INT NOT NULL,
+    puntaje         INT NOT NULL DEFAULT 0,
+    duracion_seg    INT NOT NULL DEFAULT 0,
+    resultado       VARCHAR(20) NOT NULL DEFAULT 'jugada',
+    fecha           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_partida_jugador FOREIGN KEY (jugador_id) REFERENCES Jugadores(jugador_id),
+    CONSTRAINT fk_partida_juego   FOREIGN KEY (juego_id) REFERENCES Juegos(juego_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE Logros (
+    logro_id        INT AUTO_INCREMENT PRIMARY KEY,
+    jugador_id      INT NOT NULL,
+    nombre_logro    VARCHAR(80) NOT NULL,
+    fecha_obtenido  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_logro_jugador FOREIGN KEY (jugador_id) REFERENCES Jugadores(jugador_id)
+) ENGINE=InnoDB;
+
+CREATE INDEX idx_partidas_jugador ON Partidas(jugador_id);
+CREATE INDEX idx_inventario_jugador ON Inventario_Items(jugador_id);</code></pre>
+      </div>
+      <div class="explain-panel" id="explain-paso1" hidden></div>
+      <div class="codeblock terminal">
+        <div class="codeblock-head">
+          <span>⚠ terminal (mysql CLI) — NO pegar en phpMyAdmin</span>
+          <button class="copy-btn" data-copy="mysql -u root -p < scripts/01_crear_tablas.sql">Copiar</button>
+        </div>
+        <pre><code>mysql -u root -p &lt; scripts/01_crear_tablas.sql</code></pre>
+        <span class="warn-text">Esto es un comando de <strong>terminal</strong> (cmd, PowerShell o bash) — pégalo en una consola, nunca en el cuadro SQL de phpMyAdmin.</span>
+      </div>
+      <p class="expect"><strong>Resultado esperado:</strong> la base <code>juego_online</code> aparece en el panel izquierdo con 6 tablas y 2 índices, sin errores.</p>
+    </article>
+
+    <article class="panel" id="paso-2">
+      <div class="panel-tag">scripts/02_datos_prueba.sql</div>
+      <h2>Paso 2 · Cargar datos de prueba</h2>
+      <p>Inserta 5 jugadores, 2 juegos, 4 items, inventarios y 7 partidas de ejemplo, más algunos logros. Sin este paso las consultas del Paso 3 devuelven tablas vacías.</p>
+      <div class="codeblock">
+        <div class="codeblock-head">
+          <span>en phpMyAdmin</span>
+        </div>
+        <ol class="steps-list">
+          <li>Selecciona la base <code>juego_online</code> en el panel izquierdo.</li>
+          <li>Pestaña <strong>SQL</strong> → pega el bloque de abajo (botón <em>Copiar SQL</em>) → <strong>Continuar</strong>.</li>
+        </ol>
+      </div>
+      <div class="codeblock sql">
+        <div class="codeblock-head">
+          <span>SQL — pégalo en la pestaña SQL de phpMyAdmin</span>
+          <span class="head-actions">
+            <button class="explain-btn" data-explain-target="#explain-paso2" aria-expanded="false">Explicar código</button>
+            <button class="copy-btn" data-copy-target="#sql-paso2">Copiar SQL</button>
+          </span>
+        </div>
+        <pre><code id="sql-paso2">-- Sesión 1: Datos de prueba (MySQL / MariaDB)
+USE juego_online;
+
+INSERT INTO Jugadores (nombre_usuario, email, nivel, experiencia, monedas, region) VALUES
+('DragonSlayer99', 'dragon99@game.com', 12, 340, 1500, 'AMERICA'),
+('ShadowNinja',    'shadow@game.com',   8,  120, 900,  'AMERICA'),
+('PixelQueen',     'pixel@game.com',   20,  980, 5000, 'EUROPA'),
+('NoobMaster',     'noob@game.com',    1,   10,  50,   'EUROPA'),
+('RocketFox',      'fox@game.com',     15,  600, 2200, 'AMERICA');
+
+INSERT INTO Juegos (nombre, genero, fecha_lanzamiento) VALUES
+('Battle Arena Online', 'Battle Royale', '2024-01-15'),
+('Dungeon Legends',     'RPG',           '2023-06-01');
+
+INSERT INTO Items (nombre, tipo, rareza, precio_monedas) VALUES
+('Skin Dragon Dorado',  'skin',  'legendaria', 2000),
+('Espada de Hielo',     'arma',  'epica',      800),
+('Poción de Vida x5',   'consumible', 'comun', 50),
+('Skin Sombra Ninja',   'skin',  'rara',       500);
+
+INSERT INTO Inventario_Items (jugador_id, item_id, cantidad) VALUES
+(1, 1, 1),
+(1, 3, 5),
+(2, 4, 1),
+(3, 1, 1),
+(3, 2, 1);
+
+INSERT INTO Partidas (jugador_id, juego_id, puntaje, duracion_seg, resultado) VALUES
+(1, 1, 4500, 620, 'victoria'),
+(1, 1, 3100, 540, 'derrota'),
+(2, 1, 2800, 480, 'derrota'),
+(3, 2, 9800, 900, 'victoria'),
+(3, 1, 7600, 700, 'victoria'),
+(4, 1, 300,  120, 'derrota'),
+(5, 2, 5200, 660, 'victoria');
+
+INSERT INTO Logros (jugador_id, nombre_logro) VALUES
+(3, 'Campeón Invicto'),
+(1, 'Coleccionista Legendario'),
+(5, 'Explorador de Mazmorras');</code></pre>
+      </div>
+      <div class="explain-panel" id="explain-paso2" hidden></div>
+      <div class="codeblock terminal">
+        <div class="codeblock-head">
+          <span>⚠ terminal (mysql CLI) — NO pegar en phpMyAdmin</span>
+          <button class="copy-btn" data-copy="mysql -u root -p juego_online < scripts/02_datos_prueba.sql">Copiar</button>
+        </div>
+        <pre><code>mysql -u root -p juego_online &lt; scripts/02_datos_prueba.sql</code></pre>
+        <span class="warn-text">Esto es un comando de <strong>terminal</strong> — pégalo en una consola, nunca en el cuadro SQL de phpMyAdmin.</span>
+      </div>
+      <p class="expect"><strong>Resultado esperado:</strong> al abrir la tabla <code>Jugadores</code> en phpMyAdmin (pestaña <em>Examinar</em>) se ven los 5 jugadores insertados.</p>
+      <p class="note">Requiere que el Paso 1 se haya ejecutado antes (las tablas deben existir).</p>
+    </article>
+
+    <article class="panel" id="paso-3">
+      <div class="panel-tag">scripts/03_consultas_leaderboard.sql</div>
+      <h2>Paso 3 · Consultas del leaderboard</h2>
+      <p>Cuatro consultas SQL listas para usar: tabla de clasificación general, leaderboard por juego, catálogo de items comprados y ranking de victorias.</p>
+
+      <div class="context-box">
+        <h3>¿Qué es un leaderboard y por qué importa?</h3>
+        <p>Un <strong>leaderboard</strong> (tabla de clasificación) es simplemente un ranking de jugadores ordenado por algún criterio: puntaje, victorias, nivel, etc. Detrás de esa lista tan simple que ves en cualquier juego online hay una consulta SQL con <code>JOIN</code>, <code>GROUP BY</code> y una función de agregación — exactamente lo que vas a construir en este paso.</p>
+        <p>No es solo una pantalla bonita: para el negocio detrás del juego es una de las piezas de datos más valiosas.</p>
+        <ul>
+          <li><strong>Retención de jugadores:</strong> ver tu posición (o la de tus amigos) motiva a volver a jugar para superarla — es uno de los mecanismos de "enganche" más usados en la industria.</li>
+          <li><strong>Competencia social:</strong> comparar resultados convierte una partida individual en una competencia colectiva, lo que aumenta el tiempo que un jugador pasa en la plataforma.</li>
+          <li><strong>Datos de negocio:</strong> el mismo tipo de consulta (agrupar y ordenar) sirve para detectar a los jugadores más activos, los que gastan más monedas, o los que llevan tiempo sin volver.</li>
+          <li><strong>Fundamento técnico transferible:</strong> <code>MAX()</code>, <code>SUM()</code>, <code>COUNT()</code>, <code>JOIN</code> y <code>GROUP BY</code> son la base de casi cualquier reporte o panel de estadísticas en una aplicación real, no solo de un juego.</li>
+        </ul>
+        <p>Las 4 consultas de este paso representan 4 casos de uso distintos que verás una y otra vez en el mundo real:</p>
+        <ul>
+          <li><strong>1 · Tabla de Clasificación:</strong> el ranking general "todos contra todos" que normalmente se muestra en el menú principal del juego.</li>
+          <li><strong>2 · Leaderboard por juego:</strong> el mismo ranking, pero acotado a un solo título — típico en plataformas que ofrecen varios juegos, como esta.</li>
+          <li><strong>3 · Catálogo de items comprados:</strong> no es un ranking, pero usa el mismo patrón de <code>JOIN</code> que verías en un historial de compras o un inventario visible para el jugador.</li>
+          <li><strong>4 · Ranking de victorias:</strong> una métrica distinta al puntaje acumulado — la tasa de victorias, clave en modos competitivos donde ganar importa más que la cantidad de puntos.</li>
+        </ul>
+      </div>
+
+      <div class="codeblock">
+        <div class="codeblock-head">
+          <span>en phpMyAdmin</span>
+        </div>
+        <ol class="steps-list">
+          <li>Pestaña <strong>SQL</strong> → pega <em>una</em> consulta a la vez (phpMyAdmin solo muestra el resultado de la última si pegas varias juntas).</li>
+          <li>Pulsa <strong>Continuar</strong> y revisa la tabla de resultados debajo.</li>
+        </ol>
+      </div>
+
+      <div class="codeblock sql">
+        <div class="codeblock-head">
+          <span>1 · Tabla de Clasificación (Leaderboard)</span>
+          <span class="head-actions">
+            <button class="explain-btn" data-explain-target="#explain-paso3a" aria-expanded="false">Explicar código</button>
+            <button class="copy-btn" data-copy-target="#sql-paso3a">Copiar SQL</button>
+          </span>
+        </div>
+        <pre><code id="sql-paso3a">SELECT
+    j.nombre_usuario,
+    j.nivel,
+    j.region,
+    MAX(p.puntaje) AS mejor_puntaje
+FROM Partidas p
+JOIN Jugadores j ON j.jugador_id = p.jugador_id
+GROUP BY j.jugador_id, j.nombre_usuario, j.nivel, j.region
+ORDER BY mejor_puntaje DESC;</code></pre>
+      </div>
+      <div class="explain-panel" id="explain-paso3a" hidden></div>
+
+      <div class="codeblock sql">
+        <div class="codeblock-head">
+          <span>2 · Leaderboard por juego específico</span>
+          <span class="head-actions">
+            <button class="explain-btn" data-explain-target="#explain-paso3b" aria-expanded="false">Explicar código</button>
+            <button class="copy-btn" data-copy-target="#sql-paso3b">Copiar SQL</button>
+          </span>
+        </div>
+        <pre><code id="sql-paso3b">SELECT
+    g.nombre AS juego,
+    j.nombre_usuario,
+    p.puntaje,
+    p.fecha
+FROM Partidas p
+JOIN Jugadores j ON j.jugador_id = p.jugador_id
+JOIN Juegos g ON g.juego_id = p.juego_id
+WHERE g.nombre = 'Battle Arena Online'
+ORDER BY p.puntaje DESC
+LIMIT 10;</code></pre>
+      </div>
+      <div class="explain-panel" id="explain-paso3b" hidden></div>
+
+      <div class="codeblock sql">
+        <div class="codeblock-head">
+          <span>3 · Catálogo de items comprados</span>
+          <span class="head-actions">
+            <button class="explain-btn" data-explain-target="#explain-paso3c" aria-expanded="false">Explicar código</button>
+            <button class="copy-btn" data-copy-target="#sql-paso3c">Copiar SQL</button>
+          </span>
+        </div>
+        <pre><code id="sql-paso3c">SELECT
+    j.nombre_usuario,
+    i.nombre AS item,
+    i.rareza,
+    ii.cantidad,
+    ii.fecha_obtencion
+FROM Inventario_Items ii
+JOIN Jugadores j ON j.jugador_id = ii.jugador_id
+JOIN Items i ON i.item_id = ii.item_id
+ORDER BY j.nombre_usuario, ii.fecha_obtencion;</code></pre>
+      </div>
+      <div class="explain-panel" id="explain-paso3c" hidden></div>
+
+      <div class="codeblock sql">
+        <div class="codeblock-head">
+          <span>4 · Ranking de victorias por jugador</span>
+          <span class="head-actions">
+            <button class="explain-btn" data-explain-target="#explain-paso3d" aria-expanded="false">Explicar código</button>
+            <button class="copy-btn" data-copy-target="#sql-paso3d">Copiar SQL</button>
+          </span>
+        </div>
+        <pre><code id="sql-paso3d">SELECT
+    j.nombre_usuario,
+    SUM(CASE WHEN p.resultado = 'victoria' THEN 1 ELSE 0 END) AS victorias,
+    COUNT(p.partida_id) AS partidas_jugadas
+FROM Jugadores j
+LEFT JOIN Partidas p ON p.jugador_id = j.jugador_id
+GROUP BY j.jugador_id, j.nombre_usuario
+ORDER BY victorias DESC;</code></pre>
+      </div>
+      <div class="explain-panel" id="explain-paso3d" hidden></div>
+
+      <p class="expect"><strong>Resultado esperado:</strong> 4 tablas de resultados, ordenadas por puntaje/victorias descendente.</p>
+      <p class="note">Tip: copia y pega cada consulta por separado en el cuadro SQL de phpMyAdmin durante la clase.</p>
+    </article>
+
+    <article class="panel" id="paso-4">
+      <div class="panel-tag">scripts/04_procedimiento_subir_nivel.sql</div>
+      <h2>Paso 4 · Procedimiento: subir de nivel</h2>
+      <p>Crea el procedimiento <code>subir_nivel_jugador(jugador_id, experiencia_ganada)</code>. Cada 500 puntos de experiencia acumulada sube 1 nivel; el resto se conserva como experiencia restante.</p>
+      <div class="codeblock">
+        <div class="codeblock-head">
+          <span>en phpMyAdmin</span>
+        </div>
+        <ol class="steps-list">
+          <li>Pestaña <strong>SQL</strong> → pega el bloque de abajo, incluido el <code>DELIMITER // ... //</code> (phpMyAdmin lo interpreta igual que la consola de MySQL).</li>
+          <li>Pulsa <strong>Continuar</strong>. El procedimiento queda guardado en <strong>Rutinas</strong> (pestaña de la base de datos).</li>
+        </ol>
+      </div>
+      <div class="codeblock sql">
+        <div class="codeblock-head">
+          <span>SQL — pégalo en la pestaña SQL de phpMyAdmin</span>
+          <span class="head-actions">
+            <button class="explain-btn" data-explain-target="#explain-paso4" aria-expanded="false">Explicar código</button>
+            <button class="copy-btn" data-copy-target="#sql-paso4">Copiar SQL</button>
+          </span>
+        </div>
+        <pre><code id="sql-paso4">-- Sesión 1: Procedimiento almacenado para subir de nivel a un jugador (MySQL / MariaDB)
+-- Regla: cada 500 puntos de experiencia acumulada sube 1 nivel; el sobrante se conserva.
+USE juego_online;
+
+DROP PROCEDURE IF EXISTS subir_nivel_jugador;
+
+DELIMITER //
+
+CREATE PROCEDURE subir_nivel_jugador(
+    IN p_jugador_id INT,
+    IN p_experiencia_ganada INT
+)
+BEGIN
+    DECLARE v_experiencia_total INT;
+    DECLARE v_niveles_ganados INT;
+
+    SELECT experiencia + p_experiencia_ganada INTO v_experiencia_total
+    FROM Jugadores WHERE jugador_id = p_jugador_id;
+
+    IF v_experiencia_total IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Jugador no existe';
+    END IF;
+
+    SET v_niveles_ganados = FLOOR(v_experiencia_total / 500);
+
+    UPDATE Jugadores
+    SET nivel = nivel + v_niveles_ganados,
+        experiencia = MOD(v_experiencia_total, 500)
+    WHERE jugador_id = p_jugador_id;
+
+    SELECT nivel AS nuevo_nivel, experiencia AS experiencia_restante
+    FROM Jugadores WHERE jugador_id = p_jugador_id;
+END //
+
+DELIMITER ;</code></pre>
+      </div>
+      <div class="explain-panel" id="explain-paso4" hidden></div>
+      <p class="expect"><strong>Resultado esperado:</strong> el jugador <code>NoobMaster</code> (id 4) sube de nivel 1 a nivel 3, con experiencia restante 210 (10 + 1200 = 1210 → 1210 ÷ 500 = 2 niveles, resto 210).</p>
+      <div class="codeblock sql">
+        <div class="codeblock-head">
+          <span>llamar al procedimiento manualmente</span>
+          <button class="copy-btn" data-copy="CALL subir_nivel_jugador(4, 1200);">Copiar</button>
+        </div>
+        <pre><code>CALL subir_nivel_jugador(4, 1200);</code></pre>
+      </div>
+    </article>
+
+  </section>
+</main>
+
+<footer class="foot">
+  <p>Guía de uso — Sesión 1: Base de Datos del Juego · Taller de Base de Datos (MySQL / phpMyAdmin)</p>
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const steps = document.querySelectorAll(".step");
+  const panels = document.querySelectorAll(".panel");
+
+  function activate(targetId) {
+    steps.forEach(s => s.classList.toggle("active", s.dataset.target === targetId));
+    panels.forEach(p => p.classList.toggle("active", p.id === targetId));
+    window.location.hash = targetId;
+  }
+
+  steps.forEach(step => {
+    step.addEventListener("click", () => activate(step.dataset.target));
+  });
+
+  const initial = window.location.hash.replace("#", "");
+  if (initial && document.getElementById(initial)) {
+    activate(initial);
+  }
+
+  /* ---------------------------------------------------------------
+     Modal: "¿Dónde se usa esto en el mundo real?"
+  --------------------------------------------------------------- */
+  const rwBtn = document.getElementById("real-world-btn");
+  const rwModal = document.getElementById("real-world-modal");
+  const rwClose = document.getElementById("real-world-close");
+
+  if (rwBtn && rwModal && rwClose) {
+    const openModal = () => {
+      rwModal.hidden = false;
+      rwClose.focus();
+    };
+    const closeModal = () => {
+      rwModal.hidden = true;
+      rwBtn.focus();
+    };
+
+    rwBtn.addEventListener("click", openModal);
+    rwClose.addEventListener("click", closeModal);
+    rwModal.addEventListener("click", (e) => {
+      if (e.target === rwModal) closeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !rwModal.hidden) closeModal();
+    });
+  }
+
+  /* ---------------------------------------------------------------
+     Explicación línea por línea del SQL (Paso 1)
+  --------------------------------------------------------------- */
+  const explainData = {
+    paso1: [
+      {
+        title: "Encabezado",
+        lines: [
+          ["-- Sesión 1: Modelo relacional de la plataforma de juego online", "Comentario: describe qué hace este archivo. Las líneas que empiezan con -- no se ejecutan, son solo notas para quien lee el código."],
+          ["-- Motor: MySQL / MariaDB (compatible con phpMyAdmin)", "Indica con qué motor de base de datos fue escrito este script."],
+          ["-- Requiere MySQL 8.0.16+ o MariaDB 10.5+ (soporte de restricciones CHECK)", "Avisa la versión mínima necesaria, porque en la Sesión 4 se usan restricciones CHECK que versiones viejas no soportan."]
+        ]
+      },
+      {
+        title: "Crear y seleccionar la base de datos",
+        lines: [
+          ["CREATE DATABASE IF NOT EXISTS juego_online CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", "Crea la base juego_online solo si no existe todavía (se puede ejecutar el script varias veces sin error). utf8mb4 permite guardar cualquier carácter (acentos, emojis); la collation define cómo se ordenan y comparan los textos."],
+          ["USE juego_online;", "Desde esta línea, todos los comandos siguientes se aplican dentro de la base juego_online."]
+        ]
+      },
+      {
+        title: "Limpiar tablas anteriores",
+        lines: [
+          ["SET FOREIGN_KEY_CHECKS = 0;", "Desactiva temporalmente la verificación de llaves foráneas, para poder borrar las tablas sin importar el orden."],
+          ["DROP TABLE IF EXISTS Logros;", "Borra la tabla Logros si ya existía, para empezar limpio cada vez que se ejecuta el script."],
+          ["DROP TABLE IF EXISTS Partidas;", "Borra la tabla Partidas si ya existía."],
+          ["DROP TABLE IF EXISTS Inventario_Items;", "Borra la tabla Inventario_Items si ya existía."],
+          ["DROP TABLE IF EXISTS Items;", "Borra la tabla Items si ya existía."],
+          ["DROP TABLE IF EXISTS Juegos;", "Borra la tabla Juegos si ya existía."],
+          ["DROP TABLE IF EXISTS Jugadores;", "Borra la tabla Jugadores si ya existía."],
+          ["SET FOREIGN_KEY_CHECKS = 1;", "Vuelve a activar la verificación de llaves foráneas antes de crear las tablas nuevas."]
+        ]
+      },
+      {
+        title: "Tabla Jugadores — la cuenta de cada usuario",
+        lines: [
+          ["CREATE TABLE Jugadores (", "Empieza a definir la tabla Jugadores."],
+          ["jugador_id INT AUTO_INCREMENT PRIMARY KEY,", "Identificador único del jugador. AUTO_INCREMENT hace que MySQL le asigne el número automáticamente (1, 2, 3…); PRIMARY KEY lo marca como identificador principal de la fila."],
+          ["nombre_usuario VARCHAR(50) NOT NULL UNIQUE,", "Nombre de usuario (hasta 50 caracteres). NOT NULL: obligatorio. UNIQUE: no puede repetirse entre jugadores."],
+          ["email VARCHAR(100) NOT NULL UNIQUE,", "Correo electrónico, también obligatorio y único."],
+          ["nivel INT NOT NULL DEFAULT 1,", "Nivel del jugador; si no se indica un valor al insertar, empieza en 1."],
+          ["experiencia INT NOT NULL DEFAULT 0,", "Puntos de experiencia acumulados; arranca en 0."],
+          ["monedas INT NOT NULL DEFAULT 0,", "Moneda virtual del jugador; arranca en 0."],
+          ["region VARCHAR(20) NOT NULL DEFAULT 'AMERICA',", "Región del servidor asignado (se usa en la Sesión 5 para fragmentar por región); por defecto AMERICA."],
+          ["fecha_registro DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP", "Fecha y hora de creación de la cuenta; se rellena sola con el momento exacto del INSERT."],
+          [") ENGINE=InnoDB;", "Cierra la tabla. InnoDB es el motor que soporta llaves foráneas, transacciones y bloqueo fila por fila (necesario en la Sesión 3)."]
+        ]
+      },
+      {
+        title: "Tabla Juegos — catálogo de juegos",
+        lines: [
+          ["CREATE TABLE Juegos (", "Empieza a definir la tabla Juegos."],
+          ["juego_id INT AUTO_INCREMENT PRIMARY KEY,", "Identificador único del juego, autogenerado."],
+          ["nombre VARCHAR(80) NOT NULL,", "Nombre del juego; obligatorio."],
+          ["genero VARCHAR(40),", "Género del juego (RPG, Battle Royale…); puede quedar vacío porque no tiene NOT NULL."],
+          ["fecha_lanzamiento DATE", "Fecha de lanzamiento, sin hora."],
+          [") ENGINE=InnoDB;", "Cierra la tabla Juegos."]
+        ]
+      },
+      {
+        title: "Tabla Items — catálogo de objetos comprables",
+        lines: [
+          ["CREATE TABLE Items (", "Empieza a definir la tabla Items."],
+          ["item_id INT AUTO_INCREMENT PRIMARY KEY,", "Identificador único del item, autogenerado."],
+          ["nombre VARCHAR(80) NOT NULL,", "Nombre del item; obligatorio."],
+          ["tipo VARCHAR(30) NOT NULL,", "Categoría del item: skin, arma, consumible, etc."],
+          ["rareza VARCHAR(20) NOT NULL DEFAULT 'comun',", "Nivel de rareza; por defecto \"comun\"."],
+          ["precio_monedas INT NOT NULL DEFAULT 0", "Costo del item en monedas del juego; por defecto 0."],
+          [") ENGINE=InnoDB;", "Cierra la tabla Items."]
+        ]
+      },
+      {
+        title: "Tabla Inventario_Items — qué items tiene cada jugador",
+        lines: [
+          ["CREATE TABLE Inventario_Items (", "Empieza a definir la tabla Inventario_Items."],
+          ["inventario_id INT AUTO_INCREMENT PRIMARY KEY,", "Identificador único de esta fila de inventario."],
+          ["jugador_id INT NOT NULL,", "A qué jugador pertenece este item."],
+          ["item_id INT NOT NULL,", "Qué item es."],
+          ["cantidad INT NOT NULL DEFAULT 1,", "Cuántas copias tiene el jugador; por defecto 1."],
+          ["fecha_obtencion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,", "Cuándo obtuvo el item."],
+          ["UNIQUE KEY uq_jugador_item (jugador_id, item_id),", "Un jugador no puede tener dos filas separadas del mismo item — se debe sumar la cantidad en su lugar."],
+          ["CONSTRAINT fk_inv_jugador FOREIGN KEY (jugador_id) REFERENCES Jugadores(jugador_id),", "Llave foránea: jugador_id debe existir en la tabla Jugadores."],
+          ["CONSTRAINT fk_inv_item    FOREIGN KEY (item_id) REFERENCES Items(item_id)", "Llave foránea: item_id debe existir en la tabla Items."],
+          [") ENGINE=InnoDB;", "Cierra la tabla Inventario_Items."]
+        ]
+      },
+      {
+        title: "Tabla Partidas — historial de partidas jugadas",
+        lines: [
+          ["CREATE TABLE Partidas (", "Empieza a definir la tabla Partidas."],
+          ["partida_id INT AUTO_INCREMENT PRIMARY KEY,", "Identificador único de la partida."],
+          ["jugador_id INT NOT NULL,", "Quién jugó esta partida."],
+          ["juego_id INT NOT NULL,", "En qué juego se jugó."],
+          ["puntaje INT NOT NULL DEFAULT 0,", "Puntos obtenidos; es el valor que usa el leaderboard."],
+          ["duracion_seg INT NOT NULL DEFAULT 0,", "Duración de la partida, en segundos."],
+          ["resultado VARCHAR(20) NOT NULL DEFAULT 'jugada',", "Resultado: victoria, derrota, o \"jugada\" por defecto si no se especifica."],
+          ["fecha DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,", "Cuándo se jugó la partida."],
+          ["CONSTRAINT fk_partida_jugador FOREIGN KEY (jugador_id) REFERENCES Jugadores(jugador_id),", "Llave foránea: jugador_id debe existir en Jugadores."],
+          ["CONSTRAINT fk_partida_juego   FOREIGN KEY (juego_id) REFERENCES Juegos(juego_id)", "Llave foránea: juego_id debe existir en Juegos."],
+          [") ENGINE=InnoDB;", "Cierra la tabla Partidas."]
+        ]
+      },
+      {
+        title: "Tabla Logros — medallas desbloqueadas",
+        lines: [
+          ["CREATE TABLE Logros (", "Empieza a definir la tabla Logros."],
+          ["logro_id INT AUTO_INCREMENT PRIMARY KEY,", "Identificador único del logro obtenido."],
+          ["jugador_id INT NOT NULL,", "Quién desbloqueó el logro."],
+          ["nombre_logro VARCHAR(80) NOT NULL,", "Nombre del logro; obligatorio."],
+          ["fecha_obtenido DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,", "Cuándo se desbloqueó."],
+          ["CONSTRAINT fk_logro_jugador FOREIGN KEY (jugador_id) REFERENCES Jugadores(jugador_id)", "Llave foránea: jugador_id debe existir en Jugadores."],
+          [") ENGINE=InnoDB;", "Cierra la tabla Logros."]
+        ]
+      },
+      {
+        title: "Índices — para que las consultas sean rápidas",
+        lines: [
+          ["CREATE INDEX idx_partidas_jugador ON Partidas(jugador_id);", "Crea un índice sobre jugador_id en Partidas, para que buscar o agrupar las partidas de un jugador (como en el leaderboard) sea rápido incluso con miles de filas."],
+          ["CREATE INDEX idx_inventario_jugador ON Inventario_Items(jugador_id);", "Mismo motivo, pero para consultar el inventario de un jugador rápidamente."]
+        ]
+      }
+    ],
+    paso2: [
+      {
+        title: "Encabezado y contexto",
+        lines: [
+          ["-- Sesión 1: Datos de prueba (MySQL / MariaDB)", "Comentario descriptivo del archivo."],
+          ["USE juego_online;", "Selecciona la base juego_online antes de insertar, para no insertar por error en otra base."]
+        ]
+      },
+      {
+        title: "Jugadores de ejemplo",
+        lines: [
+          ["INSERT INTO Jugadores (nombre_usuario, email, nivel, experiencia, monedas, region) VALUES", "Empieza a insertar filas en Jugadores, indicando en qué columna va cada valor de la lista."],
+          ["('DragonSlayer99', 'dragon99@game.com', 12, 340, 1500, 'AMERICA'),", "Jugador 1: nivel 12, 340 de experiencia, 1500 monedas, región América."],
+          ["('ShadowNinja',    'shadow@game.com',   8,  120, 900,  'AMERICA'),", "Jugador 2: nivel 8."],
+          ["('PixelQueen',     'pixel@game.com',   20,  980, 5000, 'EUROPA'),", "Jugador 3: el de mayor nivel (20), región Europa."],
+          ["('NoobMaster',     'noob@game.com',    1,   10,  50,   'EUROPA'),", "Jugador 4: recién empieza (nivel 1) — es el que sube de nivel en el Paso 4."],
+          ["('RocketFox',      'fox@game.com',     15,  600, 2200, 'AMERICA');", "Jugador 5, y fin de esta lista de valores (nota el ; final)."]
+        ]
+      },
+      {
+        title: "Juegos e items del catálogo",
+        lines: [
+          ["INSERT INTO Juegos (nombre, genero, fecha_lanzamiento) VALUES", "Empieza a insertar los juegos disponibles en la plataforma."],
+          ["('Battle Arena Online', 'Battle Royale', '2024-01-15'),", "Primer juego del catálogo."],
+          ["('Dungeon Legends',     'RPG',           '2023-06-01');", "Segundo juego del catálogo."],
+          ["INSERT INTO Items (nombre, tipo, rareza, precio_monedas) VALUES", "Empieza a insertar los items comprables."],
+          ["('Skin Dragon Dorado',  'skin',  'legendaria', 2000),", "Item legendario — este es el que se marca como \"único\" más adelante, en la Sesión 3."],
+          ["('Espada de Hielo',     'arma',  'epica',      800),", "Arma de rareza épica."],
+          ["('Poción de Vida x5',   'consumible', 'comun', 50),", "Consumible barato, rareza común."],
+          ["('Skin Sombra Ninja',   'skin',  'rara',       500);", "Skin de rareza rara."]
+        ]
+      },
+      {
+        title: "Inventario de cada jugador",
+        lines: [
+          ["INSERT INTO Inventario_Items (jugador_id, item_id, cantidad) VALUES", "Asigna items a jugadores usando los IDs que MySQL les fue asignando automáticamente al insertarlos arriba."],
+          ["(1, 1, 1),", "El jugador 1 (DragonSlayer99) tiene 1 unidad del item 1 (Skin Dragon Dorado)."],
+          ["(1, 3, 5),", "El jugador 1 también tiene 5 unidades del item 3 (Poción de Vida)."],
+          ["(2, 4, 1),", "El jugador 2 (ShadowNinja) tiene 1 unidad del item 4 (Skin Sombra Ninja)."],
+          ["(3, 1, 1),", "El jugador 3 (PixelQueen) también tiene el item 1."],
+          ["(3, 2, 1);", "El jugador 3 tiene además el item 2 (Espada de Hielo)."]
+        ]
+      },
+      {
+        title: "Historial de partidas y logros",
+        lines: [
+          ["INSERT INTO Partidas (jugador_id, juego_id, puntaje, duracion_seg, resultado) VALUES", "Empieza a insertar el historial de partidas jugadas — esto es lo que alimenta al leaderboard del Paso 3."],
+          ["(1, 1, 4500, 620, 'victoria'),", "Jugador 1 ganó con 4500 puntos."],
+          ["(1, 1, 3100, 540, 'derrota'),", "Jugador 1 perdió en otra partida."],
+          ["(2, 1, 2800, 480, 'derrota'),", "Jugador 2 perdió."],
+          ["(3, 2, 9800, 900, 'victoria'),", "Jugador 3 ganó con el puntaje más alto de todos (9800) — encabezará el leaderboard."],
+          ["(3, 1, 7600, 700, 'victoria'),", "Jugador 3 ganó otra partida distinta."],
+          ["(4, 1, 300,  120, 'derrota'),", "Jugador 4 (NoobMaster) perdió con muy pocos puntos."],
+          ["(5, 2, 5200, 660, 'victoria');", "Jugador 5 ganó."],
+          ["INSERT INTO Logros (jugador_id, nombre_logro) VALUES", "Empieza a insertar los logros ya desbloqueados por algunos jugadores."],
+          ["(3, 'Campeón Invicto'),", "Logro del jugador 3."],
+          ["(1, 'Coleccionista Legendario'),", "Logro del jugador 1."],
+          ["(5, 'Explorador de Mazmorras');", "Logro del jugador 5."]
+        ]
+      }
+    ],
+    paso3a: [
+      {
+        title: "Consulta 1 — Tabla de Clasificación",
+        lines: [
+          ["SELECT", "Empieza a indicar qué columnas se van a mostrar en el resultado."],
+          ["j.nombre_usuario,", "Muestra el nombre del jugador."],
+          ["j.nivel,", "Muestra su nivel actual."],
+          ["j.region,", "Muestra su región."],
+          ["MAX(p.puntaje) AS mejor_puntaje", "Calcula el puntaje más alto entre todas sus partidas y lo nombra mejor_puntaje."],
+          ["FROM Partidas p", "Toma los datos desde la tabla Partidas, usando p como alias corto."],
+          ["JOIN Jugadores j ON j.jugador_id = p.jugador_id", "Une cada partida con el jugador que la jugó, comparando sus IDs."],
+          ["GROUP BY j.jugador_id, j.nombre_usuario, j.nivel, j.region", "Agrupa todas las partidas de un mismo jugador en una sola fila — necesario para poder usar MAX()."],
+          ["ORDER BY mejor_puntaje DESC;", "Ordena el resultado de mayor a menor puntaje: así se arma el leaderboard."]
+        ]
+      }
+    ],
+    paso3b: [
+      {
+        title: "Consulta 2 — Leaderboard por juego",
+        lines: [
+          ["SELECT", "Empieza a indicar qué columnas se van a mostrar."],
+          ["g.nombre AS juego,", "Muestra el nombre del juego."],
+          ["j.nombre_usuario,", "Muestra el nombre del jugador."],
+          ["p.puntaje,", "Muestra el puntaje obtenido en esa partida."],
+          ["p.fecha", "Muestra cuándo se jugó."],
+          ["FROM Partidas p", "Parte desde la tabla Partidas."],
+          ["JOIN Jugadores j ON j.jugador_id = p.jugador_id", "Une cada partida con el jugador correspondiente."],
+          ["JOIN Juegos g ON g.juego_id = p.juego_id", "Une también con el juego en el que se jugó esa partida."],
+          ["WHERE g.nombre = 'Battle Arena Online'", "Filtra: solo las partidas jugadas en ese juego específico."],
+          ["ORDER BY p.puntaje DESC", "Ordena de mayor a menor puntaje."],
+          ["LIMIT 10;", "Muestra solo los primeros 10 resultados (el top 10)."]
+        ]
+      }
+    ],
+    paso3c: [
+      {
+        title: "Consulta 3 — Catálogo de items comprados",
+        lines: [
+          ["SELECT", "Empieza a indicar qué columnas se van a mostrar."],
+          ["j.nombre_usuario,", "Muestra el nombre del jugador dueño del item."],
+          ["i.nombre AS item,", "Muestra el nombre del item."],
+          ["i.rareza,", "Muestra la rareza del item."],
+          ["ii.cantidad,", "Muestra cuántas copias tiene ese jugador."],
+          ["ii.fecha_obtencion", "Muestra cuándo lo obtuvo."],
+          ["FROM Inventario_Items ii", "Parte desde la tabla Inventario_Items, con alias ii."],
+          ["JOIN Jugadores j ON j.jugador_id = ii.jugador_id", "Une cada fila de inventario con el jugador dueño."],
+          ["JOIN Items i ON i.item_id = ii.item_id", "Une también con los datos del item (nombre, rareza)."],
+          ["ORDER BY j.nombre_usuario, ii.fecha_obtencion;", "Ordena alfabéticamente por jugador y, dentro de cada uno, por fecha de obtención."]
+        ]
+      }
+    ],
+    paso3d: [
+      {
+        title: "Consulta 4 — Ranking de victorias",
+        lines: [
+          ["SELECT", "Empieza a indicar qué columnas se van a mostrar."],
+          ["j.nombre_usuario,", "Muestra el nombre del jugador."],
+          ["SUM(CASE WHEN p.resultado = 'victoria' THEN 1 ELSE 0 END) AS victorias,", "Cuenta cuántas partidas de ese jugador terminaron en 'victoria': suma 1 cada vez que se cumple, 0 si no."],
+          ["COUNT(p.partida_id) AS partidas_jugadas", "Cuenta el total de partidas jugadas por ese jugador."],
+          ["FROM Jugadores j", "Parte desde la tabla Jugadores (no desde Partidas, para incluir también a quien no jugó nada)."],
+          ["LEFT JOIN Partidas p ON p.jugador_id = j.jugador_id", "Une con sus partidas; LEFT JOIN asegura que un jugador sin partidas siga apareciendo, con 0."],
+          ["GROUP BY j.jugador_id, j.nombre_usuario", "Agrupa las partidas por jugador para poder contar y sumar por cada uno."],
+          ["ORDER BY victorias DESC;", "Ordena del jugador con más victorias al que tiene menos."]
+        ]
+      }
+    ],
+    paso4: [
+      {
+        title: "Encabezado",
+        lines: [
+          ["-- Sesión 1: Procedimiento almacenado para subir de nivel a un jugador (MySQL / MariaDB)", "Comentario descriptivo del archivo."],
+          ["-- Regla: cada 500 puntos de experiencia acumulada sube 1 nivel; el sobrante se conserva.", "Explica la regla de negocio que implementa el procedimiento."],
+          ["USE juego_online;", "Selecciona la base de datos donde se creará el procedimiento."]
+        ]
+      },
+      {
+        title: "Preparar el procedimiento",
+        lines: [
+          ["DROP PROCEDURE IF EXISTS subir_nivel_jugador;", "Borra una versión anterior del procedimiento si existía, para poder recrearlo sin error."],
+          ["DELIMITER //", "Cambia temporalmente el carácter que separa sentencias (de ; a //): el procedimiento tiene varios ; adentro y no queremos que MySQL lo corte a la mitad."]
+        ]
+      },
+      {
+        title: "Definición del procedimiento",
+        lines: [
+          ["CREATE PROCEDURE subir_nivel_jugador(", "Empieza a crear el procedimiento con ese nombre."],
+          ["IN p_jugador_id INT,", "Primer parámetro de entrada: el ID del jugador."],
+          ["IN p_experiencia_ganada INT", "Segundo parámetro de entrada: cuánta experiencia ganó."],
+          [")", "Cierra la lista de parámetros."],
+          ["BEGIN", "Empieza el cuerpo del procedimiento (el bloque de instrucciones)."],
+          ["DECLARE v_experiencia_total INT;", "Crea una variable temporal para guardar la experiencia total acumulada."],
+          ["DECLARE v_niveles_ganados INT;", "Crea otra variable temporal para los niveles que se van a sumar."],
+          ["SELECT experiencia + p_experiencia_ganada INTO v_experiencia_total", "Suma la experiencia actual del jugador más la nueva, y guarda el resultado en la variable."],
+          ["FROM Jugadores WHERE jugador_id = p_jugador_id;", "Busca esa fila específica usando el ID recibido como parámetro."],
+          ["IF v_experiencia_total IS NULL THEN", "Si no se encontró ningún jugador con ese ID (la suma dio NULL)…"],
+          ["SIGNAL SQLSTATE '45000'", "…lanza un error personalizado…"],
+          ["SET MESSAGE_TEXT = 'Jugador no existe';", "…con este mensaje de error."],
+          ["END IF;", "Cierra el bloque condicional."],
+          ["SET v_niveles_ganados = FLOOR(v_experiencia_total / 500);", "Calcula cuántos niveles completos corresponden (división entera entre 500)."],
+          ["UPDATE Jugadores", "Empieza a actualizar la fila de ese jugador."],
+          ["SET nivel = nivel + v_niveles_ganados,", "Le suma los niveles ganados al nivel actual."],
+          ["experiencia = MOD(v_experiencia_total, 500)", "Guarda el resto de la división como la experiencia restante (lo que no alcanzó para otro nivel)."],
+          ["WHERE jugador_id = p_jugador_id;", "Aplica el cambio solo a ese jugador."],
+          ["SELECT nivel AS nuevo_nivel, experiencia AS experiencia_restante", "Al final, muestra el resultado: el nuevo nivel y la experiencia restante."],
+          ["FROM Jugadores WHERE jugador_id = p_jugador_id;", "Leyendo los datos ya actualizados de ese mismo jugador."],
+          ["END //", "Cierra el cuerpo del procedimiento (usando el delimitador // definido arriba)."]
+        ]
+      },
+      {
+        title: "Restaurar el delimitador",
+        lines: [
+          ["DELIMITER ;", "Devuelve el delimitador normal (;) para que las siguientes instrucciones del archivo funcionen como de costumbre."]
+        ]
+      }
+    ]
+  };
+
+  document.querySelectorAll(".explain-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const panel = document.querySelector(btn.dataset.explainTarget);
+      if (!panel) return;
+
+      const isOpen = !panel.hidden;
+      if (isOpen) {
+        panel.hidden = true;
+        btn.setAttribute("aria-expanded", "false");
+        btn.textContent = "Explicar código";
+        return;
+      }
+
+      if (!panel.dataset.rendered) {
+        const key = btn.dataset.explainTarget.replace("#explain-", "");
+        const groups = explainData[key] || [];
+        groups.forEach(group => {
+          const groupEl = document.createElement("div");
+          groupEl.className = "explain-group";
+
+          const titleEl = document.createElement("div");
+          titleEl.className = "explain-group-title";
+          titleEl.textContent = group.title;
+          groupEl.appendChild(titleEl);
+
+          group.lines.forEach(([code, note]) => {
+            const row = document.createElement("div");
+            row.className = "explain-row";
+
+            const codeEl = document.createElement("div");
+            codeEl.className = "explain-code";
+            codeEl.textContent = code;
+
+            const noteEl = document.createElement("div");
+            noteEl.className = "explain-note";
+            noteEl.textContent = note;
+
+            row.appendChild(codeEl);
+            row.appendChild(noteEl);
+            groupEl.appendChild(row);
+          });
+
+          panel.appendChild(groupEl);
+        });
+        panel.dataset.rendered = "true";
+      }
+
+      panel.hidden = false;
+      btn.setAttribute("aria-expanded", "true");
+      btn.textContent = "Ocultar explicación";
+    });
+  });
+
+  document.querySelectorAll(".copy-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      let text = btn.dataset.copy;
+      if (text === undefined && btn.dataset.copyTarget) {
+        const target = document.querySelector(btn.dataset.copyTarget);
+        text = target ? target.textContent : "";
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (err) {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+      const original = btn.textContent;
+      btn.textContent = "Copiado";
+      btn.classList.add("copied");
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove("copied");
+      }, 1200);
+    });
+  });
+});
+</script>
+</body>
+</html>
