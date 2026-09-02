@@ -1,0 +1,993 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía de Scripts — Sesión 2</title>
+<style>
+:root {
+  --bg: #0f1115;
+  --panel: #171a21;
+  --panel-border: #262a33;
+  --text: #e8eaed;
+  --text-dim: #9aa0ac;
+  --accent: #7c5cff;
+  --accent-dim: #4b3aa8;
+  --code-bg: #0b0d12;
+  --success: #33c481;
+  --warn: #ffb454;
+  --warn-bg: rgba(255,180,84,0.08);
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.topbar {
+  border-bottom: 1px solid var(--panel-border);
+  padding: 2rem 1.5rem 1.5rem;
+  background: linear-gradient(180deg, rgba(124,92,255,0.08), transparent);
+}
+
+.topbar-inner { max-width: 960px; margin: 0 auto; }
+
+.badge {
+  display: inline-block;
+  background: var(--accent);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+}
+
+.topbar h1 { margin: 0 0 0.3rem; font-size: 1.8rem; }
+.subtitle { margin: 0 0 0.9rem; color: var(--text-dim); }
+
+.real-world-btn {
+  background: linear-gradient(135deg, var(--accent), #5a3fd6);
+  color: white;
+  border: none;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(124,92,255,0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.real-world-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(124,92,255,0.45); }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6,7,10,0.72);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 100;
+}
+.modal-overlay[hidden] { display: none; }
+
+.modal {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  max-width: 720px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: modal-in 0.2s ease-out;
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.3rem;
+  border-bottom: 1px solid var(--panel-border);
+  flex-shrink: 0;
+}
+.modal-head h2 { margin: 0; font-size: 1.15rem; }
+
+.modal-close {
+  background: var(--panel-border);
+  color: var(--text);
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.modal-close:hover { background: var(--accent-dim); }
+
+.modal-body {
+  padding: 1.2rem 1.3rem 1.5rem;
+  overflow-y: auto;
+}
+.modal-body > p { color: var(--text-dim); font-size: 0.9rem; margin-top: 0; }
+
+.rw-card {
+  background: var(--code-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.8rem;
+}
+.rw-card h3 { margin: 0 0 0.5rem; font-size: 0.92rem; color: var(--accent); }
+.rw-card p { margin: 0 0 0.4rem; font-size: 0.85rem; color: var(--text); line-height: 1.5; }
+.rw-card p:last-child { margin-bottom: 0; }
+.rw-card .rw-why { color: var(--text-dim); }
+.rw-card.rw-closing { border-color: var(--accent-dim); background: rgba(124,92,255,0.06); }
+.rw-card.rw-closing h3 { color: var(--text); }
+
+.layout {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 720px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+.stepper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  position: sticky;
+  top: 1.5rem;
+  align-self: start;
+}
+
+@media (max-width: 720px) {
+  .stepper {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  color: var(--text-dim);
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.9rem;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+.step:hover { border-color: var(--accent-dim); color: var(--text); }
+
+.step.active {
+  background: rgba(124,92,255,0.12);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--panel-border);
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.step.active .step-num { background: var(--accent); color: white; }
+
+.content { min-width: 0; }
+
+.panel {
+  display: none;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  animation: fade 0.2s ease;
+}
+
+.panel.active { display: block; }
+
+@keyframes fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel-tag {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+  color: var(--accent);
+  background: rgba(124,92,255,0.1);
+  border: 1px solid var(--accent-dim);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  margin-bottom: 0.8rem;
+}
+
+.panel h2 { margin-top: 0; }
+
+.checklist {
+  padding-left: 1.2rem;
+  color: var(--text-dim);
+}
+.checklist li { margin-bottom: 0.35rem; }
+.checklist code { color: var(--text); }
+
+.steps-list {
+  padding-left: 1.2rem;
+  margin: 0.4rem 0;
+}
+.steps-list li { margin-bottom: 0.4rem; }
+.steps-list code { color: var(--accent); }
+
+.context-box {
+  background: rgba(124,92,255,0.05);
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  margin: 1rem 0 1.2rem;
+}
+
+.context-box h3 {
+  margin: 0 0 0.6rem;
+  font-size: 1rem;
+  color: var(--accent);
+}
+
+.context-box p {
+  margin: 0 0 0.7rem;
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.context-box ul {
+  margin: 0 0 0.9rem;
+  padding-left: 1.2rem;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+.context-box ul:last-child { margin-bottom: 0; }
+.context-box li { margin-bottom: 0.45rem; }
+.context-box li strong { color: var(--text); }
+.context-box code { color: var(--accent); }
+
+.codeblock {
+  background: var(--code-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.codeblock-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0.7rem;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--panel-border);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.head-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
+
+.copy-btn {
+  background: var(--panel-border);
+  color: var(--text);
+  border: none;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.copy-btn:hover { background: var(--accent-dim); }
+.copy-btn.copied { background: var(--success); color: #06251a; }
+
+.explain-btn {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent-dim);
+  padding: 0.24rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.explain-btn:hover { background: rgba(124,92,255,0.12); }
+.explain-btn[aria-expanded="true"] { background: var(--accent); color: white; border-color: var(--accent); }
+
+.explain-panel {
+  background: var(--code-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  margin: -0.4rem 0 1rem;
+  padding: 0.9rem 1rem;
+  max-height: 420px;
+  overflow-y: auto;
+}
+.explain-panel[hidden] { display: none; }
+
+.explain-group + .explain-group { margin-top: 1rem; }
+
+.explain-group-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.explain-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 0.4rem 1rem;
+  padding: 0.35rem 0;
+  border-top: 1px solid var(--panel-border);
+  font-size: 0.82rem;
+}
+.explain-row:first-child { border-top: none; }
+
+@media (max-width: 640px) {
+  .explain-row { grid-template-columns: 1fr; gap: 0.15rem; }
+}
+
+.explain-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.76rem;
+  color: var(--accent);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.explain-note { color: var(--text-dim); }
+
+/* bloque SQL: la acción principal — esto SÍ se pega en el cuadro SQL de phpMyAdmin */
+.codeblock.sql { border-color: var(--accent-dim); }
+.codeblock.sql .codeblock-head {
+  background: rgba(124,92,255,0.08);
+  color: var(--accent);
+  font-weight: 600;
+}
+.codeblock.sql pre { max-height: 320px; overflow-y: auto; }
+
+/* bloque de terminal: acción alternativa — NUNCA se pega en phpMyAdmin */
+.codeblock.terminal { border-color: rgba(255,180,84,0.35); }
+.codeblock.terminal .codeblock-head {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.codeblock.terminal .warn-text {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--warn);
+  background: var(--warn-bg);
+  border-top: 1px solid rgba(255,180,84,0.25);
+  padding: 0.5rem 0.7rem;
+}
+
+pre {
+  margin: 0;
+  padding: 0.8rem;
+  overflow-x: auto;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+}
+
+p.note, p.expect {
+  font-size: 0.85rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  margin: 0.8rem 0;
+}
+
+p.note {
+  background: rgba(255,255,255,0.03);
+  color: var(--text-dim);
+  border: 1px solid var(--panel-border);
+}
+
+p.expect {
+  background: rgba(51,196,129,0.08);
+  border: 1px solid rgba(51,196,129,0.35);
+  color: var(--text);
+}
+
+.role-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0.9rem 0;
+}
+
+.role-details {
+  background: var(--code-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.role-details[open] { border-color: var(--accent-dim); }
+
+.role-summary {
+  cursor: pointer;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--text);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.role-summary::-webkit-details-marker { display: none; }
+
+.role-summary::after {
+  content: "+";
+  flex-shrink: 0;
+  color: var(--accent);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.role-details[open] .role-summary::after { content: "\2212"; }
+
+.role-summary:hover { color: var(--accent); }
+
+.role-tag {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.role-body {
+  padding: 0 1rem 1rem;
+  border-top: 1px solid var(--panel-border);
+  padding-top: 0.8rem;
+  animation: fade 0.15s ease;
+}
+
+.role-body p {
+  margin: 0 0 0.6rem;
+  font-size: 0.87rem;
+  color: var(--text-dim);
+  line-height: 1.55;
+}
+.role-body p:last-child { margin-bottom: 0; }
+.role-body strong { color: var(--text); }
+
+.role-summary-note {
+  margin: 0.8rem 0 0;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+.foot {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  padding: 2rem 1rem;
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <span class="badge">Sesión 2 · MySQL / phpMyAdmin</span>
+    <h1>Servidores y Roles de Administración</h1>
+    <p class="subtitle">Guía visual de uso de los scripts SQL — arquitectura del servidor y roles DBA / SA / DA</p>
+    <button id="real-world-btn" class="real-world-btn" aria-haspopup="dialog">💼 ¿Dónde se usa esto en el mundo real?</button>
+  </div>
+</header>
+
+<div class="modal-overlay" id="real-world-modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="real-world-title">
+    <div class="modal-head">
+      <h2 id="real-world-title">💼 Estos comandos, fuera del aula</h2>
+      <button class="modal-close" id="real-world-close" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Separar quién puede hacer qué en un servidor no es burocracia — es la diferencia entre un incidente controlado y una filtración masiva de datos. Esta es una lista corta de casos reales, uno por cada idea de esta sesión.</p>
+
+      <div class="rw-card">
+        <h3>Separación de roles (DBA / SA / DA) — que nadie tenga más poder del necesario</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> normas como PCI-DSS (pagos con tarjeta) y SOX (finanzas) exigen por ley "segregación de funciones": quien administra la base de datos no debe ser la misma persona que aprueba o audita las transacciones, para que un solo empleado no pueda cometer y ocultar un fraude por sí mismo.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> en cualquier empresa mediana en adelante, los accesos a producción están divididos exactamente así — nunca "todos son administradores".</p>
+      </div>
+
+      <div class="rw-card">
+        <h3>Principio de mínimo privilegio — dar solo el acceso que se necesita</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> la filtración de Capital One en 2019 (más de 100 millones de clientes expuestos) ocurrió porque un rol técnico en la nube tenía permisos mucho más amplios de los que su función realmente requería; un atacante que comprometió ese rol pudo leer datos que no le correspondían a esa tarea.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> es la razón por la que el rol <code>analista_da</code> de este script solo tiene <code>SELECT</code> — ni siquiera puede borrar una fila por accidente.</p>
+      </div>
+
+      <div class="rw-card">
+        <h3>SA sin acceso a datos de negocio — monitorear sin poder leer información sensible</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> en bancos y hospitales, los equipos de infraestructura (SRE/DevOps) suelen tener acceso para reiniciar servicios, ver el estado del servidor y revisar procesos — pero explícitamente <em>no</em> pueden abrir las tablas con historiales médicos o saldos de cuentas. Es un requisito habitual de cumplimiento normativo.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> reduce el "riesgo interno" — si ese usuario se ve comprometido, el daño posible es mucho menor.</p>
+      </div>
+
+      <div class="rw-card">
+        <h3>Cuentas de solo lectura para analistas — no competir con la producción</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> las plataformas de streaming y juegos online suelen dar a sus equipos de datos/BI acceso de solo lectura (a veces sobre una réplica separada), para que una consulta pesada de un analista nunca ralentice ni corrompa el servidor que atienden los jugadores en vivo.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> es el mismo patrón detrás de cualquier "data warehouse" o panel de Business Intelligence corporativo.</p>
+      </div>
+
+      <div class="rw-card rw-closing">
+        <h3>Un adelanto de por qué las contraseñas de estos scripts dicen "CambiarEnProduccion123"</h3>
+        <p class="rw-case">Uno de los errores más comunes y mejor documentados en incidentes de seguridad es dejar contraseñas de ejemplo o por defecto en sistemas reales. Por eso todo script de esta guía usa una contraseña obviamente temporal: es una señal explícita de "esto se debe cambiar antes de usarse fuera del aula" — un hábito que vale la pena mantener siempre.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="layout">
+  <nav class="stepper" id="stepper" aria-label="Pasos de la sesión">
+    <button class="step active" data-target="paso-0">
+      <span class="step-num">0</span>
+      <span class="step-label">Abrir phpMyAdmin</span>
+    </button>
+    <button class="step" data-target="paso-1">
+      <span class="step-num">1</span>
+      <span class="step-label">Arquitectura del servidor</span>
+    </button>
+    <button class="step" data-target="paso-2">
+      <span class="step-num">2</span>
+      <span class="step-label">Roles DBA / SA / DA</span>
+    </button>
+  </nav>
+
+  <section class="content">
+
+    <article class="panel active" id="paso-0">
+      <h2>Paso 0 · Abrir phpMyAdmin</h2>
+      <p>Esta sesión continúa sobre la base <code>juego_online</code> creada en la Sesión 1. Si no la tienes todavía, ejecuta primero <code>scripts/01_crear_tablas.sql</code> de esa sesión.</p>
+      <ol class="steps-list">
+        <li>Entra a phpMyAdmin (normalmente <code>http://localhost/phpmyadmin</code>).</li>
+        <li>Selecciona la base <code>juego_online</code> en el panel izquierdo.</li>
+        <li>Ve a la pestaña <strong>SQL</strong> en la barra superior — ahí pegarás cada script.</li>
+      </ol>
+      <p class="note">Requiere MySQL 8.0+ o MariaDB 10.5+. La creación de usuarios y privilegios (Paso 2) es una operación de administración del servidor completo, no solo de esta base de datos.</p>
+    </article>
+
+    <article class="panel" id="paso-1">
+      <div class="panel-tag">scripts/01_configuracion_servidor.sql</div>
+      <h2>Paso 1 · Arquitectura del servidor</h2>
+      <p>Este script no crea tablas ni inserta datos: es <strong>documentación ejecutable</strong>. Deja registradas las decisiones de arquitectura (motor elegido, réplicas por región, parámetros del servidor) como comentarios directamente junto al código, en vez de en un documento aparte que se pierde con el tiempo.</p>
+      <ul class="checklist">
+        <li>Documenta la elección del DBMS: MySQL 8.0 / MariaDB 10.5+.</li>
+        <li>Describe la arquitectura: un servidor primario + réplicas de lectura por región.</li>
+        <li>Deja parámetros recomendados de servidor como referencia (se configuran en <code>my.cnf</code>/<code>my.ini</code>, no por SQL).</li>
+      </ul>
+      <div class="codeblock">
+        <div class="codeblock-head">
+          <span>en phpMyAdmin</span>
+        </div>
+        <ol class="steps-list">
+          <li>Pestaña <strong>SQL</strong> → pega el bloque de abajo (botón <em>Copiar SQL</em>).</li>
+          <li>Pulsa <strong>Continuar</strong>. Al ser casi todo comentarios, no verás cambios visibles — es normal.</li>
+        </ol>
+      </div>
+      <div class="codeblock sql">
+        <div class="codeblock-head">
+          <span>SQL — pégalo en la pestaña SQL de phpMyAdmin</span>
+          <span class="head-actions">
+            <button class="explain-btn" data-explain-target="#explain-paso1" aria-expanded="false">Explicar código</button>
+            <button class="copy-btn" data-copy-target="#sql-paso1">Copiar SQL</button>
+          </span>
+        </div>
+        <pre><code id="sql-paso1">-- Sesión 2: Notas de arquitectura del servidor (ambiente de base de datos)
+-- Motor: MySQL / MariaDB (phpMyAdmin)
+--
+-- MySQL no soporta un equivalente funcional de "COMMENT ON DATABASE" (PostgreSQL),
+-- así que esta decisión se documenta como comentario. Si usas MariaDB 10.5+, puedes
+-- descomentar la línea ALTER DATABASE ... COMMENT para dejarlo guardado en el motor.
+
+USE juego_online;
+
+-- Elección de DBMS: MySQL 8.0 / MariaDB 10.5+ (soporta CHECK constraints y roles,
+-- necesarios en las Sesiones 4 y 2). Administrado vía phpMyAdmin.
+-- Arquitectura: un servidor primario + réplicas de lectura por región (simulado).
+--
+-- Solo en MariaDB 10.5+:
+-- ALTER DATABASE juego_online COMMENT = 'Plataforma de juego online. Arquitectura: primario + réplicas por región (AMERICA, EUROPA). Mantenido por el rol SA.';
+
+-- Parámetros recomendados de servidor (ajustar en my.cnf / my.ini, no vía SQL):
+--   innodb_buffer_pool_size = 25% de la RAM disponible
+--   max_connections = 100 (ajustar según carga esperada en la Sesión 3)
+--   log_bin = ON (necesario para respaldos incrementales, Sesión 6)</code></pre>
+      </div>
+      <div class="explain-panel" id="explain-paso1" hidden></div>
+      <p class="expect"><strong>Resultado esperado:</strong> phpMyAdmin responde "Consulta ejecutada correctamente" sin cambios visibles en las tablas — este script es documentación, no estructura.</p>
+      <p class="note">Opcional (solo MariaDB 10.5+): si descomentas la línea <code>ALTER DATABASE ... COMMENT</code>, el comentario queda guardado en el motor y es visible en herramientas de administración.</p>
+    </article>
+
+    <article class="panel" id="paso-2">
+      <div class="panel-tag">scripts/02_roles_dba_sa_da.sql</div>
+      <h2>Paso 2 · Crear los roles DBA, SA y DA</h2>
+
+      <div class="context-box">
+        <h3>¿Por qué tres roles distintos?</h3>
+        <p>En cualquier plataforma real, "tener acceso a la base de datos" no es una sola cosa — son distintos niveles de confianza según la tarea. Esta sesión traduce esa idea a tres cuentas de MySQL con privilegios muy diferentes, pensadas como analogía del juego:</p>
+        <ul>
+          <li><strong>DBA — Administrador de la plataforma:</strong> control total. Puede crear/borrar tablas, gestionar usuarios y hacer respaldos. Es el "dueño del servidor".</li>
+          <li><strong>SA — Soporte Técnico de Infraestructura:</strong> mantiene el servidor encendido y sano (procesos, réplicas, estado), pero <em>no</em> puede leer ni escribir datos de negocio como jugadores o partidas.</li>
+          <li><strong>DA — Analista de estadísticas:</strong> solo lectura (<code>SELECT</code>) sobre las tablas que necesita para generar reportes — nunca puede modificar nada.</li>
+        </ul>
+        <p>Esto se llama <strong>principio de mínimo privilegio</strong>: cada cuenta tiene exactamente el acceso que su función requiere, ni más ni menos.</p>
+      </div>
+
+      <div class="context-box">
+        <h3>¿Son puestos de trabajo reales? ¿En qué empresas se necesitan?</h3>
+        <p>Sí — DBA, SA y DA no son solo nombres inventados para este ejercicio: son cargos que existen en el mundo laboral real, aunque el nombre exacto varía según la empresa. Haz clic en cada uno para ver el título real que tiene en la industria y qué tipo de organización lo necesita como cargo dedicado.</p>
+
+        <div class="role-accordion">
+          <details class="role-details">
+            <summary class="role-summary"><span>🗄️ DBA — Administrador de la plataforma</span><span class="role-tag">Database Administrator</span></summary>
+            <div class="role-body">
+              <p><strong>¿Es un puesto real?</strong> Sí, y es uno de los más consolidados en TI. Existen certificaciones específicas para este cargo (Oracle Certified DBA, Microsoft Certified: Azure Database Administrator Associate, etc.) y suele ser una carrera propia dentro del área de datos.</p>
+              <p><strong>¿En qué tipo de empresa es necesario como cargo dedicado?</strong> Bancos, telecomunicaciones, e-commerce, salud y estudios de videojuegos online — cualquier organización cuya base de datos no se puede caer sin perder dinero o poner en riesgo información sensible de sus usuarios.</p>
+              <p><strong>¿Cuándo NO hace falta uno de tiempo completo?</strong> En una startup pequeña, donde un desarrollador backend suele cumplir esta función "a medio tiempo", sin el título formal ni exclusividad en el cargo.</p>
+            </div>
+          </details>
+
+          <details class="role-details">
+            <summary class="role-summary"><span>🛠️ SA — Soporte Técnico de Infraestructura</span><span class="role-tag">Sysadmin / DevOps / SRE</span></summary>
+            <div class="role-body">
+              <p><strong>¿Es un puesto real?</strong> Sí, aunque el nombre varía mucho entre empresas: Administrador de Sistemas (Sysadmin), Ingeniero de Infraestructura, DevOps Engineer o, en empresas más grandes y modernas, Site Reliability Engineer (SRE).</p>
+              <p><strong>¿En qué tipo de empresa es necesario como cargo dedicado?</strong> Empresas con infraestructura propia — centros de datos propios, servidores físicos, nubes privadas — típico en telecomunicaciones, banca, gobierno y grandes tecnológicas con muchos servidores que mantener.</p>
+              <p><strong>¿Cuándo NO hace falta un rol dedicado?</strong> Cuando la empresa usa servicios de nube totalmente administrados (por ejemplo, una base de datos "as a service" de AWS, Azure o GCP), buena parte de este trabajo lo hace directamente el proveedor cloud.</p>
+            </div>
+          </details>
+
+          <details class="role-details">
+            <summary class="role-summary"><span>📊 DA — Analista de estadísticas</span><span class="role-tag">Data Analyst</span></summary>
+            <div class="role-body">
+              <p><strong>¿Es un puesto real?</strong> Sí — es hoy uno de los cargos más demandados en tecnología. En empresas grandes suele crecer hacia equipos completos de Business Intelligence o Data Science.</p>
+              <p><strong>¿En qué tipo de empresa es necesario?</strong> Prácticamente cualquiera que tome decisiones basadas en datos: retail, marketing, videojuegos (analítica de jugadores y monetización), finanzas, salud.</p>
+              <p><strong>¿Cómo se ve en la práctica?</strong> En una startup, suele ser una sola persona con acceso de solo lectura, como el que crea este script. En una empresa grande, es un equipo completo con su propio almacén de datos (data warehouse), separado de la base de producción para no afectar el rendimiento del servidor en vivo.</p>
+            </div>
+          </details>
+        </div>
+
+        <p class="role-summary-note">En resumen: mientras más crece una empresa y más crítica se vuelve su base de datos, más se separan estos tres roles en personas — o equipos — distintas. Eso es exactamente lo que estás simulando al crear tres usuarios con privilegios diferentes en este paso.</p>
+      </div>
+
+      <div class="codeblock">
+        <div class="codeblock-head">
+          <span>en phpMyAdmin</span>
+        </div>
+        <ol class="steps-list">
+          <li>Selecciona la base <code>juego_online</code> en el panel izquierdo.</li>
+          <li>Pestaña <strong>SQL</strong> → pega el bloque de abajo (botón <em>Copiar SQL</em>) → <strong>Continuar</strong>.</li>
+          <li>Ve a la pestaña <strong>Cuentas de usuario</strong> (menú superior de phpMyAdmin) y verifica que aparecen <code>dba_admin</code>, <code>soporte_sa</code> y <code>analista_da</code>.</li>
+        </ol>
+      </div>
+
+      <div class="codeblock sql">
+        <div class="codeblock-head">
+          <span>SQL — pégalo en la pestaña SQL de phpMyAdmin</span>
+          <span class="head-actions">
+            <button class="explain-btn" data-explain-target="#explain-paso2" aria-expanded="false">Explicar código</button>
+            <button class="copy-btn" data-copy-target="#sql-paso2">Copiar SQL</button>
+          </span>
+        </div>
+        <pre><code id="sql-paso2">-- Sesión 2: Roles de administración — DBA, SA, DA (MySQL 8.0+ / MariaDB 10.5+)
+-- phpMyAdmin: pestaña "Cuentas de usuario" también permite crear estos usuarios
+-- desde una interfaz gráfica; aquí se hace por SQL para que quede documentado.
+
+USE juego_online;
+
+-- DBA: Administrador de la plataforma — control total sobre la base del juego
+DROP USER IF EXISTS 'dba_admin'@'%';
+CREATE USER 'dba_admin'@'%' IDENTIFIED BY 'CambiarEnProduccion123';
+GRANT ALL PRIVILEGES ON juego_online.* TO 'dba_admin'@'%' WITH GRANT OPTION;
+
+-- SA: Soporte Técnico de Infraestructura — gestiona el servidor, no datos de negocio
+DROP USER IF EXISTS 'soporte_sa'@'%';
+CREATE USER 'soporte_sa'@'%' IDENTIFIED BY 'CambiarEnProduccion123';
+GRANT PROCESS, RELOAD, REPLICATION CLIENT ON *.* TO 'soporte_sa'@'%';
+-- Nota: PROCESS/RELOAD/REPLICATION CLIENT dan visibilidad de procesos y estado del
+-- servidor, sin acceso de lectura/escritura a las tablas de negocio.
+
+-- DA: Analista de estadísticas de partidas — solo lectura
+DROP USER IF EXISTS 'analista_da'@'%';
+CREATE USER 'analista_da'@'%' IDENTIFIED BY 'CambiarEnProduccion123';
+GRANT SELECT ON juego_online.Jugadores TO 'analista_da'@'%';
+GRANT SELECT ON juego_online.Partidas  TO 'analista_da'@'%';
+GRANT SELECT ON juego_online.Logros    TO 'analista_da'@'%';
+
+FLUSH PRIVILEGES;
+
+-- Verificación (ejecutar en phpMyAdmin, pestaña SQL, o en la pestaña "Cuentas de usuario")
+-- SHOW GRANTS FOR 'dba_admin'@'%';
+-- SHOW GRANTS FOR 'soporte_sa'@'%';
+-- SHOW GRANTS FOR 'analista_da'@'%';</code></pre>
+      </div>
+      <div class="explain-panel" id="explain-paso2" hidden></div>
+
+      <p class="expect"><strong>Resultado esperado:</strong> tres usuarios nuevos visibles en la pestaña <strong>Cuentas de usuario</strong> de phpMyAdmin, cada uno con privilegios distintos.</p>
+
+      <div class="codeblock sql">
+        <div class="codeblock-head">
+          <span>verificar privilegios de un rol</span>
+          <button class="copy-btn" data-copy="SHOW GRANTS FOR 'analista_da'@'%';">Copiar</button>
+        </div>
+        <pre><code>SHOW GRANTS FOR 'analista_da'@'%';</code></pre>
+      </div>
+      <p class="note">Criterio de éxito: <code>analista_da</code> solo debe mostrar privilegios <code>SELECT</code> — nunca <code>INSERT</code>, <code>UPDATE</code> o <code>DELETE</code>.</p>
+    </article>
+
+  </section>
+</main>
+
+<footer class="foot">
+  <p>Guía de uso — Sesión 2: Servidores y Roles de Administración · Taller de Base de Datos (MySQL / phpMyAdmin)</p>
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const steps = document.querySelectorAll(".step");
+  const panels = document.querySelectorAll(".panel");
+
+  function activate(targetId) {
+    steps.forEach(s => s.classList.toggle("active", s.dataset.target === targetId));
+    panels.forEach(p => p.classList.toggle("active", p.id === targetId));
+    window.location.hash = targetId;
+  }
+
+  steps.forEach(step => {
+    step.addEventListener("click", () => activate(step.dataset.target));
+  });
+
+  const initial = window.location.hash.replace("#", "");
+  if (initial && document.getElementById(initial)) {
+    activate(initial);
+  }
+
+  /* ---------------------------------------------------------------
+     Modal: "¿Dónde se usa esto en el mundo real?"
+  --------------------------------------------------------------- */
+  const rwBtn = document.getElementById("real-world-btn");
+  const rwModal = document.getElementById("real-world-modal");
+  const rwClose = document.getElementById("real-world-close");
+
+  if (rwBtn && rwModal && rwClose) {
+    const openModal = () => {
+      rwModal.hidden = false;
+      rwClose.focus();
+    };
+    const closeModal = () => {
+      rwModal.hidden = true;
+      rwBtn.focus();
+    };
+
+    rwBtn.addEventListener("click", openModal);
+    rwClose.addEventListener("click", closeModal);
+    rwModal.addEventListener("click", (e) => {
+      if (e.target === rwModal) closeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !rwModal.hidden) closeModal();
+    });
+  }
+
+  /* ---------------------------------------------------------------
+     Explicación línea por línea del SQL
+  --------------------------------------------------------------- */
+  const explainData = {
+    paso1: [
+      {
+        title: "Encabezado y contexto",
+        lines: [
+          ["-- Sesión 2: Notas de arquitectura del servidor (ambiente de base de datos)", "Comentario: describe qué hace este archivo. Las líneas que empiezan con -- no se ejecutan, son solo notas para quien lee el código."],
+          ["-- Motor: MySQL / MariaDB (phpMyAdmin)", "Indica con qué motor de base de datos fue escrito este script."],
+          ["-- MySQL no soporta un equivalente funcional de \"COMMENT ON DATABASE\" (PostgreSQL),", "Explica una limitación real de MySQL frente a otros motores como PostgreSQL."],
+          ["-- así que esta decisión se documenta como comentario. Si usas MariaDB 10.5+, puedes", "Aclara la solución elegida: documentar en comentarios en vez de en el motor."],
+          ["-- descomentar la línea ALTER DATABASE ... COMMENT para dejarlo guardado en el motor.", "Avisa que existe una alternativa opcional más adelante, solo disponible en MariaDB."],
+          ["USE juego_online;", "Selecciona la base juego_online antes de continuar, aunque este script no modifique su estructura."]
+        ]
+      },
+      {
+        title: "Decisiones de arquitectura (documentadas como comentario)",
+        lines: [
+          ["-- Elección de DBMS: MySQL 8.0 / MariaDB 10.5+ (soporta CHECK constraints y roles,", "Registra por qué se eligió este motor: soporta restricciones CHECK, necesarias en la Sesión 4."],
+          ["-- necesarios en las Sesiones 4 y 2). Administrado vía phpMyAdmin.", "Continúa la justificación de la elección de motor."],
+          ["-- Arquitectura: un servidor primario + réplicas de lectura por región (simulado).", "Describe el diseño físico: un servidor que recibe escrituras (primario) y copias de solo lectura por región, para acelerar consultas locales — se explora más en la Sesión 5."],
+          ["-- Solo en MariaDB 10.5+:", "Marca que la siguiente línea es opcional y solo funciona en MariaDB, no en MySQL."],
+          ["-- ALTER DATABASE juego_online COMMENT = 'Plataforma de juego online. Arquitectura: primario + réplicas por región (AMERICA, EUROPA). Mantenido por el rol SA.';", "Comando real (comentado) que guardaría esta descripción directamente en los metadatos del motor, en vez de solo en el archivo .sql."]
+        ]
+      },
+      {
+        title: "Parámetros recomendados de servidor",
+        lines: [
+          ["-- Parámetros recomendados de servidor (ajustar en my.cnf / my.ini, no vía SQL):", "Aclara que estos valores no se aplican con SQL, sino editando el archivo de configuración del propio motor."],
+          ["--   innodb_buffer_pool_size = 25% de la RAM disponible", "Cuánta memoria RAM reservar para que InnoDB guarde datos en caché — afecta directamente la velocidad de las consultas."],
+          ["--   max_connections = 100 (ajustar según carga esperada en la Sesión 3)", "Cuántas conexiones simultáneas acepta el servidor — se pondrá a prueba en la Sesión 3 con tráfico masivo."],
+          ["--   log_bin = ON (necesario para respaldos incrementales, Sesión 6)", "Activa el registro binario de cambios, requisito técnico para poder hacer respaldos incrementales más adelante, en la Sesión 6."]
+        ]
+      }
+    ],
+    paso2: [
+      {
+        title: "Encabezado",
+        lines: [
+          ["-- Sesión 2: Roles de administración — DBA, SA, DA (MySQL 8.0+ / MariaDB 10.5+)", "Comentario descriptivo del archivo."],
+          ["-- phpMyAdmin: pestaña \"Cuentas de usuario\" también permite crear estos usuarios", "Aclara que existe una forma gráfica alternativa de hacer lo mismo."],
+          ["-- desde una interfaz gráfica; aquí se hace por SQL para que quede documentado.", "Explica por qué se prefiere SQL: queda como código versionable, no solo como clics en una interfaz."],
+          ["USE juego_online;", "Selecciona la base sobre la que se otorgarán algunos de los privilegios."]
+        ]
+      },
+      {
+        title: "DBA — control total",
+        lines: [
+          ["DROP USER IF EXISTS 'dba_admin'@'%';", "Borra este usuario si ya existía, para poder recrearlo sin error (el script se puede ejecutar varias veces)."],
+          ["CREATE USER 'dba_admin'@'%' IDENTIFIED BY 'CambiarEnProduccion123';", "Crea el usuario dba_admin, que puede conectarse desde cualquier host ('%'), con una contraseña que debe cambiarse antes de usarse fuera del aula."],
+          ["GRANT ALL PRIVILEGES ON juego_online.* TO 'dba_admin'@'%' WITH GRANT OPTION;", "Le da control total sobre todas las tablas de juego_online, y WITH GRANT OPTION le permite además otorgar esos mismos privilegios a otros usuarios — típico del administrador principal."]
+        ]
+      },
+      {
+        title: "SA — soporte de infraestructura, sin acceso a datos de negocio",
+        lines: [
+          ["DROP USER IF EXISTS 'soporte_sa'@'%';", "Borra este usuario si ya existía."],
+          ["CREATE USER 'soporte_sa'@'%' IDENTIFIED BY 'CambiarEnProduccion123';", "Crea el usuario soporte_sa con la misma contraseña temporal de ejemplo."],
+          ["GRANT PROCESS, RELOAD, REPLICATION CLIENT ON *.* TO 'soporte_sa'@'%';", "Le da privilegios de servidor (ver procesos activos, recargar configuración, ver estado de réplicas) pero sobre ninguna tabla en particular — nótese que no aparece ninguna base de datos de negocio en este GRANT."],
+          ["-- Nota: PROCESS/RELOAD/REPLICATION CLIENT dan visibilidad de procesos y estado del", "Aclara qué logran estos privilegios."],
+          ["-- servidor, sin acceso de lectura/escritura a las tablas de negocio.", "Refuerza la idea clave: este rol nunca puede leer los datos de los jugadores."]
+        ]
+      },
+      {
+        title: "DA — analista, solo lectura",
+        lines: [
+          ["DROP USER IF EXISTS 'analista_da'@'%';", "Borra este usuario si ya existía."],
+          ["CREATE USER 'analista_da'@'%' IDENTIFIED BY 'CambiarEnProduccion123';", "Crea el usuario analista_da."],
+          ["GRANT SELECT ON juego_online.Jugadores TO 'analista_da'@'%';", "Le da permiso de solo lectura sobre la tabla Jugadores — puede consultar, nunca modificar."],
+          ["GRANT SELECT ON juego_online.Partidas  TO 'analista_da'@'%';", "Igual, pero sobre la tabla Partidas — necesaria para generar estadísticas de juego."],
+          ["GRANT SELECT ON juego_online.Logros    TO 'analista_da'@'%';", "Igual, pero sobre la tabla Logros. Nótese que nunca se le otorga acceso a Inventario_Items ni a ninguna tabla con datos de compras."]
+        ]
+      },
+      {
+        title: "Aplicar y verificar",
+        lines: [
+          ["FLUSH PRIVILEGES;", "Recarga la tabla interna de privilegios de MySQL para asegurar que todos los cambios de GRANT/CREATE USER queden activos de inmediato."],
+          ["-- Verificación (ejecutar en phpMyAdmin, pestaña SQL, o en la pestaña \"Cuentas de usuario\")", "Indica dónde y cómo comprobar el resultado."],
+          ["-- SHOW GRANTS FOR 'dba_admin'@'%';", "Comando (comentado) para listar los privilegios exactos del rol DBA."],
+          ["-- SHOW GRANTS FOR 'soporte_sa'@'%';", "Comando (comentado) para listar los privilegios exactos del rol SA."],
+          ["-- SHOW GRANTS FOR 'analista_da'@'%';", "Comando (comentado) para listar los privilegios exactos del rol DA — debe mostrar solo SELECT."]
+        ]
+      }
+    ]
+  };
+
+  document.querySelectorAll(".explain-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const panel = document.querySelector(btn.dataset.explainTarget);
+      if (!panel) return;
+
+      const isOpen = !panel.hidden;
+      if (isOpen) {
+        panel.hidden = true;
+        btn.setAttribute("aria-expanded", "false");
+        btn.textContent = "Explicar código";
+        return;
+      }
+
+      if (!panel.dataset.rendered) {
+        const key = btn.dataset.explainTarget.replace("#explain-", "");
+        const groups = explainData[key] || [];
+        groups.forEach(group => {
+          const groupEl = document.createElement("div");
+          groupEl.className = "explain-group";
+
+          const titleEl = document.createElement("div");
+          titleEl.className = "explain-group-title";
+          titleEl.textContent = group.title;
+          groupEl.appendChild(titleEl);
+
+          group.lines.forEach(([code, note]) => {
+            const row = document.createElement("div");
+            row.className = "explain-row";
+
+            const codeEl = document.createElement("div");
+            codeEl.className = "explain-code";
+            codeEl.textContent = code;
+
+            const noteEl = document.createElement("div");
+            noteEl.className = "explain-note";
+            noteEl.textContent = note;
+
+            row.appendChild(codeEl);
+            row.appendChild(noteEl);
+            groupEl.appendChild(row);
+          });
+
+          panel.appendChild(groupEl);
+        });
+        panel.dataset.rendered = "true";
+      }
+
+      panel.hidden = false;
+      btn.setAttribute("aria-expanded", "true");
+      btn.textContent = "Ocultar explicación";
+    });
+  });
+
+  document.querySelectorAll(".copy-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      let text = btn.dataset.copy;
+      if (text === undefined && btn.dataset.copyTarget) {
+        const target = document.querySelector(btn.dataset.copyTarget);
+        text = target ? target.textContent : "";
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (err) {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+      const original = btn.textContent;
+      btn.textContent = "Copiado";
+      btn.classList.add("copied");
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove("copied");
+      }, 1200);
+    });
+  });
+});
+</script>
+</body>
+</html>
