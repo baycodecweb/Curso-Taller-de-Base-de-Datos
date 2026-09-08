@@ -1,0 +1,2563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía del Alumno — Taller de Base de Datos</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 1040px; margin: 0 auto; padding: 0 20px 60px; color: #1f2937; background: #fafafa; line-height: 1.55; }
+  h1 { font-size: 1.5rem; margin-bottom: 4px; }
+  .subtitulo { color: #6b7280; margin-top: 0; }
+  h2 { font-size: 1.15rem; margin-top: 40px; padding-top: 12px; border-top: 1px solid #e5e7eb; }
+  h3 { font-size: 1.05rem; color: #1d4ed8; margin-bottom: 4px; }
+  h4 { font-size: 0.95rem; color: #1d4ed8; margin: 14px 0 4px; }
+  code { font-family: monospace; background: #f0f0f0; padding: 1px 5px; border-radius: 3px; font-size: 0.88rem; }
+  .caja { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px 20px; margin: 14px 0; }
+  .nota { background: #fffbeb; padding: 10px 14px; border-radius: 4px; font-size: 0.92rem; margin: 14px 0; }
+  .clave { background: #eef2ff; padding: 10px 14px; border-radius: 4px; font-size: 0.9rem; margin: 12px 0 0; color: #3730a3; }
+  a { color: #1d4ed8; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.88rem; }
+  th, td { border: 1px solid #e5e7eb; padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { background: #f3f4f6; }
+  ul, ol { padding-left: 22px; }
+  li { margin-bottom: 4px; }
+  .campo { margin: 4px 0; }
+  .campo strong { color: #374151; }
+  .checklist label { display: flex; align-items: flex-start; gap: 10px; padding: 5px 0; }
+  .checklist input { margin-top: 3px; }
+  .barra-acciones { position: sticky; top: 0; background: #fafafa; padding: 14px 0 10px; margin-bottom: 6px; display: flex; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid #e5e7eb; z-index: 10; }
+  .btn { background: #1d4ed8; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; text-decoration: none; display: inline-block; }
+  .btn:hover { background: #1e40af; }
+  .badge { display: inline-block; background: #dcfce7; color: #166534; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; margin-left: 6px; white-space: nowrap; }
+  .badge-semana { display: inline-block; background: #eef2ff; color: #3730a3; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; margin-left: 6px; white-space: nowrap; }
+  .btn-info { background: white; border: 1px solid #1d4ed8; color: #1d4ed8; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.82rem; font-weight: 600; margin-top: 10px; }
+  .btn-info:hover { background: #eef2ff; }
+  .tarjeta-info { background: #f8fafc; border: 1px dashed #93c5fd; border-radius: 8px; padding: 14px 16px; margin-top: 10px; font-size: 0.9rem; }
+  .tarjeta-info h4:first-child { margin-top: 0; }
+  .pre-sql { background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 6px; padding: 7px 9px; font-family: monospace; font-size: 0.74rem; line-height: 1.4; overflow-x: auto; margin: 0; white-space: pre; }
+  .pre-sql .ln { display: inline-block; min-width: 1.6em; margin-right: 8px; padding-right: 6px; border-right: 1px solid #d1d5db; color: #9ca3af; text-align: right; user-select: none; }
+  .line-desc { font-size: 0.68rem; color: #4b5563; margin: 6px 0 0; padding-left: 17px; line-height: 1.5; word-wrap: break-word; overflow-wrap: anywhere; }
+  .line-desc li { margin-bottom: 2px; }
+  .line-desc li::marker { color: #9ca3af; }
+  .tabla-scroll { overflow-x: auto; margin: 10px 0; border-radius: 6px; }
+  .tabla-comparacion { table-layout: fixed; width: 100%; min-width: 640px; margin: 0; }
+  .tabla-comparacion th, .tabla-comparacion td { vertical-align: top; width: 33.33%; word-wrap: break-word; overflow-wrap: anywhere; }
+  .ejercicio-bloque .badge-semana { margin: 0 8px 0 0; }
+  .ejercicio-pasos { margin-top: 8px; }
+  .ejercicio-pasos > li { margin-bottom: 14px; }
+  .paso-verif { margin-top: 6px; background: #f8fafc; border-left: 3px solid #93c5fd; padding: 7px 10px; border-radius: 0 4px 4px 0; }
+  .paso-verif .pre-sql { background: transparent; border: none; padding: 0; margin-bottom: 4px; }
+  .paso-esperado { font-size: 0.78rem; color: #166534; margin: 0; }
+  .paso-esperado strong { color: #166534; }
+  .paso-terminal { font-size: 0.7rem; font-weight: 700; color: #92400e; background: #fff7ed; padding: 1px 6px; border-radius: 4px; margin-left: 6px; }
+  .recursos { font-size: 0.85rem; background: #f8fafc; border-radius: 6px; padding: 8px 12px; margin: 10px 0; }
+  .recursos summary { cursor: pointer; font-weight: 600; color: #374151; }
+  .ilustracion { width: 100%; height: auto; display: block; margin: 8px 0 2px; }
+  .pie-ilustracion { text-align: center; font-size: 0.76rem; color: #6b7280; margin: 0 0 6px; }
+  .script-ref { font-family: monospace; color: #1d4ed8; cursor: help; border-bottom: 1px dotted #1d4ed8; }
+  .script-ref:hover, .script-ref:focus-visible { background: #eef2ff; outline: none; }
+  #fuentes-scripts { display: none; }
+  .tooltip-script { position: fixed; z-index: 200; width: max-content; max-width: min(760px, calc(100vw - 24px)); max-height: min(80vh, 640px); overflow: auto; background: #1e293b; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+  .tooltip-script-titulo { position: sticky; top: 0; background: #0f172a; color: #93c5fd; font-family: monospace; font-weight: 700; padding: 6px 6px 6px 10px; border-radius: 8px 8px 0 0; font-size: 0.72rem; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .tooltip-script-cerrar { background: transparent; border: none; color: #93c5fd; font-size: 0.9rem; line-height: 1; cursor: pointer; padding: 4px 7px; border-radius: 4px; }
+  .tooltip-script-cerrar:hover { background: rgba(147, 197, 253, 0.15); }
+  .tooltip-script-cuerpo { margin: 0; padding: 10px; color: #e2e8f0; white-space: pre; font-family: monospace; font-size: 0.68rem; line-height: 1.5; }
+  @media print {
+    .barra-acciones { display: none; }
+    .btn-info { display: none; }
+    .tarjeta-info { display: block !important; }
+    .tooltip-script { display: none !important; }
+    body { margin: 0; max-width: 660px; }
+    h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; }
+    p, .nota, .clave, li, .ilustracion, .pie-ilustracion { break-inside: avoid; page-break-inside: avoid; }
+    .caja:not(:has(h3)) { break-inside: avoid; page-break-inside: avoid; }
+    table, tr { break-inside: avoid; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="barra-acciones">
+  <button class="btn" onclick="window.print()">🖨️ Imprimir / Guardar como PDF</button>
+</div>
+
+<h1>Guía del Alumno — Taller de Base de Datos</h1>
+<p class="subtitulo">Las 6 sesiones del curso, con sus entregables, actividades y recursos, en un solo lugar.</p>
+
+<h2>1. Mapa del curso</h2>
+<p>Cada sesión construye directamente sobre los scripts SQL de la anterior — respeta el orden: 1 → 2 → 3 → 4 → 5 → 6.</p>
+<table>
+  <tr><th>Sesión</th><th>Tema</th></tr>
+  <tr><td>1</td><td>Base de Datos del Juego (modelo relacional, leaderboard, roles DBA/SA/DA)</td></tr>
+  <tr><td>2</td><td>Servidores y Roles de Administración (metodologías, ambiente de BD, DBA/SA/DA)</td></tr>
+  <tr><td>3</td><td>Tráfico Masivo y Concurrencia (cambios sin downtime, disponibilidad, SLA)</td></tr>
+  <tr><td>4</td><td>Control de Accesos y Sistema Anti-Trampas (integridad, roles, inyección SQL)</td></tr>
+  <tr><td>5</td><td>Fragmentación por Regiones y Carga Masiva (particiones, índices, ETL, nube)</td></tr>
+  <tr><td>6</td><td>Respaldos y Recuperación ante Ataques (auditoría, backups, simulacro final)</td></tr>
+</table>
+
+<div class="clave">
+  <strong>Cómo está organizada cada sesión en tu carpeta del curso:</strong> dentro de <code>Sesion-0N-.../</code> vas a encontrar siempre lo mismo — <code>guia-aprendizaje.md</code> (el resumen escrito), <code>scripts/</code> (los archivos <code>.sql</code>/<code>.sh</code> que ejecutas en phpMyAdmin o terminal, en el orden numerado) y <code>guia-interactiva/Sesion-00N-index.html</code> (una página que abres directamente en el navegador con el paso a paso ilustrado y simuladores interactivos de esa sesión).
+</div>
+
+<h2>2. Las 6 sesiones en detalle</h2>
+
+<div class="caja" data-sesion="1">
+<h3>Sesión 1 — Base de Datos del Juego <span class="badge-semana">Semanas 1-2</span></h3>
+<p>Vas a construir el motor de datos de una plataforma de videojuegos online: jugadores, su inventario, las partidas que juegan y los logros que desbloquean.</p>
+<p><strong>Objetivos:</strong></p>
+<ul>
+  <li>Diseñar el modelo relacional de una plataforma de juego.</li>
+  <li>Escribir consultas SQL para un leaderboard (tabla de clasificación).</li>
+  <li>Crear un procedimiento almacenado para subir de nivel a un jugador.</li>
+</ul>
+<p><strong>Actividades:</strong></p>
+<ol start="0">
+  <li>Roles de administración: distinguir DBA, SA y DA (conceptual — Paso 0 de la guía interactiva).</li>
+  <li>Modelado: diseñar el modelo entidad-relación de <code>Jugadores</code>, <code>Juegos</code>, <code>Items</code>, <code>Inventario_Items</code>, <code>Partidas</code> y <code>Logros</code>.</li>
+  <li>Construcción: ejecutar <code>scripts/01_crear_tablas.sql</code>.</li>
+  <li>Datos de prueba: ejecutar <code>scripts/02_datos_prueba.sql</code>.</li>
+  <li>Consultas: ejecutar <code>scripts/03_consultas_leaderboard.sql</code> — Tabla de Clasificación y catálogo de items comprados.</li>
+  <li>Procedimiento almacenado: ejecutar <code>scripts/04_procedimiento_subir_nivel.sql</code>.</li>
+</ol>
+
+<button class="btn-info" id="btn-info-s1" onclick="alternarTarjeta('info-s1','btn-info-s1')">🖼️ Ver diagramas: modelo relacional y roles DBA/SA/DA</button>
+<div class="tarjeta-info" id="info-s1" hidden>
+  <h4>Modelo entidad-relación de <code>juego_online</code></h4>
+  <svg class="ilustracion" viewBox="0 0 620 330" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama entidad-relación: Jugadores, Partidas, Juegos, Inventario_Items, Items y Logros, con sus claves y cardinalidades">
+    <defs>
+      <marker id="flechaEr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"></path>
+      </marker>
+    </defs>
+
+    <rect x="15" y="100" width="150" height="110" rx="5" fill="#eef2ff" stroke="#1d4ed8" stroke-width="2"></rect>
+    <line x1="15" y1="128" x2="165" y2="128" stroke="#1d4ed8"></line>
+    <text x="90" y="120" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">Jugadores</text>
+    <text x="25" y="145" font-size="8.5" fill="#1e3a8a">jugador_id (PK)</text>
+    <text x="25" y="160" font-size="8.5" fill="#374151">nombre_usuario, nivel</text>
+    <text x="25" y="175" font-size="8.5" fill="#374151">monedas, región</text>
+    <text x="25" y="190" font-size="8.5" fill="#374151">experiencia</text>
+
+    <rect x="225" y="15" width="150" height="85" rx="5" fill="#ffffff" stroke="#94a3b8"></rect>
+    <line x1="225" y1="33" x2="375" y2="33" stroke="#94a3b8"></line>
+    <text x="300" y="27" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1f2937">Partidas</text>
+    <text x="233" y="48" font-size="8" fill="#374151">partida_id (PK)</text>
+    <text x="233" y="61" font-size="8" fill="#374151">jugador_id (FK)</text>
+    <text x="233" y="74" font-size="8" fill="#374151">juego_id (FK)</text>
+    <text x="233" y="87" font-size="8" fill="#374151">puntaje, resultado</text>
+
+    <rect x="440" y="15" width="155" height="70" rx="5" fill="#ffffff" stroke="#94a3b8"></rect>
+    <line x1="440" y1="33" x2="595" y2="33" stroke="#94a3b8"></line>
+    <text x="517" y="27" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1f2937">Juegos</text>
+    <text x="448" y="48" font-size="8" fill="#374151">juego_id (PK)</text>
+    <text x="448" y="61" font-size="8" fill="#374151">nombre, género</text>
+    <text x="448" y="74" font-size="8" fill="#374151">fecha_lanzamiento</text>
+
+    <rect x="225" y="225" width="160" height="85" rx="5" fill="#ffffff" stroke="#94a3b8"></rect>
+    <line x1="225" y1="243" x2="385" y2="243" stroke="#94a3b8"></line>
+    <text x="305" y="237" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1f2937">Inventario_Items</text>
+    <text x="233" y="258" font-size="8" fill="#374151">inventario_id (PK)</text>
+    <text x="233" y="271" font-size="8" fill="#374151">jugador_id (FK)</text>
+    <text x="233" y="284" font-size="8" fill="#374151">item_id (FK)</text>
+    <text x="233" y="297" font-size="8" fill="#374151">cantidad</text>
+
+    <rect x="450" y="225" width="145" height="70" rx="5" fill="#ffffff" stroke="#94a3b8"></rect>
+    <line x1="450" y1="243" x2="595" y2="243" stroke="#94a3b8"></line>
+    <text x="522" y="237" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1f2937">Items</text>
+    <text x="458" y="258" font-size="8" fill="#374151">item_id (PK)</text>
+    <text x="458" y="271" font-size="8" fill="#374151">nombre, rareza</text>
+    <text x="458" y="284" font-size="8" fill="#374151">precio_monedas</text>
+
+    <rect x="15" y="235" width="150" height="70" rx="5" fill="#ffffff" stroke="#94a3b8"></rect>
+    <line x1="15" y1="253" x2="165" y2="253" stroke="#94a3b8"></line>
+    <text x="90" y="247" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1f2937">Logros</text>
+    <text x="23" y="268" font-size="8" fill="#374151">logro_id (PK)</text>
+    <text x="23" y="281" font-size="8" fill="#374151">jugador_id (FK)</text>
+    <text x="23" y="294" font-size="8" fill="#374151">nombre_logro</text>
+
+    <line x1="165" y1="140" x2="225" y2="57" stroke="#374151" marker-end="url(#flechaEr1)"></line>
+    <text x="172" y="132" font-size="8" fill="#374151">1</text>
+    <text x="213" y="65" font-size="8" fill="#374151">N</text>
+
+    <line x1="375" y1="57" x2="440" y2="50" stroke="#374151" marker-end="url(#flechaEr1)"></line>
+    <text x="380" y="50" font-size="8" fill="#374151">N</text>
+    <text x="428" y="50" font-size="8" fill="#374151">1</text>
+
+    <line x1="165" y1="175" x2="225" y2="267" stroke="#374151" marker-end="url(#flechaEr1)"></line>
+    <text x="172" y="185" font-size="8" fill="#374151">1</text>
+    <text x="212" y="262" font-size="8" fill="#374151">N</text>
+
+    <line x1="385" y1="267" x2="450" y2="260" stroke="#374151" marker-end="url(#flechaEr1)"></line>
+    <text x="390" y="260" font-size="8" fill="#374151">N</text>
+    <text x="438" y="260" font-size="8" fill="#374151">1</text>
+
+    <line x1="90" y1="210" x2="90" y2="235" stroke="#374151" marker-end="url(#flechaEr1)"></line>
+    <text x="75" y="218" font-size="8" fill="#374151">1</text>
+    <text x="75" y="230" font-size="8" fill="#374151">N</text>
+  </svg>
+  <p class="pie-ilustracion">Jugadores (1) — (N) Partidas (N) — (1) Juegos · Jugadores (1) — (N) Inventario_Items (N) — (1) Items · Jugadores (1) — (N) Logros. Este es el modelo que construyes con <code>scripts/01_crear_tablas.sql</code>.</p>
+
+  <h4>Los tres roles de administración (DBA / SA / DA)</h4>
+  <svg class="ilustracion" viewBox="0 0 620 165" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tres roles de administración de base de datos: DBA con control total, SA con acceso solo a infraestructura, DA con solo lectura">
+    <rect x="15" y="15" width="180" height="120" rx="8" fill="#eef2ff" stroke="#1d4ed8" stroke-width="2"></rect>
+    <text x="105" y="42" text-anchor="middle" font-size="20">🗄️</text>
+    <text x="105" y="65" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">DBA</text>
+    <text x="105" y="80" text-anchor="middle" font-size="8" fill="#1e3a8a">Administrador de la</text>
+    <text x="105" y="92" text-anchor="middle" font-size="8" fill="#1e3a8a">plataforma</text>
+    <text x="105" y="110" text-anchor="middle" font-size="7.5" fill="#374151">Control total: crea/borra</text>
+    <text x="105" y="122" text-anchor="middle" font-size="7.5" fill="#374151">tablas, usuarios, backups</text>
+
+    <rect x="220" y="15" width="180" height="120" rx="8" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"></rect>
+    <text x="310" y="42" text-anchor="middle" font-size="20">🛠️</text>
+    <text x="310" y="65" text-anchor="middle" font-size="11" font-weight="700" fill="#92400e">SA</text>
+    <text x="310" y="80" text-anchor="middle" font-size="8" fill="#92400e">Soporte Técnico de</text>
+    <text x="310" y="92" text-anchor="middle" font-size="8" fill="#92400e">Infraestructura</text>
+    <text x="310" y="110" text-anchor="middle" font-size="7.5" fill="#374151">Mantiene el servidor,</text>
+    <text x="310" y="122" text-anchor="middle" font-size="7.5" fill="#374151">sin acceso a los datos</text>
+
+    <rect x="425" y="15" width="180" height="120" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"></rect>
+    <text x="515" y="42" text-anchor="middle" font-size="20">📊</text>
+    <text x="515" y="65" text-anchor="middle" font-size="11" font-weight="700" fill="#166534">DA</text>
+    <text x="515" y="80" text-anchor="middle" font-size="8" fill="#166534">Analista de</text>
+    <text x="515" y="92" text-anchor="middle" font-size="8" fill="#166534">estadísticas</text>
+    <text x="515" y="110" text-anchor="middle" font-size="7.5" fill="#374151">Solo lectura (SELECT)</text>
+    <text x="515" y="122" text-anchor="middle" font-size="7.5" fill="#374151">para generar reportes</text>
+  </svg>
+  <p class="pie-ilustracion">Cada rol tiene exactamente el acceso que su función necesita — principio de mínimo privilegio. Se implementan con permisos reales en la Sesión 2.</p>
+</div>
+
+<details class="recursos">
+  <summary>📂 Recursos de esta sesión</summary>
+  <p>Guía interactiva: <a href="../Sesion-01-Base-de-Datos-del-Juego/guia-interactiva/Sesion-001-index.html">Sesion-001-index.html</a><br>
+  Scripts: <code>scripts/01_crear_tablas.sql</code>, <code>02_datos_prueba.sql</code>, <code>03_consultas_leaderboard.sql</code>, <code>04_procedimiento_subir_nivel.sql</code><br>
+  Motor: MySQL 8.0.16+ / MariaDB 10.5+ (requiere soporte de <code>CHECK</code>, usado en la Sesión 4).</p>
+</details>
+<div class="clave">
+  <strong>Criterio de éxito:</strong> el leaderboard muestra correctamente los mayores puntajes por jugador, y <code>subir_nivel_jugador</code> incrementa nivel y resetea experiencia sobrante correctamente.
+</div>
+</div>
+
+<div class="caja" data-sesion="2">
+<h3>Sesión 2 — Servidores y Roles de Administración <span class="badge-semana">Semanas 3-4</span></h3>
+<p>Configura los servidores que sostienen el juego online y define quién puede hacer qué: el Administrador de la plataforma (DBA), el Soporte Técnico de Infraestructura (SA) y el Analista de estadísticas (DA).</p>
+<p><strong>Objetivos:</strong></p>
+<ul>
+  <li>Identificar herramientas metodológicas para el desarrollo de software de base de datos.</li>
+  <li>Elegir arquitectura, instalar y configurar un DBMS.</li>
+  <li>Crear usuarios/roles que reflejen DBA, SA y DA.</li>
+</ul>
+<p><strong>Actividades:</strong></p>
+<ol start="0">
+  <li>Metodologías y ambiente de BD: Cascada/Scrum/Kanban e instalación/actualización de un DBMS (conceptual — Paso 0).</li>
+  <li>Arquitectura física: revisar <code>scripts/01_configuracion_servidor.sql</code> (motor, réplicas por región, parámetros recomendados).</li>
+  <li>Roles de administración: ejecutar <code>scripts/02_roles_dba_sa_da.sql</code>.</li>
+  <li>Verificación: en phpMyAdmin → pestaña <strong>Cuentas de usuario</strong>, confirmar que cada rol solo tiene sus privilegios.</li>
+</ol>
+<table>
+  <tr><th>Rol</th><th>Analogía del juego</th><th>Privilegios típicos</th></tr>
+  <tr><td><strong>DBA</strong></td><td>Dueño del servidor del juego</td><td>Control total: crear/borrar tablas, gestionar usuarios, backups</td></tr>
+  <tr><td><strong>SA</strong></td><td>Mantiene el servidor encendido y sano</td><td>Monitoreo de procesos y estado, sin acceso a datos de negocio</td></tr>
+  <tr><td><strong>DA</strong></td><td>Genera reportes de partidas</td><td>Solo lectura (<code>SELECT</code>) sobre <code>Jugadores</code>, <code>Partidas</code>, <code>Logros</code></td></tr>
+</table>
+
+<button class="btn-info" id="btn-info-s2" onclick="alternarTarjeta('info-s2','btn-info-s2')">🖼️ Ver diagramas: metodologías y arquitectura del servidor</button>
+<div class="tarjeta-info" id="info-s2" hidden>
+  <h4>Cascada, Scrum y Kanban</h4>
+  <svg class="ilustracion" viewBox="0 0 620 175" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tres metodologías de desarrollo: Cascada secuencial por fases, Scrum en sprints cíclicos, Kanban en tablero de flujo continuo">
+    <defs>
+      <marker id="flechaMeto" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#374151"></path>
+      </marker>
+    </defs>
+
+    <rect x="25" y="12" width="140" height="22" rx="4" fill="#f3f4f6" stroke="#94a3b8"></rect>
+    <text x="95" y="27" text-anchor="middle" font-size="8.5" fill="#374151">Requisitos</text>
+    <line x1="95" y1="34" x2="95" y2="42" stroke="#374151" marker-end="url(#flechaMeto)"></line>
+    <rect x="25" y="44" width="140" height="22" rx="4" fill="#f3f4f6" stroke="#94a3b8"></rect>
+    <text x="95" y="59" text-anchor="middle" font-size="8.5" fill="#374151">Diseño</text>
+    <line x1="95" y1="66" x2="95" y2="74" stroke="#374151" marker-end="url(#flechaMeto)"></line>
+    <rect x="25" y="76" width="140" height="22" rx="4" fill="#f3f4f6" stroke="#94a3b8"></rect>
+    <text x="95" y="91" text-anchor="middle" font-size="8.5" fill="#374151">Construcción</text>
+    <line x1="95" y1="98" x2="95" y2="106" stroke="#374151" marker-end="url(#flechaMeto)"></line>
+    <rect x="25" y="108" width="140" height="22" rx="4" fill="#f3f4f6" stroke="#94a3b8"></rect>
+    <text x="95" y="123" text-anchor="middle" font-size="8.5" fill="#374151">Pruebas</text>
+    <text x="95" y="155" text-anchor="middle" font-size="10" font-weight="700" fill="#1f2937">Cascada</text>
+    <text x="95" y="168" text-anchor="middle" font-size="7.5" fill="#6b7280">todo definido antes de programar</text>
+
+    <rect x="205" y="45" width="60" height="30" rx="5" fill="#eef2ff" stroke="#1d4ed8"></rect>
+    <text x="235" y="64" text-anchor="middle" font-size="8" font-weight="700" fill="#1d4ed8">Sprint 1</text>
+    <line x1="265" y1="60" x2="285" y2="60" stroke="#1d4ed8" marker-end="url(#flechaMeto)"></line>
+    <rect x="287" y="45" width="60" height="30" rx="5" fill="#eef2ff" stroke="#1d4ed8"></rect>
+    <text x="317" y="64" text-anchor="middle" font-size="8" font-weight="700" fill="#1d4ed8">Sprint 2</text>
+    <line x1="347" y1="60" x2="367" y2="60" stroke="#1d4ed8" marker-end="url(#flechaMeto)"></line>
+    <rect x="369" y="45" width="60" height="30" rx="5" fill="#eef2ff" stroke="#1d4ed8"></rect>
+    <text x="399" y="64" text-anchor="middle" font-size="8" font-weight="700" fill="#1d4ed8">Sprint 3</text>
+    <path d="M429,50 C450,10 205,10 220,42" fill="none" stroke="#1d4ed8" stroke-dasharray="3,2" marker-end="url(#flechaMeto)"></path>
+    <text x="317" y="100" text-anchor="middle" font-size="10" font-weight="700" fill="#1f2937">Scrum</text>
+    <text x="317" y="113" text-anchor="middle" font-size="7.5" fill="#6b7280">cada sprint ≈ una sesión de este curso</text>
+
+    <rect x="450" y="12" width="50" height="120" rx="4" fill="#fef2f2" stroke="#ef4444"></rect>
+    <text x="475" y="25" text-anchor="middle" font-size="7" font-weight="700" fill="#991b1b">Por hacer</text>
+    <rect x="459" y="35" width="32" height="16" fill="#ffffff" stroke="#ef4444"></rect>
+    <rect x="459" y="55" width="32" height="16" fill="#ffffff" stroke="#ef4444"></rect>
+    <line x1="500" y1="70" x2="512" y2="70" stroke="#374151" marker-end="url(#flechaMeto)"></line>
+
+    <rect x="514" y="12" width="50" height="120" rx="4" fill="#fffbeb" stroke="#f59e0b"></rect>
+    <text x="539" y="25" text-anchor="middle" font-size="7" font-weight="700" fill="#92400e">En progreso</text>
+    <rect x="523" y="35" width="32" height="16" fill="#ffffff" stroke="#f59e0b"></rect>
+    <line x1="564" y1="43" x2="576" y2="43" stroke="#374151" marker-end="url(#flechaMeto)"></line>
+
+    <rect x="578" y="12" width="35" height="120" rx="4" fill="#f0fdf4" stroke="#16a34a"></rect>
+    <text x="595" y="25" text-anchor="middle" font-size="7" font-weight="700" fill="#166534">Hecho</text>
+    <rect x="583" y="35" width="24" height="16" fill="#ffffff" stroke="#16a34a"></rect>
+    <rect x="583" y="55" width="24" height="16" fill="#ffffff" stroke="#16a34a"></rect>
+    <rect x="583" y="75" width="24" height="16" fill="#ffffff" stroke="#16a34a"></rect>
+    <text x="530" y="155" text-anchor="middle" font-size="10" font-weight="700" fill="#1f2937">Kanban</text>
+    <text x="530" y="168" text-anchor="middle" font-size="7.5" fill="#6b7280">tablero de flujo continuo</text>
+  </svg>
+  <p class="pie-ilustracion">Este curso sigue el patrón de Scrum: cada una de las 6 sesiones es un "sprint" que agrega una capa funcional nueva sobre la anterior, en vez de diseñarlo todo de una sola vez (Cascada).</p>
+
+  <h4>Arquitectura del servidor: primario + réplicas por región</h4>
+  <svg class="ilustracion" viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Arquitectura del servidor: un servidor primario de escritura sincroniza datos hacia dos réplicas de lectura, una por región, América y Europa">
+    <defs>
+      <marker id="flechaArq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#1d4ed8"></path>
+      </marker>
+    </defs>
+
+    <rect x="220" y="15" width="180" height="60" rx="8" fill="#eef2ff" stroke="#1d4ed8" stroke-width="2"></rect>
+    <text x="310" y="38" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1d4ed8">🖥️ Servidor Primario</text>
+    <text x="310" y="55" text-anchor="middle" font-size="8" fill="#1e3a8a">juego_online (lectura + escritura)</text>
+
+    <rect x="30" y="125" width="180" height="60" rx="8" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"></rect>
+    <text x="120" y="148" text-anchor="middle" font-size="10.5" font-weight="700" fill="#92400e">🌎 Réplica América</text>
+    <text x="120" y="165" text-anchor="middle" font-size="8" fill="#92400e">solo lectura</text>
+
+    <rect x="410" y="125" width="180" height="60" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"></rect>
+    <text x="500" y="148" text-anchor="middle" font-size="10.5" font-weight="700" fill="#166534">🌍 Réplica Europa</text>
+    <text x="500" y="165" text-anchor="middle" font-size="8" fill="#166534">solo lectura</text>
+
+    <line x1="255" y1="75" x2="150" y2="125" stroke="#1d4ed8" stroke-width="1.5" marker-end="url(#flechaArq)"></line>
+    <text x="180" y="105" text-anchor="middle" font-size="7.5" fill="#1d4ed8">sincroniza</text>
+    <line x1="365" y1="75" x2="470" y2="125" stroke="#1d4ed8" stroke-width="1.5" marker-end="url(#flechaArq)"></line>
+    <text x="440" y="105" text-anchor="middle" font-size="7.5" fill="#1d4ed8">sincroniza</text>
+  </svg>
+  <p class="pie-ilustracion">Las escrituras (compras, partidas nuevas) van siempre al Servidor Primario; cada región lee de su propia réplica para responder rápido — esta arquitectura se documenta en <code>01_configuracion_servidor.sql</code> y se implementa de verdad en la Sesión 5.</p>
+</div>
+
+<details class="recursos">
+  <summary>📂 Recursos de esta sesión</summary>
+  <p>Guía interactiva: <a href="../Sesion-02-Servidores-y-Roles/guia-interactiva/Sesion-002-index.html">Sesion-002-index.html</a><br>
+  Scripts: <code>scripts/01_configuracion_servidor.sql</code>, <code>02_roles_dba_sa_da.sql</code></p>
+</details>
+<div class="clave">
+  <strong>Criterio de éxito:</strong> <code>analista_da</code> solo puede leer (<code>SELECT</code>), nunca escribir; <code>dba_admin</code> tiene control total, verificable con <code>SHOW GRANTS FOR 'dba_admin'@'%';</code>.
+</div>
+</div>
+
+<div class="caja" data-sesion="3">
+<h3>Sesión 3 — Tráfico Masivo y Concurrencia <span class="badge-semana">Semanas 5-7</span></h3>
+<p>Simula un "Evento de Lanzamiento": miles de jugadores conectados comprando items al mismo tiempo. El servidor no se puede apagar y dos jugadores no pueden comprar la misma skin única a la vez.</p>
+<p><strong>Objetivos:</strong></p>
+<ul>
+  <li>Aplicar cambios de estructura a la base de datos sin interrumpir el servicio.</li>
+  <li>Prevenir condiciones de carrera en compras concurrentes usando <code>SELECT ... FOR UPDATE</code>.</li>
+  <li>Comprender disponibilidad de datos y gestión de rendimiento.</li>
+</ul>
+<p><strong>Actividades:</strong></p>
+<ol start="0">
+  <li>Disponibilidad y SLA: disponibilidad, rendimiento y niveles de servicio (conceptual — Paso 0).</li>
+  <li>Cambios en caliente: ejecutar <code>scripts/01_alter_tables_sin_downtime.sql</code> (<code>ALGORITHM=INSTANT</code>).</li>
+  <li>Simulación de concurrencia: ejecutar <code>scripts/02_control_transacciones_deadlocks.sql</code> en dos pestañas de phpMyAdmin a la vez.</li>
+  <li>Discusión: comparar qué pasaría sin <code>FOR UPDATE</code> (venta duplicada del item único).</li>
+</ol>
+
+<button class="btn-info" id="btn-info-s3" onclick="alternarTarjeta('info-s3','btn-info-s3')">🖼️ Ver diagramas: cambios sin downtime y condición de carrera</button>
+<div class="tarjeta-info" id="info-s3" hidden>
+  <h4>Cambios de estructura sin apagar el servidor</h4>
+  <svg class="ilustracion" viewBox="0 0 620 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Comparación entre ALTER TABLE con ALGORITHM=INSTANT, sin interrupción, y un ALTER TABLE tradicional que bloquea la tabla">
+    <text x="310" y="14" text-anchor="middle" font-size="9.5" font-weight="700" fill="#166534">Con ALGORITHM=INSTANT (Paso 1 de esta sesión)</text>
+    <rect x="20" y="22" width="580" height="26" rx="4" fill="#f0fdf4" stroke="#16a34a"></rect>
+    <line x1="310" y1="22" x2="310" y2="10" stroke="#374151" stroke-dasharray="2,2"></line>
+    <text x="310" y="60" text-anchor="middle" font-size="7.5" fill="#374151">ALTER TABLE ... ALGORITHM=INSTANT ↑ (no bloquea nada)</text>
+    <text x="310" y="72" text-anchor="middle" font-size="7.5" fill="#166534">el servidor sigue respondiendo compras todo el tiempo</text>
+
+    <text x="310" y="94" text-anchor="middle" font-size="9.5" font-weight="700" fill="#991b1b">ALTER TABLE tradicional (sin INSTANT)</text>
+    <rect x="20" y="102" width="260" height="26" rx="4" fill="#f0fdf4" stroke="#16a34a"></rect>
+    <rect x="280" y="102" width="60" height="26" fill="#fef2f2" stroke="#ef4444"></rect>
+    <text x="310" y="119" text-anchor="middle" font-size="7" fill="#991b1b">🔒 bloqueado</text>
+    <rect x="340" y="102" width="260" height="26" rx="4" fill="#f0fdf4" stroke="#16a34a"></rect>
+    <text x="310" y="143" text-anchor="middle" font-size="7.5" fill="#991b1b">los jugadores no pueden comprar mientras dura el bloqueo</text>
+  </svg>
+  <p class="pie-ilustracion">Es la diferencia entre un cambio de estructura que el jugador nunca nota, y uno que interrumpe el servicio — por eso el sílabo lo llama "gestión de cambios" y "aseguramiento de la disponibilidad".</p>
+
+  <h4>Condición de carrera: por qué hace falta <code>FOR UPDATE</code></h4>
+  <svg class="ilustracion" viewBox="0 0 620 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Comparación de dos jugadores comprando el mismo item único: sin FOR UPDATE la skin se vende dos veces, con FOR UPDATE se vende solo una vez">
+    <defs>
+      <marker id="flechaCarrera" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#374151"></path>
+      </marker>
+    </defs>
+
+    <text x="155" y="14" text-anchor="middle" font-size="10.5" font-weight="700" fill="#991b1b">❌ Sin FOR UPDATE</text>
+    <rect x="20" y="24" width="270" height="34" rx="4" fill="#fef2f2" stroke="#ef4444"></rect>
+    <text x="155" y="38" text-anchor="middle" font-size="7.5" fill="#991b1b">Jugador A: SELECT vendido</text>
+    <text x="155" y="50" text-anchor="middle" font-size="7.5" fill="#991b1b">→ false</text>
+    <line x1="155" y1="58" x2="155" y2="68" stroke="#374151" marker-end="url(#flechaCarrera)"></line>
+    <rect x="20" y="70" width="270" height="34" rx="4" fill="#fef2f2" stroke="#ef4444"></rect>
+    <text x="155" y="84" text-anchor="middle" font-size="7.5" fill="#991b1b">Jugador B: SELECT vendido</text>
+    <text x="155" y="96" text-anchor="middle" font-size="7.5" fill="#991b1b">→ false (casi al mismo tiempo)</text>
+    <line x1="155" y1="104" x2="155" y2="114" stroke="#374151" marker-end="url(#flechaCarrera)"></line>
+    <rect x="20" y="116" width="270" height="30" rx="4" fill="#fef2f2" stroke="#ef4444"></rect>
+    <text x="155" y="135" text-anchor="middle" font-size="7.5" fill="#991b1b">Jugador A: UPDATE vendido = true</text>
+    <line x1="155" y1="146" x2="155" y2="156" stroke="#374151" marker-end="url(#flechaCarrera)"></line>
+    <rect x="20" y="158" width="270" height="30" rx="4" fill="#fef2f2" stroke="#ef4444"></rect>
+    <text x="155" y="177" text-anchor="middle" font-size="7.5" fill="#991b1b">Jugador B: UPDATE vendido = true</text>
+    <line x1="155" y1="188" x2="155" y2="198" stroke="#374151" marker-end="url(#flechaCarrera)"></line>
+    <rect x="20" y="200" width="270" height="34" rx="4" fill="#991b1b"></rect>
+    <text x="155" y="221" text-anchor="middle" font-size="8" font-weight="700" fill="#ffffff">🔴 la skin se vendió 2 veces</text>
+
+    <text x="465" y="14" text-anchor="middle" font-size="10.5" font-weight="700" fill="#166534">✅ Con FOR UPDATE</text>
+    <rect x="330" y="24" width="270" height="34" rx="4" fill="#f0fdf4" stroke="#16a34a"></rect>
+    <text x="465" y="38" text-anchor="middle" font-size="7.5" fill="#166534">Jugador A: SELECT ... FOR UPDATE</text>
+    <text x="465" y="50" text-anchor="middle" font-size="7.5" fill="#166534">→ bloquea la fila</text>
+    <line x1="465" y1="58" x2="465" y2="68" stroke="#374151" marker-end="url(#flechaCarrera)"></line>
+    <rect x="330" y="70" width="270" height="34" rx="4" fill="#f0fdf4" stroke="#16a34a"></rect>
+    <text x="465" y="84" text-anchor="middle" font-size="7.5" fill="#166534">Jugador B: SELECT ... FOR UPDATE</text>
+    <text x="465" y="96" text-anchor="middle" font-size="7.5" fill="#166534">→ espera (fila bloqueada por A)</text>
+    <line x1="465" y1="104" x2="465" y2="114" stroke="#374151" marker-end="url(#flechaCarrera)"></line>
+    <rect x="330" y="116" width="270" height="30" rx="4" fill="#f0fdf4" stroke="#16a34a"></rect>
+    <text x="465" y="135" text-anchor="middle" font-size="7.5" fill="#166534">Jugador A: UPDATE + COMMIT → EXITO</text>
+    <line x1="465" y1="146" x2="465" y2="156" stroke="#374151" marker-end="url(#flechaCarrera)"></line>
+    <rect x="330" y="158" width="270" height="30" rx="4" fill="#f0fdf4" stroke="#16a34a"></rect>
+    <text x="465" y="177" text-anchor="middle" font-size="7.5" fill="#166534">Jugador B: relee vendido=true → RECHAZADO</text>
+    <line x1="465" y1="188" x2="465" y2="198" stroke="#374151" marker-end="url(#flechaCarrera)"></line>
+    <rect x="330" y="200" width="270" height="34" rx="4" fill="#166534"></rect>
+    <text x="465" y="221" text-anchor="middle" font-size="8" font-weight="700" fill="#ffffff">🟢 la skin se vendió solo 1 vez</text>
+  </svg>
+  <p class="pie-ilustracion">Sin bloqueo, ambos jugadores leen "disponible" antes de que el otro confirme la compra. <code>FOR UPDATE</code> obliga al segundo a esperar y releer el dato ya actualizado — es lo que hace <code>comprar_item_unico</code> en el Paso 2.</p>
+</div>
+
+<details class="recursos">
+  <summary>📂 Recursos de esta sesión</summary>
+  <p>Guía interactiva: <a href="../Sesion-03-Trafico-Masivo-y-Concurrencia/guia-interactiva/Sesion-003-index.html">Sesion-003-index.html</a><br>
+  Scripts: <code>scripts/01_alter_tables_sin_downtime.sql</code>, <code>02_control_transacciones_deadlocks.sql</code><br>
+  Requiere tablas <strong>InnoDB</strong> (bloqueo de filas con <code>FOR UPDATE</code>).</p>
+</details>
+<div class="clave">
+  <strong>Criterio de éxito:</strong> las columnas nuevas se agregan sin bloquear lecturas/escrituras existentes; de dos llamadas concurrentes a <code>comprar_item_unico</code> con el mismo item único, solo una retorna <code>EXITO</code>.
+</div>
+</div>
+
+<div class="caja" data-sesion="4">
+<h3>Sesión 4 — Control de Accesos y Sistema Anti-Trampas <span class="badge-semana">Semanas 8-10</span></h3>
+<p>Protege el juego contra hackers que intentan modificarse el nivel, robar items o alterar los resultados de un torneo.</p>
+<p><strong>Objetivos:</strong></p>
+<ul>
+  <li>Distinguir integridad estructural y semántica.</li>
+  <li>Configurar permisos por rol: jugador, moderador, administrador.</li>
+  <li>Reconocer y frenar intentos de inyección SQL.</li>
+</ul>
+<p><strong>Actividades:</strong></p>
+<ol>
+  <li>Integridad: ejecutar <code>scripts/01_integridad_restricciones.sql</code> — restricciones <code>CHECK</code> (integridad semántica).</li>
+  <li>Roles y permisos: ejecutar <code>scripts/02_roles_permisos_jugador_moderador_admin.sql</code> (requiere haber ejecutado antes las Sesiones 1 y 3).</li>
+  <li>Simulador anti-inyección SQL: ejecutar <code>scripts/03_prevencion_sql_injection.sql</code> y resolver el reto de identificar el payload malicioso.</li>
+</ol>
+
+<button class="btn-info" id="btn-info-s4" onclick="alternarTarjeta('info-s4','btn-info-s4')">🖼️ Ver diagramas: jerarquía de roles e inyección SQL</button>
+<div class="tarjeta-info" id="info-s4" hidden>
+  <h4>Jerarquía de roles: cada uno hereda del anterior</h4>
+  <svg class="ilustracion" viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Jerarquía de roles anidados: rol_administrador contiene todo lo de rol_moderador, que a su vez contiene todo lo de rol_jugador">
+    <rect x="20" y="15" width="580" height="170" rx="10" fill="#eef2ff" stroke="#1d4ed8" stroke-width="2"></rect>
+    <text x="310" y="32" text-anchor="middle" font-size="10" font-weight="700" fill="#1d4ed8">rol_administrador — + asignar monedas/nivel, borrar jugadores y partidas</text>
+
+    <rect x="55" y="42" width="510" height="128" rx="10" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2"></rect>
+    <text x="310" y="59" text-anchor="middle" font-size="10" font-weight="700" fill="#1e3a8a">rol_moderador — + banear jugadores (UPDATE baneado)</text>
+
+    <rect x="90" y="69" width="440" height="88" rx="10" fill="#ffffff" stroke="#1d4ed8" stroke-width="2"></rect>
+    <text x="310" y="88" text-anchor="middle" font-size="10" font-weight="700" fill="#1d4ed8">rol_jugador</text>
+    <text x="310" y="106" text-anchor="middle" font-size="8" fill="#374151">SELECT sobre su perfil, items y juegos</text>
+    <text x="310" y="120" text-anchor="middle" font-size="8" fill="#374151">EXECUTE subir_nivel_jugador, comprar_item_unico</text>
+    <text x="310" y="134" text-anchor="middle" font-size="8" fill="#374151">nunca UPDATE directo sobre monedas o nivel</text>
+    <text x="310" y="150" text-anchor="middle" font-size="7.5" font-style="italic" fill="#6b7280">principio de mínimo privilegio</text>
+  </svg>
+  <p class="pie-ilustracion"><code>GRANT rol_jugador TO rol_moderador;</code> y <code>GRANT rol_moderador TO rol_administrador;</code> — cada rol exterior tiene automáticamente todo lo del rol que envuelve, más sus propios privilegios extra.</p>
+
+  <h4>Cómo rompe una consulta la inyección SQL</h4>
+  <svg class="ilustracion" viewBox="0 0 620 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Comparación de tres consultas: búsqueda normal, payload de inyección que rompe la consulta, y procedimiento seguro con parámetro tipado">
+    <text x="20" y="14" font-size="9" font-weight="700" fill="#166534">1) Búsqueda normal — el texto es un valor</text>
+    <rect x="20" y="20" width="580" height="26" rx="4" fill="#f0fdf4" stroke="#16a34a"></rect>
+    <text x="30" y="37" font-family="monospace" font-size="8.5" fill="#374151">... WHERE nombre_usuario = '<tspan fill="#166534" font-weight="700">DragonSlayer99</tspan>'</text>
+    <text x="30" y="58" font-size="7.5" fill="#166534">→ devuelve 1 fila: el jugador real</text>
+
+    <text x="20" y="78" font-size="9" font-weight="700" fill="#991b1b">2) Payload malicioso: ' OR '1'='1 — rompe la consulta</text>
+    <rect x="20" y="84" width="580" height="26" rx="4" fill="#fef2f2" stroke="#ef4444"></rect>
+    <text x="30" y="101" font-family="monospace" font-size="8.5" fill="#374151">... WHERE nombre_usuario = ''<tspan fill="#991b1b" font-weight="700"> OR '1'='1'</tspan></text>
+    <text x="30" y="122" font-size="7.5" fill="#991b1b">→ la comilla cierra el texto antes de tiempo; OR '1'='1' es siempre verdadero → TODOS los jugadores</text>
+
+    <text x="20" y="145" font-size="9" font-weight="700" fill="#1d4ed8">3) Con buscar_jugador_seguro — parámetro tipado</text>
+    <rect x="20" y="151" width="580" height="26" rx="4" fill="#eef2ff" stroke="#1d4ed8"></rect>
+    <text x="30" y="168" font-family="monospace" font-size="8.5" fill="#1e3a8a">WHERE nombre_usuario = p_nombre_usuario  -- siempre valor, nunca código</text>
+    <text x="30" y="189" font-size="7.5" fill="#1d4ed8">→ el motor nunca interpreta el payload como SQL: 0 filas</text>
+  </svg>
+  <p class="pie-ilustracion">La comilla simple es la clave del ataque: si el backend concatena texto sin más, puede cerrar el literal antes de tiempo y convertir el resto en código SQL real — por eso el procedimiento del Paso 3 nunca concatena, solo recibe parámetros.</p>
+</div>
+
+<details class="recursos">
+  <summary>📂 Recursos de esta sesión</summary>
+  <p>Guía interactiva: <a href="../Sesion-04-Control-de-Accesos-y-Anti-Trampas/guia-interactiva/Sesion-004-index.html">Sesion-004-index.html</a> (incluye simulador de brecha de seguridad en tiempo real)<br>
+  Scripts: <code>scripts/01_integridad_restricciones.sql</code>, <code>02_roles_permisos_jugador_moderador_admin.sql</code>, <code>03_prevencion_sql_injection.sql</code></p>
+</details>
+<div class="clave">
+  <strong>Criterio de éxito:</strong> un jugador no puede otorgarse monedas/nivel directamente; un moderador puede banear pero no asignar monedas; <code>buscar_jugador_seguro('\' OR \'1\'=\'1')</code> devuelve 0 filas.
+</div>
+</div>
+
+<div class="caja" data-sesion="5">
+<h3>Sesión 5 — Fragmentación por Regiones y Carga Masiva <span class="badge-semana">Semanas 11-13</span></h3>
+<p>Separa los servidores por regiones (Servidor América, Servidor Europa) y sincronízalos en la nube. Importa miles de registros históricos y logra que el matchmaking responda en milisegundos.</p>
+<p><strong>Objetivos:</strong></p>
+<ul>
+  <li>Fragmentar (particionar) tablas por región.</li>
+  <li>Importar datos masivos mediante un proceso tipo ETL.</li>
+  <li>Crear índices que aceleren las consultas de matchmaking.</li>
+</ul>
+<p><strong>Actividades:</strong></p>
+<ol>
+  <li>Fragmentación: ejecutar <code>scripts/01_fragmentacion_particiones_region.sql</code> — crea <code>Partidas_Fragmentada</code> particionada por región.</li>
+  <li>Índices para matchmaking: ejecutar <code>scripts/02_indices_matchmaking.sql</code>.</li>
+  <li>Carga masiva ETL: ejecutar <code>scripts/03_etl_carga_masiva.sql</code> (5000 partidas simuladas con CTE recursiva).</li>
+  <li>Medición: comparar <code>EXPLAIN</code> de la consulta de matchmaking antes/después de indexar.</li>
+  <li>Carga y descarga en la nube: conceptual — Paso 4 de la guía interactiva (<code>aws s3 cp</code>, <code>az storage blob</code>, ETL local vs. en la nube).</li>
+</ol>
+
+<button class="btn-info" id="btn-info-s5" onclick="alternarTarjeta('info-s5','btn-info-s5')">🖼️ Ver diagramas: fragmentación por región y ETL en la nube</button>
+<div class="tarjeta-info" id="info-s5" hidden>
+  <h4>Fragmentación por región y partition pruning</h4>
+  <svg class="ilustracion" viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Una consulta filtrada por región AMERICA solo toca la partición p_america; la partición p_europa se omite por completo (partition pruning)">
+    <defs>
+      <marker id="flechaFrag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#374151"></path>
+      </marker>
+    </defs>
+
+    <rect x="190" y="10" width="240" height="32" rx="5" fill="#eef2ff" stroke="#1d4ed8"></rect>
+    <text x="310" y="31" text-anchor="middle" font-family="monospace" font-size="8.5" fill="#1d4ed8">... WHERE region = 'AMERICA'</text>
+    <line x1="310" y1="42" x2="310" y2="58" stroke="#374151" marker-end="url(#flechaFrag)"></line>
+
+    <rect x="170" y="60" width="280" height="30" rx="5" fill="#ffffff" stroke="#94a3b8"></rect>
+    <text x="310" y="80" text-anchor="middle" font-size="9" font-weight="700" fill="#1f2937">Partidas_Fragmentada</text>
+
+    <line x1="260" y1="90" x2="140" y2="120" stroke="#16a34a" stroke-width="2" marker-end="url(#flechaFrag)"></line>
+    <line x1="360" y1="90" x2="480" y2="120" stroke="#94a3b8" stroke-dasharray="3,3" marker-end="url(#flechaFrag)"></line>
+
+    <rect x="40" y="122" width="200" height="60" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"></rect>
+    <text x="140" y="144" text-anchor="middle" font-size="9.5" font-weight="700" fill="#166534">p_america ✅ tocada</text>
+    <text x="140" y="160" text-anchor="middle" font-size="7.5" fill="#166534">se lee solo esta partición</text>
+    <text x="140" y="173" text-anchor="middle" font-size="7.5" fill="#166534">EXPLAIN → partitions: p_america</text>
+
+    <rect x="380" y="122" width="200" height="60" rx="6" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"></rect>
+    <text x="480" y="144" text-anchor="middle" font-size="9.5" font-weight="700" fill="#6b7280">p_europa ⏭️ omitida</text>
+    <text x="480" y="160" text-anchor="middle" font-size="7.5" fill="#6b7280">ni se abre ni se escanea</text>
+    <text x="480" y="173" text-anchor="middle" font-size="7.5" fill="#6b7280">"partition pruning"</text>
+  </svg>
+  <p class="pie-ilustracion">Filtrar por región le permite al motor descartar particiones enteras sin leerlas — por eso el matchmaking responde en milisegundos incluso con miles de partidas cargadas (verificable con <code>EXPLAIN</code>, Paso 2).</p>
+
+  <h4>ETL local vs. carga/descarga en la nube</h4>
+  <svg class="ilustracion" viewBox="0 0 620 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Pipeline ETL: extraer, transformar y cargar datos desde un origen (CSV o la nube) hacia las particiones de la base de datos, con carga y descarga hacia almacenamiento en la nube">
+    <defs>
+      <marker id="flechaEtl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#1d4ed8"></path>
+      </marker>
+    </defs>
+
+    <text x="310" y="14" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1d4ed8">Extract → Transform → Load (Paso 3)</text>
+
+    <rect x="15" y="65" width="105" height="55" rx="6" fill="#fff7ed" stroke="#f59e0b" stroke-dasharray="4,2"></rect>
+    <text x="67" y="87" text-anchor="middle" font-size="8" font-weight="700" fill="#92400e">☁️ Nube / CSV</text>
+    <text x="67" y="101" text-anchor="middle" font-size="7.5" fill="#92400e">externo</text>
+    <line x1="120" y1="92" x2="140" y2="92" stroke="#1d4ed8" marker-end="url(#flechaEtl)"></line>
+
+    <rect x="142" y="65" width="85" height="55" rx="6" fill="#eef2ff" stroke="#1d4ed8"></rect>
+    <text x="184" y="97" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1d4ed8">Extract</text>
+    <line x1="227" y1="92" x2="247" y2="92" stroke="#1d4ed8" marker-end="url(#flechaEtl)"></line>
+
+    <rect x="249" y="65" width="85" height="55" rx="6" fill="#eef2ff" stroke="#1d4ed8"></rect>
+    <text x="291" y="97" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1d4ed8">Transform</text>
+    <line x1="334" y1="92" x2="354" y2="92" stroke="#1d4ed8" marker-end="url(#flechaEtl)"></line>
+
+    <rect x="356" y="65" width="85" height="55" rx="6" fill="#eef2ff" stroke="#1d4ed8"></rect>
+    <text x="398" y="97" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1d4ed8">Load</text>
+    <line x1="441" y1="92" x2="461" y2="92" stroke="#1d4ed8" marker-end="url(#flechaEtl)"></line>
+
+    <rect x="463" y="58" width="145" height="68" rx="6" fill="#f0fdf4" stroke="#16a34a"></rect>
+    <text x="535" y="80" text-anchor="middle" font-size="8" font-weight="700" fill="#166534">Partidas_Fragmentada</text>
+    <text x="535" y="94" text-anchor="middle" font-size="7.5" fill="#166534">p_america / p_europa</text>
+    <text x="535" y="108" text-anchor="middle" font-size="7.5" fill="#166534">(5000 filas, CTE recursiva)</text>
+
+    <path d="M540,58 C560,25 90,25 67,63" fill="none" stroke="#92400e" stroke-dasharray="3,2" marker-end="url(#flechaEtl)"></path>
+    <text x="310" y="35" text-anchor="middle" font-size="7.5" fill="#92400e">carga (upload) / descarga (download) hacia la nube — Paso 4, conceptual: aws s3 cp, az storage blob</text>
+
+    <text x="310" y="145" text-anchor="middle" font-size="7.5" fill="#6b7280">En producción: AWS Glue, AWS DMS o Azure Data Factory automatizan este mismo pipeline</text>
+    <text x="310" y="160" text-anchor="middle" font-size="7.5" fill="#6b7280">para sincronizar el Servidor América y el Servidor Europa entre sí, en la nube.</text>
+  </svg>
+  <p class="pie-ilustracion">El Paso 3 simula el ETL dentro del mismo servidor; el Paso 4 extiende la misma idea hacia un origen o destino remoto — subir/bajar un archivo de S3/Blob Storage antes o después de cargarlo.</p>
+</div>
+
+<details class="recursos">
+  <summary>📂 Recursos de esta sesión</summary>
+  <p>Guía interactiva: <a href="../Sesion-05-Fragmentacion-y-Carga-Masiva/guia-interactiva/Sesion-005-index.html">Sesion-005-index.html</a><br>
+  Scripts: <code>scripts/01_fragmentacion_particiones_region.sql</code>, <code>02_indices_matchmaking.sql</code>, <code>03_etl_carga_masiva.sql</code><br>
+  MySQL/MariaDB no permite <code>FOREIGN KEY</code> hacia/desde una tabla particionada — <code>Partidas_Fragmentada</code> no tiene FK explícitas a propósito.</p>
+</details>
+<div class="clave">
+  <strong>Criterio de éxito:</strong> <code>EXPLAIN</code> muestra que filtrar por región solo toca la partición correspondiente, y la consulta de matchmaking usa los índices creados (<code>type</code> distinto de <code>ALL</code>).
+</div>
+</div>
+
+<div class="caja" data-sesion="6">
+<h3>Sesión 6 — Respaldos y Recuperación ante Ataques <span class="badge-semana">Semanas 14-16</span></h3>
+<p>¿Qué pasa si el servidor sufre un ataque DDoS o se cae el centro de datos? Reto final: simular una caída crítica y restablecer las cuentas de los usuarios sin perder compras ni progreso.</p>
+<p><strong>Objetivos:</strong></p>
+<ul>
+  <li>Configurar copias de seguridad automáticas (totales e incrementales).</li>
+  <li>Auditar accesos y cambios sobre la base de datos.</li>
+  <li>Ejecutar un simulacro completo de desastre y recuperación.</li>
+</ul>
+<p><strong>Actividades:</strong></p>
+<ol>
+  <li>Auditoría: ejecutar <code>scripts/01_auditoria_trazas.sql</code> — registra cambios críticos mediante un <code>TRIGGER</code>.</li>
+  <li>Respaldo total: pestaña <strong>Exportar</strong> de phpMyAdmin, o <code>scripts/02_backup_completo.sh</code>.</li>
+  <li>Respaldo incremental / binlog: <code>scripts/03_backup_incremental_binlog.sh</code> — recuperación punto-en-el-tiempo (PITR).</li>
+  <li>Calendarización, objetos y snapshots: conceptual — Paso 4 (programar con <code>cron</code>, respaldar una sola tabla/procedimiento, discos de imagen).</li>
+  <li><strong>Reto final:</strong> ejecutar <code>scripts/04_simulacro_desastre_recuperacion.sh</code> — borra la base intencionalmente y la restaura desde el respaldo.</li>
+</ol>
+
+<button class="btn-info" id="btn-info-s6" onclick="alternarTarjeta('info-s6','btn-info-s6')">🖼️ Ver diagramas: PITR con binlog y simulacro de desastre</button>
+<div class="tarjeta-info" id="info-s6" hidden>
+  <h4>Por qué el binlog salva "casi todo": PITR</h4>
+  <svg class="ilustracion" viewBox="0 0 620 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Comparación: solo respaldo total se pierde todo desde el backup hasta el incidente; con binlog y PITR solo se pierden unos segundos">
+    <text x="20" y="14" font-size="9" font-weight="700" fill="#991b1b">Solo respaldo total (sin binlog)</text>
+    <rect x="20" y="20" width="150" height="26" rx="3" fill="#f0fdf4" stroke="#16a34a"></rect>
+    <text x="95" y="37" text-anchor="middle" font-size="7.5" fill="#166534">respaldo</text>
+    <rect x="170" y="20" width="390" height="26" rx="3" fill="#fef2f2" stroke="#ef4444"></rect>
+    <text x="365" y="37" text-anchor="middle" font-size="7.5" fill="#991b1b">❌ todo lo ocurrido después del respaldo se pierde</text>
+
+    <text x="20" y="78" font-size="9" font-weight="700" fill="#166534">Respaldo total + binlog (PITR, Paso 3)</text>
+    <rect x="20" y="84" width="150" height="26" rx="3" fill="#f0fdf4" stroke="#16a34a"></rect>
+    <text x="95" y="101" text-anchor="middle" font-size="7.5" fill="#166534">respaldo</text>
+    <rect x="170" y="84" width="370" height="26" rx="3" fill="#f0fdf4" stroke="#16a34a"></rect>
+    <text x="355" y="101" text-anchor="middle" font-size="7.5" fill="#166534">✅ binlog reproducido — transacciones recuperadas</text>
+    <rect x="540" y="84" width="20" height="26" fill="#f3f4f6" stroke="#94a3b8"></rect>
+
+    <line x1="560" y1="8" x2="560" y2="118" stroke="#991b1b" stroke-width="1.5" stroke-dasharray="3,2"></line>
+    <text x="560" y="130" text-anchor="middle" font-size="8" font-weight="700" fill="#991b1b">🔥 incidente</text>
+  </svg>
+  <p class="pie-ilustracion">Sin binlog, todo lo ocurrido entre el último respaldo y el incidente se pierde. Con PITR, el simulador del Paso 3 deja elegir el punto exacto de recuperación: solo se pierden los segundos entre el último commit registrado y la caída.</p>
+
+  <h4>El reto final: simulacro de desastre en 4 pasos</h4>
+  <svg class="ilustracion" viewBox="0 0 620 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Cuatro pasos del simulacro de desastre: estado normal, ataque simulado con DROP DATABASE, restauración desde el respaldo, y verificación de que no se perdieron datos">
+    <defs>
+      <marker id="flechaSim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#374151"></path>
+      </marker>
+    </defs>
+
+    <rect x="20" y="35" width="130" height="60" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"></rect>
+    <text x="85" y="60" text-anchor="middle" font-size="8.5" font-weight="700" fill="#166534">1. Estado normal</text>
+    <text x="85" y="75" text-anchor="middle" font-size="7" fill="#166534">jugadores con su progreso</text>
+    <line x1="150" y1="65" x2="168" y2="65" stroke="#374151" marker-end="url(#flechaSim)"></line>
+
+    <rect x="170" y="35" width="130" height="60" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="2"></rect>
+    <text x="235" y="60" text-anchor="middle" font-size="8.5" font-weight="700" fill="#991b1b">2. 🔥 DROP DATABASE</text>
+    <text x="235" y="75" text-anchor="middle" font-size="7" fill="#991b1b">ataque / caída simulada</text>
+    <line x1="300" y1="65" x2="318" y2="65" stroke="#374151" marker-end="url(#flechaSim)"></line>
+
+    <rect x="320" y="35" width="130" height="60" rx="6" fill="#eef2ff" stroke="#1d4ed8" stroke-width="2"></rect>
+    <text x="385" y="60" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1d4ed8">3. Restaurar</text>
+    <text x="385" y="75" text-anchor="middle" font-size="7" fill="#1d4ed8">desde el respaldo (Paso 2)</text>
+    <line x1="450" y1="65" x2="468" y2="65" stroke="#374151" marker-end="url(#flechaSim)"></line>
+
+    <rect x="470" y="35" width="130" height="60" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"></rect>
+    <text x="535" y="55" text-anchor="middle" font-size="8.5" font-weight="700" fill="#166534">4. ✅ Verificar</text>
+    <text x="535" y="70" text-anchor="middle" font-size="7" fill="#166534">monedas, nivel e inventario</text>
+    <text x="535" y="82" text-anchor="middle" font-size="7" fill="#166534">idénticos a como estaban</text>
+  </svg>
+  <p class="pie-ilustracion">Es el mismo patrón que un "game day" de un equipo de infraestructura real: provocar la falla a propósito para comprobar, con evidencia y no solo con la teoría, que la recuperación funciona.</p>
+</div>
+
+<details class="recursos">
+  <summary>📂 Recursos de esta sesión</summary>
+  <p>Guía interactiva: <a href="../Sesion-06-Respaldos-y-Recuperacion/guia-interactiva/Sesion-006-index.html">Sesion-006-index.html</a> (incluye recreación completa del simulacro de desastre)<br>
+  Scripts: <code>scripts/01_auditoria_trazas.sql</code>, <code>02_backup_completo.sh</code>, <code>03_backup_incremental_binlog.sh</code>, <code>04_simulacro_desastre_recuperacion.sh</code></p>
+</details>
+<div class="clave">
+  <strong>Criterio de éxito (reto final):</strong> tras el "ataque" simulado, la base se restaura completamente; inventario, monedas y nivel de cada jugador quedan idénticos a como estaban antes del incidente.
+</div>
+</div>
+
+<h2>3. Glosario rápido del curso</h2>
+<p>Términos que reaparecen entre sesiones — si olvidas uno, vuelve aquí antes de repasar la sesión completa.</p>
+<button class="btn-info" id="btn-info-glosario" onclick="alternarTarjeta('info-glosario','btn-info-glosario')">📖 Ver glosario del curso</button>
+<div class="tarjeta-info" id="info-glosario" hidden>
+  <h4>DBA / SA / DA (Sesiones 1-2)</h4>
+  <p><strong>DBA</strong> (Administrador de la plataforma): control total sobre la base. <strong>SA</strong> (Soporte Técnico de Infraestructura): mantiene el servidor, sin acceso a datos de negocio. <strong>DA</strong> (Analista de estadísticas): solo lectura para reportes.</p>
+  <h4>Disponibilidad y SLA (Sesión 3)</h4>
+  <p><strong>Disponibilidad:</strong> proporción del tiempo en que el sistema responde correctamente. <strong>SLA</strong> (Service Level Agreement): compromiso formal de disponibilidad (uptime), latencia y throughput.</p>
+  <h4>Roles y grupos de privilegios (Sesión 4)</h4>
+  <p>Un <code>ROLE</code> en MySQL es un grupo de privilegios con nombre — se asigna una cuenta real a un rol en vez de otorgar permisos uno por uno.</p>
+  <h4>ETL (Sesión 5)</h4>
+  <p><strong>Extract-Transform-Load:</strong> extraer datos de un origen, transformarlos, y cargarlos en el destino — el patrón detrás de toda carga masiva, local o en la nube.</p>
+  <h4>PITR (Sesión 6)</h4>
+  <p><strong>Point-In-Time Recovery</strong> (recuperación punto-en-el-tiempo): restaurar un respaldo total y luego reproducir el binary log hasta justo antes del incidente, para no perder casi nada.</p>
+</div>
+
+<h2>4. Checklist general del curso</h2>
+<div class="nota">
+  <strong>Antes de dar por cerrado el curso</strong>, verifica que completaste cada uno de estos puntos — uno por sesión, más algunos generales.
+</div>
+<div class="caja checklist">
+  <label><input type="checkbox"> Sesión 1: diseñé el modelo ER y el leaderboard responde correctamente.</label>
+  <label><input type="checkbox"> Sesión 2: los tres roles (<code>dba_admin</code>, <code>soporte_sa</code>, <code>analista_da</code>) tienen exactamente los privilegios que les corresponde.</label>
+  <label><input type="checkbox"> Sesión 3: probé la concurrencia con dos pestañas y solo una compra tuvo éxito.</label>
+  <label><input type="checkbox"> Sesión 4: resolví el reto del simulador anti-inyección SQL.</label>
+  <label><input type="checkbox"> Sesión 5: comparé el <code>EXPLAIN</code> antes y después de crear los índices de matchmaking.</label>
+  <label><input type="checkbox"> Sesión 6: completé el simulacro de desastre y verifiqué que no se perdió ningún dato.</label>
+  <label><input type="checkbox"> Abrí y usé la guía interactiva de cada una de las 6 sesiones, no solo los scripts.</label>
+  <label><input type="checkbox"> Ejecuté los scripts de cada sesión en el orden correcto sobre la misma base <code>juego_online</code>.</label>
+</div>
+
+<h2>5. Cómo te van a evaluar</h2>
+<table>
+  <tr><th>Criterio</th><th>Qué se revisa</th></tr>
+  <tr><td><strong>C — Conceptual</strong></td><td>Reconoces y explicas los conceptos de la sesión (roles DBA/SA/DA, tipos de integridad, disponibilidad/SLA, ETL, auditoría, etc.) mediante una evaluación objetiva con preguntas escritas que validan los conceptos de cada sesión. Estas preguntas ya existen como un balotario que puedes revisar libremente, por si quieres practicar o simplemente tienes curiosidad.</td></tr>
+  <tr><td><strong>P — Procedimental</strong></td><td>Implementaste correctamente los scripts de la sesión sobre <code>juego_online</code> y puedes demostrarlo (leaderboard, roles, concurrencia, seguridad, fragmentación, respaldos), documentado en un informe práctico. Debes poder escribir los comandos o recrear los scripts en cualquier ambiente y ante cualquier dificultad que se plantee en la evaluación, ya que todo el código se te entregó con anticipación precisamente para que practiques y lo corrobores en tu propio motor o gestor de base de datos.</td></tr>
+  <tr><td><strong>A — Actitudinal</strong></td><td>Participas activamente en el trabajo en equipo y en la solución de problemas durante cada sesión. También se evalúa la actitud con la que resuelves los problemas técnicos que puedan surgir al presentar tus entregables — por ejemplo, usar un gestor de base de datos distinto o adaptar tu código a tu propio entorno. Lo que importa es el interés genuino por cumplir con el entregable buscando soluciones, y no simplemente reclamar o excusarte con factores externos, ya que el docente entregó el código y las herramientas con 4 meses de anticipación para que puedas gestionar tus tiempos.</td></tr>
+</table>
+<h2>6. Anexo: SQL Server / PostgreSQL vs MySQL/MariaDB</h2>
+<p>El sílabo pide <strong>SQL Server y PostgreSQL</strong> (Sesión 1: "Programación en SQL server y Postgre"); este curso los adapta a <strong>MySQL/MariaDB con phpMyAdmin</strong> porque es el motor disponible en el laboratorio. Las ideas y la lógica son las mismas — cambia la sintaxis. Usa esta tabla para reconocer el mismo comando en los tres motores, por si trabajas con SQL Server o PostgreSQL en otra materia o en una empresa.</p>
+
+<svg class="ilustracion" viewBox="0 0 620 205" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Un mismo objetivo, un ID que sube solo con cada jugador nuevo, resuelto con AUTO_INCREMENT en MySQL y MariaDB, IDENTITY en SQL Server y SERIAL en PostgreSQL">
+  <defs>
+    <marker id="flechaTraductor" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#374151"></path>
+    </marker>
+  </defs>
+  <rect x="170" y="15" width="280" height="55" rx="8" fill="#fffbeb" stroke="#f59e0b" stroke-width="2"></rect>
+  <text x="310" y="37" text-anchor="middle" font-size="9.5" font-weight="700" fill="#92400e">🎯 Mismo objetivo</text>
+  <text x="310" y="55" text-anchor="middle" font-size="8" fill="#92400e">un ID que sube solo con cada jugador nuevo</text>
+
+  <line x1="230" y1="70" x2="95" y2="118" stroke="#374151" stroke-width="1.5" marker-end="url(#flechaTraductor)"></line>
+  <line x1="310" y1="70" x2="310" y2="118" stroke="#374151" stroke-width="1.5" marker-end="url(#flechaTraductor)"></line>
+  <line x1="390" y1="70" x2="525" y2="118" stroke="#374151" stroke-width="1.5" marker-end="url(#flechaTraductor)"></line>
+
+  <rect x="10" y="120" width="170" height="70" rx="6" fill="#eef2ff" stroke="#1d4ed8" stroke-width="2"></rect>
+  <text x="95" y="140" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1d4ed8">MySQL/MariaDB</text>
+  <text x="95" y="153" text-anchor="middle" font-size="7.5" fill="#1e3a8a">(este curso)</text>
+  <text x="95" y="173" text-anchor="middle" font-family="monospace" font-size="8" fill="#374151">AUTO_INCREMENT</text>
+
+  <rect x="225" y="120" width="170" height="70" rx="6" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"></rect>
+  <text x="310" y="145" text-anchor="middle" font-size="9.5" font-weight="700" fill="#92400e">SQL Server</text>
+  <text x="310" y="173" text-anchor="middle" font-family="monospace" font-size="8" fill="#374151">IDENTITY(1,1)</text>
+
+  <rect x="440" y="120" width="170" height="70" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"></rect>
+  <text x="525" y="145" text-anchor="middle" font-size="9.5" font-weight="700" fill="#166534">PostgreSQL</text>
+  <text x="525" y="173" text-anchor="middle" font-family="monospace" font-size="8" fill="#374151">SERIAL</text>
+</svg>
+<p class="pie-ilustracion">Es como decir "hola" en tres idiomas: cambia la palabra, no el saludo. Toda la tabla de abajo funciona así — mismo problema, tres formas distintas de escribirlo.</p>
+
+<button class="btn-info" id="btn-info-comparacion" onclick="alternarTarjeta('info-comparacion','btn-info-comparacion')">🔀 Ver comparación de comandos: MySQL/MariaDB vs SQL Server vs PostgreSQL</button>
+<div class="tarjeta-info" id="info-comparacion" hidden>
+
+<h4>Sesión 1 — Autoincremento de clave primaria</h4>
+<div class="tabla-scroll">
+<table class="tabla-comparacion">
+<tr><th>MySQL/MariaDB (este curso)</th><th>SQL Server</th><th>PostgreSQL</th></tr>
+<tr>
+<td><pre class="pre-sql"><span class="ln">1</span>jugador_id INT AUTO_INCREMENT
+<span class="ln">2</span>  PRIMARY KEY</pre><ol class="line-desc"><li>define la columna como número entero que MySQL asigna solo, sumando 1 en cada fila nueva.</li><li>la marca como clave primaria (identificador único de cada jugador).</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>jugador_id INT IDENTITY(1,1)
+<span class="ln">2</span>  PRIMARY KEY</pre><ol class="line-desc"><li>columna entera que empieza en 1 y sube de 1 en 1 automáticamente.</li><li>la marca como clave primaria.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>jugador_id SERIAL
+<span class="ln">2</span>  PRIMARY KEY
+<span class="ln">3</span>-- o: GENERATED ALWAYS AS IDENTITY</pre><ol class="line-desc"><li>crea la columna entera y, por detrás, una secuencia que la va incrementando sola.</li><li>la marca como clave primaria.</li><li>comentario: forma moderna equivalente a SERIAL en versiones recientes de PostgreSQL.</li></ol></td>
+</tr>
+</table>
+</div>
+
+<h4>Sesión 1 — Limitar filas (leaderboard: top 10 puntajes)</h4>
+<div class="tabla-scroll">
+<table class="tabla-comparacion">
+<tr><th>MySQL/MariaDB (este curso)</th><th>SQL Server</th><th>PostgreSQL</th></tr>
+<tr>
+<td><pre class="pre-sql"><span class="ln">1</span>SELECT * FROM Partidas
+<span class="ln">2</span>ORDER BY puntaje DESC
+<span class="ln">3</span>LIMIT 10;</pre><ol class="line-desc"><li>trae todas las columnas de la tabla Partidas.</li><li>ordena los resultados del puntaje más alto al más bajo.</li><li>se queda solo con las primeras 10 filas ya ordenadas.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>SELECT TOP 10 * FROM Partidas
+<span class="ln">2</span>ORDER BY puntaje DESC;
+<span class="ln">3</span>-- o: OFFSET 0 ROWS FETCH NEXT
+<span class="ln">4</span>--    10 ROWS ONLY</pre><ol class="line-desc"><li>pide de una vez las primeras 10 filas de la tabla.</li><li>ordena esas filas del puntaje más alto al más bajo.</li><li>comentario: forma alternativa de paginar en SQL Server.</li><li>continúa el comentario: se queda con 10 filas contando desde la posición 0.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>SELECT * FROM Partidas
+<span class="ln">2</span>ORDER BY puntaje DESC
+<span class="ln">3</span>LIMIT 10;</pre><ol class="line-desc"><li>trae todas las columnas de la tabla Partidas.</li><li>ordena los resultados del puntaje más alto al más bajo.</li><li>se queda solo con las primeras 10 filas ya ordenadas.</li></ol></td>
+</tr>
+</table>
+</div>
+
+<svg class="ilustracion" viewBox="0 0 620 205" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Leaderboard ordenado por puntaje: las primeras diez filas se muestran, LIMIT 10 o TOP 10 corta el resto">
+  <text x="310" y="14" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1f2937">🏆 Leaderboard ordenado de mayor a menor puntaje</text>
+
+  <text x="132" y="33" text-anchor="end" font-size="6.5" fill="#374151">#1</text>
+  <rect x="140" y="26" width="440" height="9" rx="2" fill="#dcfce7" stroke="#16a34a"></rect>
+  <text x="132" y="45" text-anchor="end" font-size="6.5" fill="#374151">#2</text>
+  <rect x="140" y="38" width="407" height="9" rx="2" fill="#dcfce7" stroke="#16a34a"></rect>
+  <text x="132" y="57" text-anchor="end" font-size="6.5" fill="#374151">#3</text>
+  <rect x="140" y="50" width="375" height="9" rx="2" fill="#dcfce7" stroke="#16a34a"></rect>
+  <text x="132" y="69" text-anchor="end" font-size="6.5" fill="#374151">#4</text>
+  <rect x="140" y="62" width="342" height="9" rx="2" fill="#dcfce7" stroke="#16a34a"></rect>
+  <text x="132" y="81" text-anchor="end" font-size="6.5" fill="#374151">#5</text>
+  <rect x="140" y="74" width="309" height="9" rx="2" fill="#dcfce7" stroke="#16a34a"></rect>
+  <text x="132" y="93" text-anchor="end" font-size="6.5" fill="#374151">#6</text>
+  <rect x="140" y="86" width="277" height="9" rx="2" fill="#dcfce7" stroke="#16a34a"></rect>
+  <text x="132" y="105" text-anchor="end" font-size="6.5" fill="#374151">#7</text>
+  <rect x="140" y="98" width="244" height="9" rx="2" fill="#dcfce7" stroke="#16a34a"></rect>
+  <text x="132" y="117" text-anchor="end" font-size="6.5" fill="#374151">#8</text>
+  <rect x="140" y="110" width="211" height="9" rx="2" fill="#dcfce7" stroke="#16a34a"></rect>
+  <text x="132" y="129" text-anchor="end" font-size="6.5" fill="#374151">#9</text>
+  <rect x="140" y="122" width="179" height="9" rx="2" fill="#dcfce7" stroke="#16a34a"></rect>
+  <text x="132" y="141" text-anchor="end" font-size="6.5" fill="#374151">#10</text>
+  <rect x="140" y="134" width="146" height="9" rx="2" fill="#dcfce7" stroke="#16a34a"></rect>
+
+  <line x1="15" y1="151" x2="605" y2="151" stroke="#991b1b" stroke-width="1.5" stroke-dasharray="4,3"></line>
+  <rect x="255" y="144" width="110" height="13" fill="#fafafa" opacity="0.95"></rect>
+  <text x="310" y="154" text-anchor="middle" font-size="7.5" font-weight="700" fill="#991b1b">✂️ LIMIT 10 / TOP 10</text>
+
+  <text x="132" y="169" text-anchor="end" font-size="6.5" fill="#9ca3af">#11</text>
+  <rect x="140" y="160" width="113" height="9" rx="2" fill="#f3f4f6" stroke="#94a3b8"></rect>
+  <text x="132" y="181" text-anchor="end" font-size="6.5" fill="#9ca3af">#12</text>
+  <rect x="140" y="172" width="80" height="9" rx="2" fill="#f3f4f6" stroke="#94a3b8"></rect>
+
+  <text x="310" y="197" text-anchor="middle" font-size="7.5" fill="#374151">🟩 se muestran (leaderboard)  ·  ⬜ se cortan, nunca llegan al jugador</text>
+</svg>
+<p class="pie-ilustracion">MySQL/MariaDB y PostgreSQL cortan con <code>LIMIT 10</code> al final de la consulta; SQL Server corta al principio con <code>TOP 10</code>. El resultado que ve el jugador es idéntico en los tres.</p>
+<p class="pie-ilustracion"><strong>¿Por qué importa?</strong> Sin <code>LIMIT</code>/<code>TOP</code>, el motor tendría que ordenar y devolver <em>todas</em> las partidas de la tabla —podrían ser miles o millones— solo para que la aplicación se quede con las 10 primeras. Cortar dentro de la base de datos, no después en el código, ahorra memoria, tiempo de red y trabajo del servidor. Lo que este ejemplo quiere demostrar es la idea central de todo este anexo: los tres motores resuelven el mismo problema de rendimiento, solo cambia la palabra clave que usan para pedirlo.</p>
+
+<h4>Sesión 1 — Procedimiento almacenado (<code>subir_nivel_jugador</code>)</h4>
+<div class="tabla-scroll">
+<table class="tabla-comparacion">
+<tr><th>MySQL/MariaDB (este curso)</th><th>SQL Server</th><th>PostgreSQL</th></tr>
+<tr>
+<td><pre class="pre-sql"><span class="ln">1</span>DELIMITER $$
+<span class="ln">2</span>CREATE PROCEDURE subir_nivel_jugador
+<span class="ln">3</span>  (IN p_id INT)
+<span class="ln">4</span>BEGIN
+<span class="ln">5</span>  UPDATE Jugadores
+<span class="ln">6</span>  SET nivel = nivel + 1
+<span class="ln">7</span>  WHERE jugador_id = p_id;
+<span class="ln">8</span>END$$
+<span class="ln">9</span>DELIMITER ;</pre><ol class="line-desc"><li>cambia el símbolo de "fin de instrucción" a $$, para que el ; de adentro no corte el procedimiento antes de tiempo.</li><li>empieza a crear el procedimiento y le da nombre.</li><li>recibe un parámetro de entrada: el ID del jugador.</li><li>abre el bloque de instrucciones del procedimiento.</li><li>indica que se va a modificar la tabla Jugadores.</li><li>le suma 1 al nivel actual.</li><li>solo al jugador cuyo ID coincide con el parámetro recibido.</li><li>cierra el bloque del procedimiento (con el delimitador especial).</li><li>devuelve el punto y coma a su función normal.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>CREATE PROCEDURE
+<span class="ln">2</span>  subir_nivel_jugador
+<span class="ln">3</span>  @p_id INT
+<span class="ln">4</span>AS
+<span class="ln">5</span>BEGIN
+<span class="ln">6</span>  UPDATE Jugadores
+<span class="ln">7</span>  SET nivel = nivel + 1
+<span class="ln">8</span>  WHERE jugador_id = @p_id;
+<span class="ln">9</span>END;</pre><ol class="line-desc"><li>empieza a crear el procedimiento.</li><li>le da el nombre.</li><li>declara el parámetro de entrada (en SQL Server todos llevan @).</li><li>separa la declaración del procedimiento de su contenido.</li><li>abre el bloque de instrucciones.</li><li>va a modificar la tabla Jugadores.</li><li>le suma 1 al nivel actual.</li><li>solo al jugador cuyo ID coincide con el parámetro.</li><li>cierra el bloque del procedimiento.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>CREATE OR REPLACE PROCEDURE
+<span class="ln">2</span>  subir_nivel_jugador(p_id INT)
+<span class="ln">3</span>LANGUAGE plpgsql AS $$
+<span class="ln">4</span>BEGIN
+<span class="ln">5</span>  UPDATE Jugadores
+<span class="ln">6</span>  SET nivel = nivel + 1
+<span class="ln">7</span>  WHERE jugador_id = p_id;
+<span class="ln">8</span>END;
+<span class="ln">9</span>$$;</pre><ol class="line-desc"><li>crea el procedimiento, o lo reemplaza si ya existía uno con ese nombre.</li><li>nombre y parámetro de entrada, entre paréntesis como en una función.</li><li>indica que el cuerpo está en PL/pgSQL y abre el bloque con $$.</li><li>abre las instrucciones del procedimiento.</li><li>va a modificar la tabla Jugadores.</li><li>le suma 1 al nivel actual.</li><li>solo al jugador cuyo ID coincide con el parámetro.</li><li>cierra las instrucciones.</li><li>cierra el bloque $$ abierto en la línea 3 y termina la sentencia.</li></ol></td>
+</tr>
+</table>
+</div>
+
+<h4>Sesiones 2 y 4 — Roles y permisos (DBA/SA/DA, jugador/moderador/admin)</h4>
+<div class="tabla-scroll">
+<table class="tabla-comparacion">
+<tr><th>MySQL/MariaDB (este curso)</th><th>SQL Server</th><th>PostgreSQL</th></tr>
+<tr>
+<td><pre class="pre-sql"><span class="ln">1</span>CREATE ROLE 'analista_da';
+<span class="ln">2</span>GRANT SELECT ON
+<span class="ln">3</span>  juego_online.*
+<span class="ln">4</span>  TO 'analista_da';
+<span class="ln">5</span>GRANT 'analista_da'
+<span class="ln">6</span>  TO 'usuario'@'%';</pre><ol class="line-desc"><li>crea el rol (grupo de permisos) llamado analista_da.</li><li>empieza a otorgar el permiso de solo lectura (SELECT).</li><li>sobre todas las tablas de la base juego_online.</li><li>se lo asigna al rol recién creado.</li><li>toma el rol analista_da...</li><li>...y se lo entrega a una cuenta de usuario real, para que herede esos permisos.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>CREATE ROLE analista_da;
+<span class="ln">2</span>GRANT SELECT ON
+<span class="ln">3</span>  SCHEMA::dbo
+<span class="ln">4</span>  TO analista_da;
+<span class="ln">5</span>ALTER ROLE analista_da
+<span class="ln">6</span>  ADD MEMBER usuario;</pre><ol class="line-desc"><li>crea el rol analista_da.</li><li>empieza a otorgar el permiso de solo lectura.</li><li>sobre todo el esquema dbo (equivale a "toda la base" en SQL Server).</li><li>se lo asigna al rol.</li><li>modifica el rol analista_da...</li><li>...para agregarle un usuario real como miembro.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>CREATE ROLE analista_da;
+<span class="ln">2</span>GRANT SELECT ON
+<span class="ln">3</span>  ALL TABLES IN SCHEMA public
+<span class="ln">4</span>  TO analista_da;
+<span class="ln">5</span>GRANT analista_da
+<span class="ln">6</span>  TO usuario;</pre><ol class="line-desc"><li>crea el rol analista_da.</li><li>empieza a otorgar el permiso de solo lectura.</li><li>sobre todas las tablas del esquema public.</li><li>se lo asigna al rol.</li><li>toma el rol analista_da...</li><li>...y se lo entrega a un usuario real.</li></ol></td>
+</tr>
+</table>
+</div>
+
+<h4>Sesión 3 — Bloqueo de fila en una compra (<code>comprar_item_unico</code>)</h4>
+<div class="tabla-scroll">
+<table class="tabla-comparacion">
+<tr><th>MySQL/MariaDB (este curso)</th><th>SQL Server</th><th>PostgreSQL</th></tr>
+<tr>
+<td><pre class="pre-sql"><span class="ln">1</span>START TRANSACTION;
+<span class="ln">2</span>SELECT vendido FROM Items
+<span class="ln">3</span>WHERE item_id = 1
+<span class="ln">4</span>FOR UPDATE;
+<span class="ln">5</span>-- ... UPDATE ...
+<span class="ln">6</span>COMMIT;</pre><ol class="line-desc"><li>abre una transacción: los cambios que siguen no se guardan hasta el COMMIT.</li><li>consulta si el item ya fue vendido.</li><li>específicamente el item con ID 1 (la skin única).</li><li>bloquea esa fila: nadie más puede tomarla con FOR UPDATE hasta que termine esta transacción.</li><li>aquí iría el UPDATE que marca el item como vendido.</li><li>guarda los cambios y libera el bloqueo de la fila.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>BEGIN TRANSACTION;
+<span class="ln">2</span>SELECT vendido FROM Items
+<span class="ln">3</span>WITH (UPDLOCK, ROWLOCK)
+<span class="ln">4</span>WHERE item_id = 1;
+<span class="ln">5</span>-- SQL Server no usa FOR UPDATE
+<span class="ln">6</span>-- ... UPDATE ...
+<span class="ln">7</span>COMMIT;</pre><ol class="line-desc"><li>abre una transacción.</li><li>consulta si el item ya fue vendido.</li><li>pide un bloqueo de actualización sobre esa fila exacta.</li><li>específicamente el item con ID 1.</li><li>aclaración: esta sintaxis reemplaza a FOR UPDATE en SQL Server.</li><li>aquí iría el UPDATE que marca el item como vendido.</li><li>guarda los cambios y libera el bloqueo.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>BEGIN;
+<span class="ln">2</span>SELECT vendido FROM Items
+<span class="ln">3</span>WHERE item_id = 1
+<span class="ln">4</span>FOR UPDATE;
+<span class="ln">5</span>-- ... UPDATE ...
+<span class="ln">6</span>COMMIT;</pre><ol class="line-desc"><li>abre una transacción.</li><li>consulta si el item ya fue vendido.</li><li>específicamente el item con ID 1.</li><li>bloquea esa fila hasta que termine la transacción.</li><li>aquí iría el UPDATE que marca el item como vendido.</li><li>guarda los cambios y libera el bloqueo.</li></ol></td>
+</tr>
+</table>
+</div>
+
+<svg class="ilustracion" viewBox="0 0 620 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bloqueo de fila: el Jugador A toma el candado sobre el item unico y compra primero, el Jugador B espera su turno hasta que la fila se libere">
+  <defs>
+    <marker id="flechaCandado" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#374151"></path>
+    </marker>
+  </defs>
+  <text x="310" y="16" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1f2937">🔒 Bloqueo de fila: solo un jugador compra a la vez</text>
+
+  <rect x="15" y="55" width="155" height="55" rx="8" fill="#eef2ff" stroke="#1d4ed8" stroke-width="2"></rect>
+  <text x="92" y="76" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1d4ed8">🎮 Jugador A</text>
+  <text x="92" y="94" text-anchor="middle" font-size="7.5" fill="#1e3a8a">toma el candado ✅</text>
+
+  <rect x="225" y="42" width="170" height="72" rx="8" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"></rect>
+  <text x="310" y="68" text-anchor="middle" font-size="22">🔒</text>
+  <text x="310" y="90" text-anchor="middle" font-size="9" font-weight="700" fill="#92400e">Skin legendaria</text>
+  <text x="310" y="103" text-anchor="middle" font-size="7" fill="#92400e">(item único)</text>
+
+  <rect x="450" y="55" width="155" height="55" rx="8" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2"></rect>
+  <text x="527" y="76" text-anchor="middle" font-size="9.5" font-weight="700" fill="#6b7280">🎮 Jugador B</text>
+  <text x="527" y="94" text-anchor="middle" font-size="7.5" fill="#6b7280">espera su turno ⏳</text>
+
+  <line x1="170" y1="80" x2="223" y2="78" stroke="#16a34a" stroke-width="2" marker-end="url(#flechaCandado)"></line>
+  <line x1="395" y1="78" x2="448" y2="80" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3,2" marker-end="url(#flechaCandado)"></line>
+
+  <text x="310" y="128" text-anchor="middle" font-size="7.5" fill="#374151">MySQL/PostgreSQL: <tspan font-family="monospace" font-weight="700">FOR UPDATE</tspan></text>
+  <text x="310" y="140" text-anchor="middle" font-size="7.5" fill="#374151">SQL Server: <tspan font-family="monospace" font-weight="700">WITH (UPDLOCK, ROWLOCK)</tspan></text>
+</svg>
+<p class="pie-ilustracion">La idea es la misma en los tres motores: mientras el Jugador A tiene el candado sobre la fila, el Jugador B tiene que esperar — así nunca se vende la misma skin dos veces (lo ves a fondo en el diagrama de la Sesión 3).</p>
+<p class="pie-ilustracion"><strong>¿Por qué importa?</strong> Sin este candado, los dos jugadores podrían leer "disponible" casi al mismo tiempo y los dos terminarían comprando el mismo item único — una condición de carrera que en un juego real significa vender una skin que ya no existe, o cobrarle a alguien por algo que nunca recibe. Bloquear la fila obliga a que las compras pasen de una en una. Lo que este ejemplo quiere demostrar es que este control de concurrencia no es un detalle de sintaxis: es la diferencia entre un evento de lanzamiento que funciona y uno que genera compras dobles y reclamos — por eso los tres motores, cada uno a su manera, ofrecen una forma de bloquear la fila.</p>
+
+<h4>Sesión 3 — Cambio de estructura sin bloquear el servicio</h4>
+<div class="tabla-scroll">
+<table class="tabla-comparacion">
+<tr><th>MySQL/MariaDB (este curso)</th><th>SQL Server</th><th>PostgreSQL</th></tr>
+<tr>
+<td><pre class="pre-sql"><span class="ln">1</span>ALTER TABLE Jugadores
+<span class="ln">2</span>ADD COLUMN pais VARCHAR(50),
+<span class="ln">3</span>ALGORITHM=INSTANT;</pre><ol class="line-desc"><li>va a modificar la estructura de la tabla Jugadores.</li><li>agrega una columna nueva llamada país.</li><li>hace el cambio como metadata pura, sin copiar la tabla ni bloquear lecturas/escrituras.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>-- Agregar columna con DEFAULT
+<span class="ln">2</span>-- ya es metadata-only desde
+<span class="ln">3</span>-- SQL Server 2012+.
+<span class="ln">4</span>-- Para índices, en Enterprise:
+<span class="ln">5</span>CREATE INDEX ix_pais
+<span class="ln">6</span>ON Jugadores(pais)
+<span class="ln">7</span>WITH (ONLINE = ON);</pre><ol class="line-desc"><li>comentario: explica el caso de agregar una columna con valor por defecto.</li><li>continúa el comentario: ese cambio ya es casi instantáneo...</li><li>...desde SQL Server 2012.</li><li>comentario: para crear índices sin bloquear, hace falta la edición Enterprise.</li><li>crea un índice nuevo llamado ix_pais.</li><li>sobre la columna país de la tabla Jugadores.</li><li>lo construye en línea, sin bloquear la tabla mientras se crea.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>-- Desde PostgreSQL 11, agregar
+<span class="ln">2</span>-- columna con DEFAULT constante
+<span class="ln">3</span>-- es solo metadata (instantáneo):
+<span class="ln">4</span>ALTER TABLE Jugadores
+<span class="ln">5</span>ADD COLUMN pais VARCHAR(50);</pre><ol class="line-desc"><li>comentario: explica desde qué versión de PostgreSQL aplica.</li><li>continúa: cuando el valor por defecto es un valor fijo...</li><li>...el cambio es solo metadata, no reescribe la tabla entera.</li><li>va a modificar la estructura de la tabla Jugadores.</li><li>agrega la columna país, de forma prácticamente instantánea.</li></ol></td>
+</tr>
+</table>
+</div>
+
+<h4>Sesión 5 — Particionar una tabla por región</h4>
+<div class="tabla-scroll">
+<table class="tabla-comparacion">
+<tr><th>MySQL/MariaDB (este curso)</th><th>SQL Server</th><th>PostgreSQL</th></tr>
+<tr>
+<td><pre class="pre-sql"><span class="ln">1</span>CREATE TABLE
+<span class="ln">2</span>  Partidas_Fragmentada (...)
+<span class="ln">3</span>PARTITION BY LIST
+<span class="ln">4</span>  COLUMNS(region) (
+<span class="ln">5</span>  PARTITION p_america
+<span class="ln">6</span>    VALUES IN ('AMERICA'),
+<span class="ln">7</span>  PARTITION p_europa
+<span class="ln">8</span>    VALUES IN ('EUROPA')
+<span class="ln">9</span>);</pre><ol class="line-desc"><li>empieza a crear la tabla.</li><li>le da nombre (las columnas van dentro de los paréntesis, resumidas aquí).</li><li>indica que se va a partir en pedazos según una lista de valores.</li><li>la columna que decide en qué pedazo cae cada fila es region.</li><li>define el primer pedazo, llamado p_america.</li><li>ahí van las filas donde region = 'AMERICA'.</li><li>define el segundo pedazo, llamado p_europa.</li><li>ahí van las filas donde region = 'EUROPA'.</li><li>cierra la definición de particiones y la sentencia.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>CREATE PARTITION FUNCTION
+<span class="ln">2</span>  pfRegion (VARCHAR(20))
+<span class="ln">3</span>  AS RANGE LEFT
+<span class="ln">4</span>  FOR VALUES ('AMERICA');
+<span class="ln">5</span>CREATE PARTITION SCHEME
+<span class="ln">6</span>  psRegion AS PARTITION
+<span class="ln">7</span>  pfRegion ALL TO ([PRIMARY]);
+<span class="ln">8</span>-- tabla creada con
+<span class="ln">9</span>-- ON psRegion(region)</pre><ol class="line-desc"><li>crea la "función de partición": la regla que decide en qué pedazo cae cada valor.</li><li>le da nombre y dice qué tipo de dato evalúa (texto de hasta 20 caracteres).</li><li>indica cómo se comparan los límites de cada rango.</li><li>define dónde corta el primer rango.</li><li>crea el "esquema de partición": dice en qué archivos físicos vive cada pedazo.</li><li>le da nombre y lo asocia a la función de partición de arriba.</li><li>manda todos los pedazos al grupo de archivos PRIMARY.</li><li>comentario: falta el último paso...</li><li>...crear la tabla indicando que use este esquema sobre la columna region.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>CREATE TABLE
+<span class="ln">2</span>  Partidas_Fragmentada (...)
+<span class="ln">3</span>  PARTITION BY LIST (region);
+<span class="ln">4</span>
+<span class="ln">5</span>CREATE TABLE p_america
+<span class="ln">6</span>  PARTITION OF
+<span class="ln">7</span>  Partidas_Fragmentada
+<span class="ln">8</span>  FOR VALUES IN ('AMERICA');</pre><ol class="line-desc"><li>empieza a crear la tabla "padre".</li><li>le da nombre (columnas resumidas en los paréntesis).</li><li>declara que se va a partir en listas según la columna region.</li><li>línea en blanco, solo separa visualmente la tabla padre de la tabla hija.</li><li>crea una tabla "hija" independiente, llamada p_america.</li><li>la declara como una partición de...</li><li>...la tabla Partidas_Fragmentada.</li><li>y le dice que reciba las filas donde region = 'AMERICA'.</li></ol></td>
+</tr>
+</table>
+</div>
+
+<svg class="ilustracion" viewBox="0 0 620 175" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Consulta filtrada por region AMERICA abre solo el cajon AMERICA de la tabla fragmentada; el cajon EUROPA ni se abre">
+  <defs>
+    <marker id="flechaCajones" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#374151"></path>
+    </marker>
+  </defs>
+  <text x="310" y="14" text-anchor="middle" font-size="9.5" font-weight="700" fill="#1f2937">📮 Fragmentar por región: como casilleros de correo</text>
+
+  <rect x="190" y="20" width="240" height="24" rx="4" fill="#eef2ff" stroke="#1d4ed8"></rect>
+  <text x="310" y="36" text-anchor="middle" font-family="monospace" font-size="8" fill="#1d4ed8">... WHERE region = 'AMERICA'</text>
+
+  <line x1="230" y1="44" x2="150" y2="70" stroke="#16a34a" stroke-width="2" marker-end="url(#flechaCajones)"></line>
+  <line x1="390" y1="44" x2="470" y2="70" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3,2" marker-end="url(#flechaCajones)"></line>
+
+  <rect x="40" y="72" width="200" height="85" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="3"></rect>
+  <text x="140" y="92" text-anchor="middle" font-size="9.5" font-weight="700" fill="#166534">🌎 Cajón AMERICA</text>
+  <text x="140" y="106" text-anchor="middle" font-size="7.5" fill="#166534">✅ se abre y se revisa</text>
+  <rect x="55" y="115" width="45" height="14" rx="2" fill="#ffffff" stroke="#16a34a"></rect>
+  <text x="77" y="125" text-anchor="middle" font-size="8">🎮</text>
+  <rect x="115" y="115" width="45" height="14" rx="2" fill="#ffffff" stroke="#16a34a"></rect>
+  <text x="137" y="125" text-anchor="middle" font-size="8">🎮</text>
+  <rect x="175" y="115" width="45" height="14" rx="2" fill="#ffffff" stroke="#16a34a"></rect>
+  <text x="197" y="125" text-anchor="middle" font-size="8">🎮</text>
+
+  <rect x="380" y="72" width="200" height="85" rx="8" fill="#f3f4f6" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5,3"></rect>
+  <text x="480" y="92" text-anchor="middle" font-size="9.5" font-weight="700" fill="#6b7280">🌍 Cajón EUROPA</text>
+  <text x="480" y="106" text-anchor="middle" font-size="7.5" fill="#6b7280">⏭️ ni se abre</text>
+  <text x="480" y="130" text-anchor="middle" font-size="7" fill="#9ca3af">(partition pruning)</text>
+</svg>
+<p class="pie-ilustracion">MySQL/MariaDB usa <code>PARTITION BY LIST COLUMNS</code>, SQL Server usa una función + esquema de partición, y PostgreSQL crea una tabla hija por región — pero en los tres, filtrar por región le ahorra al motor abrir cajones que no necesita.</p>
+<p class="pie-ilustracion"><strong>¿Por qué importa?</strong> Sin particiones, el motor tendría que revisar <em>todas</em> las partidas —de América y de Europa juntas— para encontrar las de una sola región, aunque la mitad de ese trabajo sea inútil. Al dividir la tabla en cajones separados, una consulta de matchmaking filtrada por región puede ignorar por completo el cajón que no le sirve, en vez de leerlo y descartarlo fila por fila. Lo que este ejemplo quiere demostrar es por qué el matchmaking puede responder en milisegundos incluso con millones de partidas guardadas: no es magia, es que el motor nunca abre la mitad de los datos que no necesita — y los tres motores llegan a ese mismo ahorro, aunque organicen los cajones de forma distinta.</p>
+
+<h4>Sesión 6 — Trigger de auditoría</h4>
+<div class="tabla-scroll">
+<table class="tabla-comparacion">
+<tr><th>MySQL/MariaDB (este curso)</th><th>SQL Server</th><th>PostgreSQL</th></tr>
+<tr>
+<td><pre class="pre-sql"><span class="ln">1</span>CREATE TRIGGER
+<span class="ln">2</span>  auditar_cambio_monedas
+<span class="ln">3</span>AFTER UPDATE ON Jugadores
+<span class="ln">4</span>FOR EACH ROW
+<span class="ln">5</span>BEGIN
+<span class="ln">6</span>  INSERT INTO Auditoria
+<span class="ln">7</span>  VALUES (NEW.jugador_id,
+<span class="ln">8</span>    OLD.monedas, NEW.monedas);
+<span class="ln">9</span>END;</pre><ol class="line-desc"><li>empieza a crear el trigger.</li><li>le da nombre.</li><li>se dispara después de cada UPDATE sobre la tabla Jugadores.</li><li>se ejecuta una vez por cada fila modificada.</li><li>abre el bloque de instrucciones del trigger.</li><li>inserta un registro nuevo en la tabla Auditoria.</li><li>guarda el ID del jugador modificado (NEW = valores después del cambio)...</li><li>...y las monedas antes (OLD) y después (NEW) del cambio.</li><li>cierra el bloque del trigger.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln"> 1</span>CREATE TRIGGER
+<span class="ln"> 2</span>  auditar_cambio_monedas
+<span class="ln"> 3</span>ON Jugadores AFTER UPDATE
+<span class="ln"> 4</span>AS
+<span class="ln"> 5</span>BEGIN
+<span class="ln"> 6</span>  INSERT INTO Auditoria
+<span class="ln"> 7</span>  SELECT jugador_id, monedas
+<span class="ln"> 8</span>  FROM deleted;
+<span class="ln"> 9</span>  -- usa las tablas virtuales
+<span class="ln">10</span>  -- inserted / deleted
+<span class="ln">11</span>END;</pre><ol class="line-desc"><li>empieza a crear el trigger.</li><li>le da nombre.</li><li>se dispara después de un UPDATE sobre la tabla Jugadores.</li><li>separa la declaración del contenido del trigger.</li><li>abre el bloque de instrucciones.</li><li>inserta un registro nuevo en la tabla Auditoria.</li><li>toma el ID y las monedas...</li><li>...de la tabla virtual deleted, que guarda los valores de antes del cambio.</li><li>comentario: SQL Server usa tablas especiales para esto...</li><li>...llamadas inserted (valores nuevos) y deleted (valores viejos).</li><li>cierra el bloque del trigger.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>CREATE TRIGGER
+<span class="ln">2</span>  auditar_cambio_monedas
+<span class="ln">3</span>AFTER UPDATE ON Jugadores
+<span class="ln">4</span>FOR EACH ROW EXECUTE FUNCTION
+<span class="ln">5</span>  fn_auditar_monedas();
+<span class="ln">6</span>-- la función usa NEW.col /
+<span class="ln">7</span>-- OLD.col, igual que MySQL</pre><ol class="line-desc"><li>empieza a crear el trigger.</li><li>le da nombre.</li><li>se dispara después de un UPDATE sobre la tabla Jugadores.</li><li>por cada fila modificada, ejecuta una función...</li><li>...llamada fn_auditar_monedas (en PostgreSQL la lógica va en una función aparte).</li><li>comentario: dentro de esa función se usan NEW.columna...</li><li>...y OLD.columna, igual que en MySQL/MariaDB.</li></ol></td>
+</tr>
+</table>
+</div>
+
+<h4>Sesión 6 — Respaldo completo</h4>
+<div class="tabla-scroll">
+<table class="tabla-comparacion">
+<tr><th>MySQL/MariaDB (este curso)</th><th>SQL Server</th><th>PostgreSQL</th></tr>
+<tr>
+<td><pre class="pre-sql"><span class="ln">1</span>mysqldump -u root -p
+<span class="ln">2</span>  juego_online > backup.sql</pre><ol class="line-desc"><li>llama a la herramienta de respaldo, pidiendo la contraseña del usuario root.</li><li>exporta la base juego_online y guarda todo en el archivo backup.sql.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>BACKUP DATABASE juego_online
+<span class="ln">2</span>TO DISK = 'C:\backup.bak';</pre><ol class="line-desc"><li>ordena hacer un respaldo completo de la base juego_online.</li><li>y guardarlo en ese archivo .bak del disco.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>pg_dump -U postgres
+<span class="ln">2</span>  juego_online > backup.sql</pre><ol class="line-desc"><li>llama a la herramienta de respaldo, conectándose como el usuario postgres.</li><li>exporta la base juego_online y guarda todo en el archivo backup.sql.</li></ol></td>
+</tr>
+</table>
+</div>
+
+<h4>Sesión 6 — Respaldo incremental / punto-en-el-tiempo (PITR)</h4>
+<div class="tabla-scroll">
+<table class="tabla-comparacion">
+<tr><th>MySQL/MariaDB (este curso)</th><th>SQL Server</th><th>PostgreSQL</th></tr>
+<tr>
+<td><pre class="pre-sql"><span class="ln">1</span>-- Binary log (binlog),
+<span class="ln">2</span>-- reproducido con:
+<span class="ln">3</span>mysqlbinlog binlog.000001
+<span class="ln">4</span>  | mysql -u root -p</pre><ol class="line-desc"><li>comentario: explica que se usa el registro binario (binlog)...</li><li>...que se puede volver a reproducir con este comando.</li><li>lee el archivo de binlog con todos los cambios registrados.</li><li>y lo envía directo al servidor, para reproducir esos cambios uno por uno.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>BACKUP LOG juego_online
+<span class="ln">2</span>TO DISK = 'C:\log.trn';
+<span class="ln">3</span>-- respaldos de log de
+<span class="ln">4</span>-- transacciones encadenados</pre><ol class="line-desc"><li>ordena respaldar el log de transacciones de la base.</li><li>y guardarlo en ese archivo .trn.</li><li>comentario: estos respaldos de log...</li><li>...se encadenan uno tras otro para poder recuperar hasta el momento exacto.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>-- WAL archiving, restaurado
+<span class="ln">2</span>-- con recovery_target_time
+<span class="ln">3</span>-- y pg_basebackup /
+<span class="ln">4</span>-- pg_receivewal</pre><ol class="line-desc"><li>comentario: PostgreSQL archiva su registro WAL, y para restaurar...</li><li>...se indica hasta qué momento exacto recuperar (recovery_target_time).</li><li>los respaldos base se toman con la herramienta pg_basebackup...</li><li>...y el WAL en tiempo real se recibe con pg_receivewal.</li></ol></td>
+</tr>
+</table>
+</div>
+
+<h4>Todas las sesiones — Ejecutar un script SQL</h4>
+<div class="tabla-scroll">
+<table class="tabla-comparacion">
+<tr><th>MySQL/MariaDB (este curso)</th><th>SQL Server</th><th>PostgreSQL</th></tr>
+<tr>
+<td><pre class="pre-sql"><span class="ln">1</span>-- phpMyAdmin, pestaña SQL, o:
+<span class="ln">2</span>mysql -u root -p
+<span class="ln">3</span>  juego_online < script.sql</pre><ol class="line-desc"><li>comentario: se puede pegar el script en la pestaña SQL de phpMyAdmin, o usar la línea de comandos.</li><li>conecta al servidor MySQL como root, pidiendo contraseña.</li><li>y ejecuta todo el contenido del archivo script.sql sobre la base juego_online.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>-- SQL Server Management
+<span class="ln">2</span>-- Studio (SSMS), o:
+<span class="ln">3</span>sqlcmd -i script.sql</pre><ol class="line-desc"><li>comentario: se puede usar la aplicación gráfica...</li><li>...llamada SSMS, o la línea de comandos.</li><li>ejecuta el archivo script.sql desde la terminal.</li></ol></td>
+<td><pre class="pre-sql"><span class="ln">1</span>-- pgAdmin, o:
+<span class="ln">2</span>psql -U postgres
+<span class="ln">3</span>  -f script.sql</pre><ol class="line-desc"><li>comentario: se puede usar la aplicación gráfica pgAdmin, o la línea de comandos.</li><li>conecta al servidor PostgreSQL como el usuario postgres.</li><li>y ejecuta el archivo script.sql indicado con -f.</li></ol></td>
+</tr>
+</table>
+</div>
+
+<p class="pie-ilustracion">La lógica que aprendiste (modelo relacional, transacciones, roles, particiones, respaldos) es la misma en los tres motores — lo único que cambia es la sintaxis exacta de cada comando.</p>
+</div>
+
+<button class="btn-info" id="btn-info-ejercicio" onclick="alternarTarjeta('info-ejercicio','btn-info-ejercicio')">▶️ Ver ejercicio guiado: las 6 sesiones en un solo flujo paso a paso</button>
+<div class="tarjeta-info" id="info-ejercicio" hidden>
+<p>Este ejercicio conecta los scripts de las 6 sesiones en <strong>una sola secuencia ejecutable</strong>, en el mismo orden en que se construye <code>juego_online</code> — respeta el orden 1 → 18, porque cada paso depende de que el anterior ya se haya ejecutado. Corre cada script en phpMyAdmin (pestaña SQL) y luego la consulta de verificación de ese paso, para confirmar que funcionó antes de seguir al siguiente. Los pasos marcados <span class="paso-terminal">terminal</span> se ejecutan en la línea de comandos, no en phpMyAdmin.</p>
+
+<div class="caja ejercicio-bloque" data-sesion="1">
+<span class="badge-semana">I.1 · Sesión 1</span><strong>Base de Datos del Juego</strong>
+
+<svg class="ilustracion" viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama de flujo de la Sesión 1: primero se crean las tablas, luego se insertan datos de prueba, después se consulta el leaderboard y por último se sube de nivel a un jugador">
+  <defs>
+    <marker id="flechaFlujoS1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#374151"></path>
+    </marker>
+  </defs>
+
+  <rect x="10" y="25" width="140" height="150" rx="8" fill="#eef2ff" stroke="#1d4ed8" stroke-width="2"></rect>
+  <circle cx="30" cy="45" r="12" fill="#1d4ed8"></circle>
+  <text x="30" y="49" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">1</text>
+  <text x="80" y="72" text-anchor="middle" font-size="22">🗄️</text>
+  <text x="80" y="95" text-anchor="middle" font-size="10" font-weight="700" fill="#1d4ed8">Crear tablas</text>
+  <text x="80" y="111" text-anchor="middle" font-size="7" fill="#1e3a8a">01_crear_tablas.sql</text>
+  <text x="80" y="131" text-anchor="middle" font-size="7.5" fill="#374151">6 tablas vacías:</text>
+  <text x="80" y="144" text-anchor="middle" font-size="7.5" fill="#374151">Jugadores, Items,</text>
+  <text x="80" y="157" text-anchor="middle" font-size="7.5" fill="#374151">Partidas...</text>
+
+  <line x1="150" y1="100" x2="178" y2="100" stroke="#374151" stroke-width="2" marker-end="url(#flechaFlujoS1)"></line>
+
+  <rect x="180" y="25" width="140" height="150" rx="8" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"></rect>
+  <circle cx="200" cy="45" r="12" fill="#f59e0b"></circle>
+  <text x="200" y="49" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">2</text>
+  <text x="250" y="72" text-anchor="middle" font-size="22">📥</text>
+  <text x="250" y="95" text-anchor="middle" font-size="10" font-weight="700" fill="#92400e">Insertar datos</text>
+  <text x="250" y="111" text-anchor="middle" font-size="7" fill="#92400e">02_datos_prueba.sql</text>
+  <text x="250" y="131" text-anchor="middle" font-size="7.5" fill="#374151">Llena las tablas</text>
+  <text x="250" y="144" text-anchor="middle" font-size="7.5" fill="#374151">con jugadores,</text>
+  <text x="250" y="157" text-anchor="middle" font-size="7.5" fill="#374151">items y partidas</text>
+
+  <line x1="320" y1="100" x2="348" y2="100" stroke="#374151" stroke-width="2" marker-end="url(#flechaFlujoS1)"></line>
+
+  <rect x="350" y="25" width="140" height="150" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"></rect>
+  <circle cx="370" cy="45" r="12" fill="#16a34a"></circle>
+  <text x="370" y="49" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">3</text>
+  <text x="420" y="72" text-anchor="middle" font-size="22">🏆</text>
+  <text x="420" y="95" text-anchor="middle" font-size="10" font-weight="700" fill="#166534">Leaderboard</text>
+  <text x="420" y="111" text-anchor="middle" font-size="6.3" fill="#166534">03_consultas_leaderboard.sql</text>
+  <text x="420" y="131" text-anchor="middle" font-size="7.5" fill="#374151">Ordena a los</text>
+  <text x="420" y="144" text-anchor="middle" font-size="7.5" fill="#374151">jugadores de mayor</text>
+  <text x="420" y="157" text-anchor="middle" font-size="7.5" fill="#374151">a menor puntaje</text>
+
+  <line x1="490" y1="100" x2="518" y2="100" stroke="#374151" stroke-width="2" marker-end="url(#flechaFlujoS1)"></line>
+
+  <rect x="520" y="25" width="140" height="150" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"></rect>
+  <circle cx="540" cy="45" r="12" fill="#7c3aed"></circle>
+  <text x="540" y="49" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">4</text>
+  <text x="590" y="72" text-anchor="middle" font-size="22">⬆️</text>
+  <text x="590" y="95" text-anchor="middle" font-size="10" font-weight="700" fill="#5b21b6">Subir de nivel</text>
+  <text x="590" y="111" text-anchor="middle" font-size="6.3" fill="#5b21b6">04_procedimiento_subir_nivel.sql</text>
+  <text x="590" y="131" text-anchor="middle" font-size="7.5" fill="#374151">Cambia nivel y</text>
+  <text x="590" y="144" text-anchor="middle" font-size="7.5" fill="#374151">experiencia de</text>
+  <text x="590" y="157" text-anchor="middle" font-size="7.5" fill="#374151">un jugador</text>
+</svg>
+<p class="pie-ilustracion">Sigue el orden 1 → 2 → 3 → 4 sobre la misma base <code>juego_online</code>: sin tablas no hay dónde insertar, sin datos no hay leaderboard que mostrar, y el procedimiento del paso 4 modifica las filas que insertaste en el paso 2.</p>
+
+<ol class="ejercicio-pasos" start="1">
+<li><strong>scripts/01_crear_tablas.sql</strong> — crea la base <code>juego_online</code> y sus 6 tablas (Jugadores, Juegos, Items, Inventario_Items, Partidas, Logros).
+  <div class="paso-verif">
+    <pre class="pre-sql">SHOW TABLES;</pre>
+    <p class="paso-esperado">✅ Esperado: aparecen las 6 tablas.</p>
+  </div>
+</li>
+<li><strong>scripts/02_datos_prueba.sql</strong> — inserta jugadores, items y partidas de ejemplo.
+  <div class="paso-verif">
+    <pre class="pre-sql">SELECT COUNT(*) FROM Jugadores;</pre>
+    <p class="paso-esperado">✅ Esperado: más de 0 filas.</p>
+  </div>
+</li>
+<li><strong>scripts/03_consultas_leaderboard.sql</strong> — genera el leaderboard y el catálogo de items comprados.
+  <div class="paso-verif">
+    <p class="paso-esperado">✅ Esperado: la consulta misma es el resultado — una lista de jugadores ordenada de mayor a menor puntaje.</p>
+  </div>
+</li>
+<li><strong>scripts/04_procedimiento_subir_nivel.sql</strong> — crea el procedimiento <code>subir_nivel_jugador</code>.
+  <div class="paso-verif">
+    <pre class="pre-sql">CALL subir_nivel_jugador(1, 500);
+SELECT nivel, experiencia FROM Jugadores WHERE jugador_id = 1;</pre>
+    <p class="paso-esperado">✅ Esperado: el nivel o la experiencia del jugador 1 cambiaron respecto a antes de la llamada.</p>
+  </div>
+</li>
+</ol>
+</div>
+
+<div class="caja ejercicio-bloque" data-sesion="2">
+<span class="badge-semana">I.1 (cont.) · Sesión 2</span><strong>Servidores y Roles de Administración</strong>
+
+<svg class="ilustracion" viewBox="0 0 680 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama de la Sesión 2: a la izquierda, un servidor primario que escribe datos y los replica a servidores de solo lectura en América y Europa; a la derecha, los tres usuarios reales dba_admin, soporte_sa y analista_da con sus permisos exactos">
+  <defs>
+    <marker id="flechaArqS2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#374151"></path>
+    </marker>
+  </defs>
+
+  <text x="170" y="18" text-anchor="middle" font-size="9" font-weight="700" fill="#1f2937">Arquitectura: primario + réplicas</text>
+  <rect x="95" y="30" width="150" height="60" rx="8" fill="#eef2ff" stroke="#1d4ed8" stroke-width="2"></rect>
+  <text x="170" y="53" text-anchor="middle" font-size="18">🖥️</text>
+  <text x="170" y="70" text-anchor="middle" font-size="8" font-weight="700" fill="#1d4ed8">Servidor Primario</text>
+  <text x="170" y="82" text-anchor="middle" font-size="6.5" fill="#1e3a8a">Escribe (INSERT/UPDATE)</text>
+
+  <line x1="150" y1="90" x2="90" y2="135" stroke="#374151" stroke-width="2" marker-end="url(#flechaArqS2)"></line>
+  <line x1="190" y1="90" x2="250" y2="135" stroke="#374151" stroke-width="2" marker-end="url(#flechaArqS2)"></line>
+  <text x="95" y="115" font-size="6.3" fill="#374151">replica</text>
+  <text x="222" y="115" font-size="6.3" fill="#374151">replica</text>
+
+  <rect x="10" y="138" width="140" height="60" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"></rect>
+  <text x="80" y="160" text-anchor="middle" font-size="16">🌎</text>
+  <text x="80" y="177" text-anchor="middle" font-size="7.5" font-weight="700" fill="#166534">Réplica América</text>
+  <text x="80" y="189" text-anchor="middle" font-size="6.5" fill="#374151">Solo lectura</text>
+
+  <rect x="190" y="138" width="140" height="60" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"></rect>
+  <text x="260" y="160" text-anchor="middle" font-size="16">🌍</text>
+  <text x="260" y="177" text-anchor="middle" font-size="7.5" font-weight="700" fill="#166534">Réplica Europa</text>
+  <text x="260" y="189" text-anchor="middle" font-size="6.5" fill="#374151">Solo lectura</text>
+
+  <text x="170" y="215" text-anchor="middle" font-size="6.5" fill="#6b7280">01_configuracion_servidor.sql — documentación (sin verificación por consulta)</text>
+
+  <line x1="340" y1="12" x2="340" y2="215" stroke="#e5e7eb"></line>
+
+  <text x="510" y="18" text-anchor="middle" font-size="9" font-weight="700" fill="#1f2937">Permisos reales (02_roles_dba_sa_da.sql)</text>
+
+  <rect x="360" y="30" width="300" height="40" rx="6" fill="#eef2ff" stroke="#1d4ed8" stroke-width="2"></rect>
+  <text x="382" y="55" text-anchor="middle" font-size="16">🗄️</text>
+  <text x="408" y="48" font-size="8" font-weight="700" fill="#1d4ed8">dba_admin</text>
+  <text x="408" y="61" font-size="6.3" fill="#1e3a8a">SELECT · INSERT · UPDATE · DELETE (todas las tablas)</text>
+
+  <rect x="360" y="76" width="300" height="40" rx="6" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"></rect>
+  <text x="382" y="101" text-anchor="middle" font-size="16">🛠️</text>
+  <text x="408" y="94" font-size="8" font-weight="700" fill="#92400e">soporte_sa</text>
+  <text x="408" y="107" font-size="6.3" fill="#92400e">Monitorea el servidor — sin acceso a los datos</text>
+
+  <rect x="360" y="122" width="300" height="40" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"></rect>
+  <text x="382" y="147" text-anchor="middle" font-size="16">📊</text>
+  <text x="408" y="140" font-size="8" font-weight="700" fill="#166534">analista_da</text>
+  <text x="408" y="153" font-size="6.3" fill="#166534">Solo SELECT sobre Jugadores, Partidas y Logros</text>
+
+  <text x="510" y="185" text-anchor="middle" font-size="6.5" fill="#6b7280">SHOW GRANTS FOR 'analista_da'@'%';</text>
+  <text x="510" y="197" text-anchor="middle" font-size="6.5" fill="#166534" font-weight="700">✅ debe mostrar solo SELECT — nunca INSERT/UPDATE</text>
+</svg>
+<p class="pie-ilustracion">La arquitectura (izquierda) es la documentación del paso 5 — se vuelve real en la Sesión 5. Los tres usuarios (derecha) son la implementación real de los roles DBA/SA/DA que viste como concepto en la Sesión 1: mismo principio de mínimo privilegio, ahora con <code>GRANT</code> de verdad.</p>
+
+<ol class="ejercicio-pasos" start="5">
+<li><strong>scripts/01_configuracion_servidor.sql</strong> — documenta la arquitectura (servidor primario + réplicas por región) y los parámetros recomendados del servidor.
+  <div class="paso-verif">
+    <p class="paso-esperado">ℹ️ Sin verificación por consulta: es documentación técnica que vas a usar de verdad en la Sesión 5. Léelo antes de seguir.</p>
+  </div>
+</li>
+<li><strong>scripts/02_roles_dba_sa_da.sql</strong> — crea los usuarios <code>dba_admin</code>, <code>soporte_sa</code> y <code>analista_da</code>, cada uno con sus privilegios.
+  <div class="paso-verif">
+    <pre class="pre-sql">SHOW GRANTS FOR 'analista_da'@'%';</pre>
+    <p class="paso-esperado">✅ Esperado: solo <code>SELECT</code> sobre Jugadores, Partidas y Logros — nunca <code>INSERT</code>/<code>UPDATE</code>.</p>
+  </div>
+</li>
+</ol>
+</div>
+
+<div class="caja ejercicio-bloque" data-sesion="3">
+<span class="badge-semana">I.2 · Sesión 3</span><strong>Tráfico Masivo y Concurrencia</strong>
+
+<svg class="ilustracion" viewBox="0 0 680 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama de la Sesión 3: a la izquierda, la tabla Items gana dos columnas nuevas sin apagar el servidor; a la derecha, dos jugadores intentan comprar el mismo item único al mismo tiempo y FOR UPDATE deja pasar solo a uno">
+  <defs>
+    <marker id="flechaConcS3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#374151"></path>
+    </marker>
+  </defs>
+
+  <text x="170" y="18" text-anchor="middle" font-size="9" font-weight="700" fill="#1f2937">Cambio de estructura sin downtime</text>
+
+  <rect x="20" y="30" width="125" height="70" rx="6" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"></rect>
+  <text x="82" y="44" text-anchor="middle" font-size="7.5" font-weight="700" fill="#1f2937">Items (antes)</text>
+  <text x="28" y="58" font-size="6.5" fill="#374151">item_id (PK)</text>
+  <text x="28" y="69" font-size="6.5" fill="#374151">nombre, rareza</text>
+  <text x="28" y="80" font-size="6.5" fill="#374151">precio_monedas</text>
+
+  <line x1="145" y1="65" x2="173" y2="65" stroke="#374151" stroke-width="2" marker-end="url(#flechaConcS3)"></line>
+  <text x="159" y="58" text-anchor="middle" font-size="5.6" fill="#374151">ALTER ... INSTANT</text>
+
+  <rect x="175" y="30" width="155" height="90" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"></rect>
+  <text x="252" y="44" text-anchor="middle" font-size="7.5" font-weight="700" fill="#166534">Items (después)</text>
+  <text x="183" y="58" font-size="6.5" fill="#374151">item_id (PK)</text>
+  <text x="183" y="69" font-size="6.5" fill="#374151">nombre, rareza</text>
+  <text x="183" y="80" font-size="6.5" fill="#374151">precio_monedas</text>
+  <text x="183" y="93" font-size="6.5" font-weight="700" fill="#166534">es_unico ← nueva</text>
+  <text x="183" y="104" font-size="6.5" font-weight="700" fill="#166534">vendido ← nueva</text>
+
+  <text x="170" y="140" text-anchor="middle" font-size="16">🖥️</text>
+  <text x="170" y="156" text-anchor="middle" font-size="6.5" font-weight="700" fill="#16a34a">Sigue respondiendo — sin downtime</text>
+
+  <text x="170" y="176" text-anchor="middle" font-size="6.3" fill="#6b7280">01_alter_tables_sin_downtime.sql</text>
+  <text x="170" y="188" text-anchor="middle" font-size="6.3" fill="#6b7280">Verifica con DESCRIBE Items;</text>
+
+  <line x1="340" y1="12" x2="340" y2="215" stroke="#e5e7eb"></line>
+
+  <text x="510" y="18" text-anchor="middle" font-size="9" font-weight="700" fill="#1f2937">Bloqueo de fila: FOR UPDATE</text>
+
+  <rect x="440" y="30" width="140" height="50" rx="8" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"></rect>
+  <text x="510" y="50" text-anchor="middle" font-size="18">🔒</text>
+  <text x="510" y="68" text-anchor="middle" font-size="7.5" font-weight="700" fill="#92400e">Item único (id=1)</text>
+  <text x="510" y="78" text-anchor="middle" font-size="6.3" fill="#92400e">es_unico = TRUE</text>
+  <text x="510" y="95" text-anchor="middle" font-size="6" fill="#92400e">🔒 bloquea la fila durante la transacción</text>
+
+  <rect x="365" y="110" width="130" height="55" rx="8" fill="#eef2ff" stroke="#1d4ed8" stroke-width="2"></rect>
+  <text x="430" y="130" text-anchor="middle" font-size="16">🎮</text>
+  <text x="430" y="145" text-anchor="middle" font-size="7.5" font-weight="700" fill="#1d4ed8">Jugador A</text>
+  <text x="430" y="156" text-anchor="middle" font-size="5.6" fill="#1e3a8a">CALL comprar_item_unico(...)</text>
+
+  <rect x="525" y="110" width="130" height="55" rx="8" fill="#eef2ff" stroke="#1d4ed8" stroke-width="2"></rect>
+  <text x="590" y="130" text-anchor="middle" font-size="16">🎮</text>
+  <text x="590" y="145" text-anchor="middle" font-size="7.5" font-weight="700" fill="#1d4ed8">Jugador B</text>
+  <text x="590" y="156" text-anchor="middle" font-size="5.6" fill="#1e3a8a">CALL comprar_item_unico(...)</text>
+
+  <line x1="430" y1="110" x2="488" y2="82" stroke="#374151" stroke-width="2" marker-end="url(#flechaConcS3)"></line>
+  <line x1="590" y1="110" x2="532" y2="82" stroke="#374151" stroke-width="2" marker-end="url(#flechaConcS3)"></line>
+
+  <text x="430" y="181" text-anchor="middle" font-size="6.5" font-weight="700" fill="#166534">✅ EXITO (llegó primero)</text>
+  <text x="590" y="181" text-anchor="middle" font-size="6.3" font-weight="700" fill="#b91c1c">❌ RECHAZADO (fila bloqueada)</text>
+
+  <text x="510" y="199" text-anchor="middle" font-size="6.3" fill="#6b7280">02_control_transacciones_deadlocks.sql</text>
+  <text x="510" y="211" text-anchor="middle" font-size="6.3" fill="#6b7280">Reto real: 2 pestañas de phpMyAdmin, mismo item_id, casi al mismo tiempo</text>
+</svg>
+<p class="pie-ilustracion">Izquierda: la tabla cambia de forma "en caliente" — los jugadores siguen jugando mientras se agregan columnas. Derecha: cuando dos jugadores intentan comprar el mismo item único a la vez, <code>FOR UPDATE</code> deja pasar solo al primero y bloquea al segundo hasta que la transacción termina — así nunca se vende dos veces la misma unidad.</p>
+
+<ol class="ejercicio-pasos" start="7">
+<li><strong>scripts/01_alter_tables_sin_downtime.sql</strong> — agrega las columnas <code>es_unico</code> y <code>vendido</code> a la tabla Items, sin bloquear el servicio.
+  <div class="paso-verif">
+    <pre class="pre-sql">DESCRIBE Items;</pre>
+    <p class="paso-esperado">✅ Esperado: aparecen las columnas nuevas <code>es_unico</code> y <code>vendido</code>.</p>
+  </div>
+</li>
+<li><strong>scripts/02_control_transacciones_deadlocks.sql</strong> — crea <code>comprar_item_unico</code>, que usa <code>FOR UPDATE</code> para bloquear la fila del item.
+  <div class="paso-verif">
+    <pre class="pre-sql">SELECT item_id FROM Items WHERE es_unico = TRUE;
+CALL comprar_item_unico(1, /* item_id de arriba */ 1, @resultado);
+SELECT @resultado;</pre>
+    <p class="paso-esperado">✅ Esperado: <code>@resultado</code> dice EXITO. Para el reto real: abre dos pestañas de phpMyAdmin y llama al mismo item_id casi al mismo tiempo desde ambas — solo una debe decir EXITO, la otra RECHAZADO.</p>
+  </div>
+</li>
+</ol>
+</div>
+
+<div class="caja ejercicio-bloque" data-sesion="4">
+<span class="badge-semana">I.3 · Sesión 4</span><strong>Control de Accesos y Sistema Anti-Trampas</strong>
+
+<svg class="ilustracion" viewBox="0 0 680 235" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama de la Sesión 4 en tres partes: las restricciones CHECK bloquean un UPDATE inválido, los tres roles jugador, moderador y administrador heredan privilegios en cadena, y el procedimiento con parámetro tipado neutraliza un intento de inyección SQL">
+  <defs>
+    <marker id="flechaAccS4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#374151"></path>
+    </marker>
+  </defs>
+
+  <text x="112" y="18" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1f2937">Integridad: CHECK</text>
+  <text x="112" y="42" text-anchor="middle" font-size="22">🛡️</text>
+  <rect x="25" y="52" width="175" height="42" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="2"></rect>
+  <text x="112" y="70" text-anchor="middle" font-size="6.3" fill="#991b1b">UPDATE monedas = -100</text>
+  <text x="112" y="83" text-anchor="middle" font-size="5.8" font-weight="700" fill="#991b1b">❌ viola chk_monedas_no_negativas</text>
+  <text x="112" y="108" text-anchor="middle" font-size="6.2" fill="#374151">Las restricciones CHECK</text>
+  <text x="112" y="119" text-anchor="middle" font-size="6.2" fill="#374151">protegen los datos aunque</text>
+  <text x="112" y="130" text-anchor="middle" font-size="6.2" fill="#374151">el UPDATE sea inválido</text>
+  <text x="112" y="150" text-anchor="middle" font-size="6" fill="#6b7280">01_integridad_restricciones.sql</text>
+  <text x="112" y="161" text-anchor="middle" font-size="5.8" fill="#6b7280">Prueba: UPDATE con -100 → error</text>
+
+  <line x1="220" y1="12" x2="220" y2="226" stroke="#e5e7eb"></line>
+
+  <text x="328" y="18" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1f2937">Jerarquía de roles (herencia)</text>
+
+  <rect x="253" y="30" width="150" height="48" rx="6" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"></rect>
+  <text x="328" y="48" text-anchor="middle" font-size="16">👑</text>
+  <text x="328" y="64" text-anchor="middle" font-size="6.8" font-weight="700" fill="#5b21b6">rol_administrador</text>
+  <text x="328" y="74" text-anchor="middle" font-size="5.8" fill="#5b21b6">+ asignar monedas</text>
+
+  <line x1="328" y1="78" x2="328" y2="94" stroke="#374151" stroke-width="1.5" marker-end="url(#flechaAccS4)"></line>
+  <text x="345" y="89" font-size="5.4" fill="#374151">hereda de</text>
+
+  <rect x="253" y="96" width="150" height="48" rx="6" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"></rect>
+  <text x="328" y="114" text-anchor="middle" font-size="16">🛡️</text>
+  <text x="328" y="130" text-anchor="middle" font-size="6.8" font-weight="700" fill="#92400e">rol_moderador</text>
+  <text x="328" y="140" text-anchor="middle" font-size="5.6" fill="#92400e">+ banear (UPDATE baneado)</text>
+
+  <line x1="328" y1="144" x2="328" y2="160" stroke="#374151" stroke-width="1.5" marker-end="url(#flechaAccS4)"></line>
+  <text x="345" y="155" font-size="5.4" fill="#374151">hereda de</text>
+
+  <rect x="253" y="162" width="150" height="48" rx="6" fill="#eef2ff" stroke="#1d4ed8" stroke-width="2"></rect>
+  <text x="328" y="180" text-anchor="middle" font-size="16">🎮</text>
+  <text x="328" y="196" text-anchor="middle" font-size="6.8" font-weight="700" fill="#1d4ed8">rol_jugador</text>
+  <text x="328" y="206" text-anchor="middle" font-size="5.6" fill="#1e3a8a">Básico: jugar, comprar</text>
+
+  <text x="328" y="223" text-anchor="middle" font-size="5.4" fill="#6b7280">02_roles_permisos_jugador_moderador_admin.sql</text>
+
+  <line x1="435" y1="12" x2="435" y2="226" stroke="#e5e7eb"></line>
+
+  <text x="542" y="18" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1f2937">Anti-inyección SQL</text>
+
+  <rect x="460" y="30" width="165" height="34" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="2"></rect>
+  <text x="542" y="44" text-anchor="middle" font-size="6.5" font-weight="700" fill="#991b1b">Entrada: ' OR '1'='1</text>
+  <text x="542" y="56" text-anchor="middle" font-size="5.8" fill="#991b1b">(intento de inyección)</text>
+
+  <line x1="542" y1="64" x2="542" y2="80" stroke="#374151" stroke-width="1.5" marker-end="url(#flechaAccS4)"></line>
+
+  <rect x="460" y="82" width="165" height="52" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"></rect>
+  <text x="542" y="101" text-anchor="middle" font-size="17">🛡️</text>
+  <text x="542" y="118" text-anchor="middle" font-size="6.4" font-weight="700" fill="#166534">buscar_jugador_seguro</text>
+  <text x="542" y="129" text-anchor="middle" font-size="5.6" fill="#166534">parámetro tipado, no texto</text>
+
+  <line x1="542" y1="134" x2="542" y2="150" stroke="#374151" stroke-width="1.5" marker-end="url(#flechaAccS4)"></line>
+
+  <rect x="460" y="152" width="165" height="34" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"></rect>
+  <text x="542" y="166" text-anchor="middle" font-size="6.5" font-weight="700" fill="#166534">✅ 0 filas devueltas</text>
+  <text x="542" y="178" text-anchor="middle" font-size="5.8" fill="#166534">el payload no rompe nada</text>
+
+  <text x="542" y="200" text-anchor="middle" font-size="5.8" fill="#6b7280">03_prevencion_sql_injection.sql</text>
+  <text x="542" y="211" text-anchor="middle" font-size="5.3" fill="#6b7280">vs. concatenar texto (vulnerable, no ejecutable)</text>
+</svg>
+<p class="pie-ilustracion">Tres capas de defensa que se complementan: los <code>CHECK</code> impiden datos inválidos aunque el UPDATE venga de un usuario autorizado; la herencia de roles (jugador → moderador → administrador) da a cada cuenta solo lo que necesita; y el parámetro tipado de <code>buscar_jugador_seguro</code> hace que un texto malicioso se trate como dato, nunca como código SQL.</p>
+
+<ol class="ejercicio-pasos" start="9">
+<li><strong>scripts/01_integridad_restricciones.sql</strong> — agrega restricciones <code>CHECK</code> (monedas, experiencia y nivel no negativos; resultado de partida válido).
+  <div class="paso-verif">
+    <pre class="pre-sql">UPDATE Jugadores SET monedas = -100 WHERE jugador_id = 1;</pre>
+    <p class="paso-esperado">✅ Esperado: error — viola <code>chk_monedas_no_negativas</code>. Si se ejecuta sin error, la restricción no quedó bien creada.</p>
+  </div>
+</li>
+<li><strong>scripts/02_roles_permisos_jugador_moderador_admin.sql</strong> — crea <code>rol_jugador</code>, <code>rol_moderador</code> (hereda de jugador) y <code>rol_administrador</code> (hereda de moderador).
+  <div class="paso-verif">
+    <pre class="pre-sql">SHOW GRANTS FOR 'rol_moderador';</pre>
+    <p class="paso-esperado">✅ Esperado: aparece <code>GRANT rol_jugador TO rol_moderador</code> y el permiso extra de banear (<code>UPDATE (baneado)</code>).</p>
+  </div>
+</li>
+<li><strong>scripts/03_prevencion_sql_injection.sql</strong> — crea <code>buscar_jugador_seguro</code>, con parámetros tipados en vez de texto concatenado.
+  <div class="paso-verif">
+    <pre class="pre-sql">CALL buscar_jugador_seguro('\' OR \'1\'=\'1');</pre>
+    <p class="paso-esperado">✅ Esperado: 0 filas — el payload de inyección no rompe la consulta.</p>
+  </div>
+</li>
+</ol>
+</div>
+
+<div class="caja ejercicio-bloque" data-sesion="5">
+<span class="badge-semana">I.4 · Sesión 5</span><strong>Fragmentación por Regiones y Carga Masiva</strong>
+
+<svg class="ilustracion" viewBox="0 0 680 235" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama de la Sesión 5 en tres partes: una consulta filtrada por región solo toca la partición de América, un índice cambia el plan de ejecución de recorrer todo a usar el índice, y una CTE recursiva carga 5000 partidas nuevas en la tabla">
+  <defs>
+    <marker id="flechaFragS5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#374151"></path>
+    </marker>
+  </defs>
+
+  <text x="112" y="18" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1f2937">Fragmentación por región</text>
+
+  <rect x="25" y="30" width="175" height="30" rx="6" fill="#eef2ff" stroke="#1d4ed8" stroke-width="2"></rect>
+  <text x="112" y="49" text-anchor="middle" font-size="5.7" font-weight="700" fill="#1d4ed8">WHERE region = 'AMERICA'</text>
+
+  <line x1="70" y1="60" x2="50" y2="80" stroke="#374151" stroke-width="1.5" marker-end="url(#flechaFragS5)"></line>
+  <line x1="150" y1="60" x2="175" y2="80" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="3,3"></line>
+
+  <rect x="20" y="84" width="85" height="60" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"></rect>
+  <text x="62" y="104" text-anchor="middle" font-size="16">🌎</text>
+  <text x="62" y="120" text-anchor="middle" font-size="6.3" font-weight="700" fill="#166534">p_america</text>
+  <text x="62" y="132" text-anchor="middle" font-size="5.8" fill="#166534">✅ leída</text>
+
+  <rect x="115" y="84" width="85" height="60" rx="6" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"></rect>
+  <text x="157" y="104" text-anchor="middle" font-size="16">🌍</text>
+  <text x="157" y="120" text-anchor="middle" font-size="6.3" font-weight="700" fill="#6b7280">p_europa</text>
+  <text x="157" y="132" text-anchor="middle" font-size="5.8" fill="#6b7280">🚫 no tocada</text>
+
+  <text x="112" y="155" text-anchor="middle" font-size="5.8" fill="#6b7280">01_fragmentacion_particiones_region.sql</text>
+  <text x="112" y="166" text-anchor="middle" font-size="5.8" fill="#6b7280">EXPLAIN → partitions: solo p_america</text>
+
+  <line x1="220" y1="12" x2="220" y2="226" stroke="#e5e7eb"></line>
+
+  <text x="328" y="18" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1f2937">Índices: antes vs. después</text>
+
+  <rect x="245" y="32" width="165" height="55" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="2"></rect>
+  <text x="328" y="52" text-anchor="middle" font-size="17">🐢</text>
+  <text x="328" y="68" text-anchor="middle" font-size="6.5" font-weight="700" fill="#991b1b">type = ALL</text>
+  <text x="328" y="79" text-anchor="middle" font-size="5.8" fill="#991b1b">recorre todas las filas</text>
+
+  <line x1="328" y1="87" x2="328" y2="103" stroke="#374151" stroke-width="1.5" marker-end="url(#flechaFragS5)"></line>
+
+  <rect x="245" y="105" width="165" height="55" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"></rect>
+  <text x="328" y="125" text-anchor="middle" font-size="17">⚡</text>
+  <text x="328" y="141" text-anchor="middle" font-size="6" font-weight="700" fill="#166534">type = ref, key = idx_...</text>
+  <text x="328" y="152" text-anchor="middle" font-size="5.6" fill="#166534">usa el índice — mucho más rápido</text>
+
+  <text x="328" y="178" text-anchor="middle" font-size="5.8" fill="#6b7280">02_indices_matchmaking.sql</text>
+  <text x="328" y="189" text-anchor="middle" font-size="5.8" fill="#6b7280">Compara el EXPLAIN antes y después</text>
+
+  <line x1="435" y1="12" x2="435" y2="226" stroke="#e5e7eb"></line>
+
+  <text x="542" y="18" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1f2937">Carga masiva (ETL)</text>
+
+  <rect x="460" y="32" width="165" height="50" rx="6" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"></rect>
+  <text x="542" y="52" text-anchor="middle" font-size="16">⚙️</text>
+  <text x="542" y="67" text-anchor="middle" font-size="6" font-weight="700" fill="#92400e">CTE recursiva genera</text>
+  <text x="542" y="78" text-anchor="middle" font-size="5.6" fill="#92400e">5000 partidas simuladas</text>
+
+  <line x1="542" y1="82" x2="542" y2="98" stroke="#374151" stroke-width="1.5" marker-end="url(#flechaFragS5)"></line>
+
+  <rect x="460" y="100" width="165" height="55" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"></rect>
+  <text x="542" y="120" text-anchor="middle" font-size="16">📊</text>
+  <text x="542" y="135" text-anchor="middle" font-size="6.2" font-weight="700" fill="#166534">Partidas_Fragmentada</text>
+  <text x="542" y="146" text-anchor="middle" font-size="6" font-weight="700" fill="#166534">+5000 filas nuevas</text>
+
+  <text x="542" y="172" text-anchor="middle" font-size="5.8" fill="#6b7280">03_etl_carga_masiva.sql</text>
+  <text x="542" y="183" text-anchor="middle" font-size="5.8" fill="#6b7280">Verifica con SELECT COUNT(*)</text>
+</svg>
+<p class="pie-ilustracion">Las tres piezas trabajan juntas sobre la misma tabla: la fragmentación hace que una consulta por región ignore por completo los datos de otras regiones (partition pruning), los índices evitan recorrer fila por fila dentro de esa partición, y el ETL es lo que llena la tabla con volumen real para poder medir la diferencia.</p>
+
+<ol class="ejercicio-pasos" start="12">
+<li><strong>scripts/01_fragmentacion_particiones_region.sql</strong> — crea <code>Partidas_Fragmentada</code> particionada por región y migra hacia ahí las partidas que ya tenías.
+  <div class="paso-verif">
+    <pre class="pre-sql">EXPLAIN SELECT * FROM Partidas_Fragmentada
+WHERE region = 'AMERICA';</pre>
+    <p class="paso-esperado">✅ Esperado: la columna <code>partitions</code> del plan muestra solo <code>p_america</code>.</p>
+  </div>
+</li>
+<li><strong>scripts/02_indices_matchmaking.sql</strong> — crea los índices que aceleran la consulta de matchmaking (por región + nivel).
+  <div class="paso-verif">
+    <p class="paso-esperado">✅ Esperado: al correr el <code>EXPLAIN</code> de la consulta de matchmaking que trae el propio script, la columna <code>type</code> ya no es <code>ALL</code> y <code>key</code> muestra uno de los índices nuevos.</p>
+  </div>
+</li>
+<li><strong>scripts/03_etl_carga_masiva.sql</strong> — carga 5000 partidas históricas simuladas con una CTE recursiva.
+  <div class="paso-verif">
+    <pre class="pre-sql">SELECT COUNT(*) FROM Partidas_Fragmentada;</pre>
+    <p class="paso-esperado">✅ Esperado: el conteo subió en 5000 respecto al que tenías antes de este paso.</p>
+  </div>
+</li>
+</ol>
+</div>
+
+<div class="caja ejercicio-bloque" data-sesion="6">
+<span class="badge-semana">I.5 · Sesión 6</span><strong>Respaldos y Recuperación ante Ataques</strong>
+
+<svg class="ilustracion" viewBox="0 0 680 310" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama de la Sesión 6: mientras el juego funciona, la auditoría registra cambios, se toma un respaldo completo y el binlog sigue grabando; luego ocurre un ataque simulado que borra la base; finalmente se restaura desde el respaldo y se reproduce el binlog, dejando los datos de los jugadores intactos">
+  <defs>
+    <marker id="flechaGrisS6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#374151"></path>
+    </marker>
+    <marker id="flechaRojaS6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#dc2626"></path>
+    </marker>
+    <marker id="flechaVerdeS6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#16a34a"></path>
+    </marker>
+  </defs>
+
+  <text x="340" y="14" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1f2937">Mientras el juego funciona normalmente...</text>
+
+  <rect x="10" y="25" width="200" height="75" rx="8" fill="#eef2ff" stroke="#1d4ed8" stroke-width="2"></rect>
+  <text x="110" y="48" text-anchor="middle" font-size="20">🔍</text>
+  <text x="110" y="68" text-anchor="middle" font-size="8" font-weight="700" fill="#1d4ed8">Auditoría</text>
+  <text x="110" y="80" text-anchor="middle" font-size="6" fill="#1e3a8a">Trigger registra cada cambio</text>
+  <text x="110" y="90" text-anchor="middle" font-size="6" fill="#1e3a8a">en Auditoria_Monedas</text>
+
+  <line x1="210" y1="62" x2="238" y2="62" stroke="#374151" stroke-width="1.5" marker-end="url(#flechaGrisS6)"></line>
+
+  <rect x="240" y="25" width="200" height="75" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"></rect>
+  <text x="340" y="48" text-anchor="middle" font-size="20">💾</text>
+  <text x="340" y="68" text-anchor="middle" font-size="8" font-weight="700" fill="#166534">Respaldo completo</text>
+  <text x="340" y="80" text-anchor="middle" font-size="6" fill="#166534">mysqldump → foto total</text>
+  <text x="340" y="90" text-anchor="middle" font-size="6" fill="#166534">de la base juego_online</text>
+
+  <line x1="440" y1="62" x2="468" y2="62" stroke="#374151" stroke-width="1.5" marker-end="url(#flechaGrisS6)"></line>
+
+  <rect x="470" y="25" width="200" height="75" rx="8" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"></rect>
+  <text x="570" y="48" text-anchor="middle" font-size="20">📜</text>
+  <text x="570" y="68" text-anchor="middle" font-size="7.3" font-weight="700" fill="#92400e">Binlog sigue grabando</text>
+  <text x="570" y="80" text-anchor="middle" font-size="6" fill="#92400e">cada cambio después</text>
+  <text x="570" y="90" text-anchor="middle" font-size="6" fill="#92400e">del respaldo (PITR)</text>
+
+  <line x1="340" y1="100" x2="340" y2="125" stroke="#dc2626" stroke-width="2.5" marker-end="url(#flechaRojaS6)"></line>
+  <text x="360" y="116" font-size="5.8" font-weight="700" fill="#dc2626">¡ataque simulado!</text>
+
+  <rect x="190" y="128" width="300" height="45" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="2.5"></rect>
+  <text x="220" y="155" text-anchor="middle" font-size="20">💥</text>
+  <text x="365" y="147" text-anchor="middle" font-size="7" font-weight="700" fill="#991b1b">DROP DATABASE juego_online;</text>
+  <text x="365" y="160" text-anchor="middle" font-size="6" fill="#991b1b">reto final: ataque / desastre simulado</text>
+
+  <line x1="340" y1="173" x2="340" y2="198" stroke="#16a34a" stroke-width="2.5" marker-end="url(#flechaVerdeS6)"></line>
+  <text x="358" y="189" font-size="5.8" font-weight="700" fill="#166534">restaurar</text>
+
+  <rect x="170" y="200" width="340" height="55" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="2.5"></rect>
+  <text x="205" y="223" text-anchor="middle" font-size="22">♻️</text>
+  <text x="360" y="217" text-anchor="middle" font-size="6.8" font-weight="700" fill="#166534">Restaura el respaldo completo +</text>
+  <text x="360" y="229" text-anchor="middle" font-size="6.3" fill="#166534">reproduce el binlog hasta justo antes del ataque</text>
+  <text x="360" y="244" text-anchor="middle" font-size="5.6" fill="#166534">04_simulacro_desastre_recuperacion.sh</text>
+
+  <line x1="340" y1="255" x2="340" y2="272" stroke="#374151" stroke-width="1.5" marker-end="url(#flechaGrisS6)"></line>
+  <text x="340" y="286" text-anchor="middle" font-size="6.5" font-weight="700" fill="#166534">✅ SELECT * FROM Jugadores;</text>
+  <text x="340" y="298" text-anchor="middle" font-size="6" fill="#166534">monedas, nivel e inventario idénticos a antes del ataque</text>
+</svg>
+<p class="pie-ilustracion">El respaldo completo es una "foto" del momento en que se tomó; el binlog es la película de todo lo que pasó después. Restaurar ambos juntos (PITR) es lo que permite recuperar el estado justo antes del ataque, sin perder ni una compra.</p>
+
+<ol class="ejercicio-pasos" start="15">
+<li><strong>scripts/01_auditoria_trazas.sql</strong> — crea la tabla <code>Auditoria_Monedas</code> y el trigger <code>auditoria_monedas</code>.
+  <div class="paso-verif">
+    <pre class="pre-sql">UPDATE Jugadores SET monedas = monedas + 100 WHERE jugador_id = 1;
+SELECT * FROM Auditoria_Monedas
+ORDER BY auditoria_id DESC LIMIT 1;</pre>
+    <p class="paso-esperado">✅ Esperado: aparece un registro nuevo con <code>monedas_antes</code> y <code>monedas_despues</code>.</p>
+  </div>
+</li>
+<li><strong>scripts/02_backup_completo.sh</strong> <span class="paso-terminal">terminal</span> — hace un respaldo completo con <code>mysqldump</code>.
+  <div class="paso-verif">
+    <pre class="pre-sql">ls -la respaldos/</pre>
+    <p class="paso-esperado">✅ Esperado: un archivo nuevo <code>juego_online_completo_&lt;fecha&gt;.sql</code>.</p>
+  </div>
+</li>
+<li><strong>scripts/03_backup_incremental_binlog.sh</strong> <span class="paso-terminal">terminal</span> — documenta y prepara el respaldo incremental vía binary log (PITR).
+  <div class="paso-verif">
+    <pre class="pre-sql">SHOW VARIABLES LIKE 'log_bin';</pre>
+    <p class="paso-esperado">✅ Esperado: <code>ON</code> — sin esto no hay binlog que reproducir.</p>
+  </div>
+</li>
+<li><strong>scripts/04_simulacro_desastre_recuperacion.sh</strong> <span class="paso-terminal">terminal</span> — <strong>reto final:</strong> borra <code>juego_online</code> a propósito y la restaura desde el respaldo del paso 16.
+  <div class="paso-verif">
+    <pre class="pre-sql">SELECT * FROM Jugadores;</pre>
+    <p class="paso-esperado">✅ Esperado: los mismos datos que tenías antes del "ataque" simulado — ninguna compra ni progreso perdido.</p>
+  </div>
+</li>
+</ol>
+</div>
+
+<p class="pie-ilustracion">Si llegaste al paso 18 con todas las verificaciones en verde, recorriste en un solo hilo los cinco indicadores de logro del sílabo (I.1 a I.5) sobre la misma base de datos, de principio a fin.</p>
+</div>
+
+<div id="fuentes-scripts" hidden>
+<pre class="fuente-script" data-sesion="1" data-archivo="01_crear_tablas.sql">-- Sesión 1: Modelo relacional de la plataforma de juego online
+-- Motor: MySQL / MariaDB (compatible con phpMyAdmin)
+-- Requiere MySQL 8.0.16+ o MariaDB 10.5+ (soporte de restricciones CHECK)
+
+CREATE DATABASE IF NOT EXISTS juego_online CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE juego_online;
+
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS Logros;
+DROP TABLE IF EXISTS Partidas;
+DROP TABLE IF EXISTS Inventario_Items;
+DROP TABLE IF EXISTS Items;
+DROP TABLE IF EXISTS Juegos;
+DROP TABLE IF EXISTS Jugadores;
+SET FOREIGN_KEY_CHECKS = 1;
+
+CREATE TABLE Jugadores (
+    jugador_id      INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_usuario  VARCHAR(50)  NOT NULL UNIQUE,
+    email           VARCHAR(100) NOT NULL UNIQUE,
+    nivel           INT NOT NULL DEFAULT 1,
+    experiencia     INT NOT NULL DEFAULT 0,
+    monedas         INT NOT NULL DEFAULT 0,
+    region          VARCHAR(20) NOT NULL DEFAULT 'AMERICA',
+    fecha_registro  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE Juegos (
+    juego_id        INT AUTO_INCREMENT PRIMARY KEY,
+    nombre          VARCHAR(80) NOT NULL,
+    genero          VARCHAR(40),
+    fecha_lanzamiento DATE
+) ENGINE=InnoDB;
+
+CREATE TABLE Items (
+    item_id         INT AUTO_INCREMENT PRIMARY KEY,
+    nombre          VARCHAR(80) NOT NULL,
+    tipo            VARCHAR(30) NOT NULL,       -- skin, arma, potenciador, etc.
+    rareza          VARCHAR(20) NOT NULL DEFAULT 'comun',
+    precio_monedas  INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB;
+
+CREATE TABLE Inventario_Items (
+    inventario_id   INT AUTO_INCREMENT PRIMARY KEY,
+    jugador_id      INT NOT NULL,
+    item_id         INT NOT NULL,
+    cantidad        INT NOT NULL DEFAULT 1,
+    fecha_obtencion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_jugador_item (jugador_id, item_id),
+    CONSTRAINT fk_inv_jugador FOREIGN KEY (jugador_id) REFERENCES Jugadores(jugador_id),
+    CONSTRAINT fk_inv_item    FOREIGN KEY (item_id) REFERENCES Items(item_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE Partidas (
+    partida_id      INT AUTO_INCREMENT PRIMARY KEY,
+    jugador_id      INT NOT NULL,
+    juego_id        INT NOT NULL,
+    puntaje         INT NOT NULL DEFAULT 0,
+    duracion_seg    INT NOT NULL DEFAULT 0,
+    resultado       VARCHAR(20) NOT NULL DEFAULT 'jugada', -- victoria/derrota/jugada
+    fecha           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_partida_jugador FOREIGN KEY (jugador_id) REFERENCES Jugadores(jugador_id),
+    CONSTRAINT fk_partida_juego   FOREIGN KEY (juego_id) REFERENCES Juegos(juego_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE Logros (
+    logro_id        INT AUTO_INCREMENT PRIMARY KEY,
+    jugador_id      INT NOT NULL,
+    nombre_logro    VARCHAR(80) NOT NULL,
+    fecha_obtenido  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_logro_jugador FOREIGN KEY (jugador_id) REFERENCES Jugadores(jugador_id)
+) ENGINE=InnoDB;
+
+CREATE INDEX idx_partidas_jugador ON Partidas(jugador_id);
+CREATE INDEX idx_inventario_jugador ON Inventario_Items(jugador_id);</pre>
+<pre class="fuente-script" data-sesion="1" data-archivo="02_datos_prueba.sql">-- Sesión 1: Datos de prueba (MySQL / MariaDB)
+USE juego_online;
+
+INSERT INTO Jugadores (nombre_usuario, email, nivel, experiencia, monedas, region) VALUES
+('DragonSlayer99', 'dragon99@game.com', 12, 340, 1500, 'AMERICA'),
+('ShadowNinja',    'shadow@game.com',   8,  120, 900,  'AMERICA'),
+('PixelQueen',     'pixel@game.com',   20,  980, 5000, 'EUROPA'),
+('NoobMaster',     'noob@game.com',    1,   10,  50,   'EUROPA'),
+('RocketFox',      'fox@game.com',     15,  600, 2200, 'AMERICA');
+
+INSERT INTO Juegos (nombre, genero, fecha_lanzamiento) VALUES
+('Battle Arena Online', 'Battle Royale', '2024-01-15'),
+('Dungeon Legends',     'RPG',           '2023-06-01');
+
+INSERT INTO Items (nombre, tipo, rareza, precio_monedas) VALUES
+('Skin Dragon Dorado',  'skin',  'legendaria', 2000),
+('Espada de Hielo',     'arma',  'epica',      800),
+('Poción de Vida x5',   'consumible', 'comun', 50),
+('Skin Sombra Ninja',   'skin',  'rara',       500);
+
+INSERT INTO Inventario_Items (jugador_id, item_id, cantidad) VALUES
+(1, 1, 1),
+(1, 3, 5),
+(2, 4, 1),
+(3, 1, 1),
+(3, 2, 1);
+
+INSERT INTO Partidas (jugador_id, juego_id, puntaje, duracion_seg, resultado) VALUES
+(1, 1, 4500, 620, 'victoria'),
+(1, 1, 3100, 540, 'derrota'),
+(2, 1, 2800, 480, 'derrota'),
+(3, 2, 9800, 900, 'victoria'),
+(3, 1, 7600, 700, 'victoria'),
+(4, 1, 300,  120, 'derrota'),
+(5, 2, 5200, 660, 'victoria');
+
+INSERT INTO Logros (jugador_id, nombre_logro) VALUES
+(3, 'Campeón Invicto'),
+(1, 'Coleccionista Legendario'),
+(5, 'Explorador de Mazmorras');</pre>
+<pre class="fuente-script" data-sesion="1" data-archivo="03_consultas_leaderboard.sql">-- Sesión 1: Consultas SQL — Leaderboard y catálogo de compras (MySQL / MariaDB)
+USE juego_online;
+
+-- 1) Tabla de Clasificación (Leaderboard): mayor puntaje individual por jugador
+SELECT
+    j.nombre_usuario,
+    j.nivel,
+    j.region,
+    MAX(p.puntaje) AS mejor_puntaje
+FROM Partidas p
+JOIN Jugadores j ON j.jugador_id = p.jugador_id
+GROUP BY j.jugador_id, j.nombre_usuario, j.nivel, j.region
+ORDER BY mejor_puntaje DESC;
+
+-- 2) Leaderboard por juego específico
+SELECT
+    g.nombre AS juego,
+    j.nombre_usuario,
+    p.puntaje,
+    p.fecha
+FROM Partidas p
+JOIN Jugadores j ON j.jugador_id = p.jugador_id
+JOIN Juegos g ON g.juego_id = p.juego_id
+WHERE g.nombre = 'Battle Arena Online'
+ORDER BY p.puntaje DESC
+LIMIT 10;
+
+-- 3) Catálogo de items comprados por jugador
+SELECT
+    j.nombre_usuario,
+    i.nombre AS item,
+    i.rareza,
+    ii.cantidad,
+    ii.fecha_obtencion
+FROM Inventario_Items ii
+JOIN Jugadores j ON j.jugador_id = ii.jugador_id
+JOIN Items i ON i.item_id = ii.item_id
+ORDER BY j.nombre_usuario, ii.fecha_obtencion;
+
+-- 4) Ranking de victorias por jugador
+-- (MySQL no soporta COUNT(*) FILTER (WHERE ...); se usa SUM(CASE WHEN ...) en su lugar)
+SELECT
+    j.nombre_usuario,
+    SUM(CASE WHEN p.resultado = 'victoria' THEN 1 ELSE 0 END) AS victorias,
+    COUNT(p.partida_id) AS partidas_jugadas
+FROM Jugadores j
+LEFT JOIN Partidas p ON p.jugador_id = j.jugador_id
+GROUP BY j.jugador_id, j.nombre_usuario
+ORDER BY victorias DESC;</pre>
+<pre class="fuente-script" data-sesion="1" data-archivo="04_procedimiento_subir_nivel.sql">-- Sesión 1: Procedimiento almacenado para subir de nivel a un jugador (MySQL / MariaDB)
+-- Regla: cada 500 puntos de experiencia acumulada sube 1 nivel; el sobrante se conserva.
+-- Nota: phpMyAdmin (pestaña SQL) reconoce la instrucción DELIMITER igual que el cliente
+-- de línea de comandos de MySQL, así que este bloque se puede pegar tal cual.
+USE juego_online;
+
+DROP PROCEDURE IF EXISTS subir_nivel_jugador;
+
+DELIMITER //
+
+CREATE PROCEDURE subir_nivel_jugador(
+    IN p_jugador_id INT,
+    IN p_experiencia_ganada INT
+)
+BEGIN
+    DECLARE v_experiencia_total INT;
+    DECLARE v_niveles_ganados INT;
+
+    SELECT experiencia + p_experiencia_ganada INTO v_experiencia_total
+    FROM Jugadores WHERE jugador_id = p_jugador_id;
+
+    IF v_experiencia_total IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Jugador no existe';
+    END IF;
+
+    SET v_niveles_ganados = FLOOR(v_experiencia_total / 500);
+
+    UPDATE Jugadores
+    SET nivel = nivel + v_niveles_ganados,
+        experiencia = MOD(v_experiencia_total, 500)
+    WHERE jugador_id = p_jugador_id;
+
+    SELECT nivel AS nuevo_nivel, experiencia AS experiencia_restante
+    FROM Jugadores WHERE jugador_id = p_jugador_id;
+END //
+
+DELIMITER ;
+
+-- Prueba: el jugador 4 (NoobMaster) gana 1200 puntos de experiencia
+CALL subir_nivel_jugador(4, 1200);
+
+-- Verificación
+SELECT nombre_usuario, nivel, experiencia FROM Jugadores WHERE jugador_id = 4;</pre>
+<pre class="fuente-script" data-sesion="2" data-archivo="01_configuracion_servidor.sql">-- Sesión 2: Notas de arquitectura del servidor (ambiente de base de datos)
+-- Motor: MySQL / MariaDB (phpMyAdmin)
+--
+-- MySQL no soporta un equivalente funcional de "COMMENT ON DATABASE" (PostgreSQL),
+-- así que esta decisión se documenta como comentario. Si usas MariaDB 10.5+, puedes
+-- descomentar la línea ALTER DATABASE ... COMMENT para dejarlo guardado en el motor.
+
+USE juego_online;
+
+-- Elección de DBMS: MySQL 8.0 / MariaDB 10.5+ (soporta CHECK constraints y roles,
+-- necesarios en las Sesiones 4 y 2). Administrado vía phpMyAdmin.
+-- Arquitectura: un servidor primario + réplicas de lectura por región (simulado).
+--
+-- Solo en MariaDB 10.5+:
+-- ALTER DATABASE juego_online COMMENT = 'Plataforma de juego online. Arquitectura: primario + réplicas por región (AMERICA, EUROPA). Mantenido por el rol SA.';
+
+-- Parámetros recomendados de servidor (ajustar en my.cnf / my.ini, no vía SQL):
+--   innodb_buffer_pool_size = 25% de la RAM disponible
+--   max_connections = 100 (ajustar según carga esperada en la Sesión 3)
+--   log_bin = ON (necesario para respaldos incrementales, Sesión 6)</pre>
+<pre class="fuente-script" data-sesion="2" data-archivo="02_roles_dba_sa_da.sql">-- Sesión 2: Roles de administración — DBA, SA, DA (MySQL 8.0+ / MariaDB 10.5+)
+-- phpMyAdmin: pestaña "Cuentas de usuario" también permite crear estos usuarios
+-- desde una interfaz gráfica; aquí se hace por SQL para que quede documentado.
+
+USE juego_online;
+
+-- DBA: Administrador de la plataforma — control total sobre la base del juego
+DROP USER IF EXISTS 'dba_admin'@'%';
+CREATE USER 'dba_admin'@'%' IDENTIFIED BY 'CambiarEnProduccion123';
+GRANT ALL PRIVILEGES ON juego_online.* TO 'dba_admin'@'%' WITH GRANT OPTION;
+
+-- SA: Soporte Técnico de Infraestructura — gestiona el servidor, no datos de negocio
+DROP USER IF EXISTS 'soporte_sa'@'%';
+CREATE USER 'soporte_sa'@'%' IDENTIFIED BY 'CambiarEnProduccion123';
+GRANT PROCESS, RELOAD, REPLICATION CLIENT ON *.* TO 'soporte_sa'@'%';
+-- Nota: PROCESS/RELOAD/REPLICATION CLIENT dan visibilidad de procesos y estado del
+-- servidor, sin acceso de lectura/escritura a las tablas de negocio.
+
+-- DA: Analista de estadísticas de partidas — solo lectura
+DROP USER IF EXISTS 'analista_da'@'%';
+CREATE USER 'analista_da'@'%' IDENTIFIED BY 'CambiarEnProduccion123';
+GRANT SELECT ON juego_online.Jugadores TO 'analista_da'@'%';
+GRANT SELECT ON juego_online.Partidas  TO 'analista_da'@'%';
+GRANT SELECT ON juego_online.Logros    TO 'analista_da'@'%';
+
+FLUSH PRIVILEGES;
+
+-- Verificación (ejecutar en phpMyAdmin, pestaña SQL, o en la pestaña "Cuentas de usuario")
+-- SHOW GRANTS FOR 'dba_admin'@'%';
+-- SHOW GRANTS FOR 'soporte_sa'@'%';
+-- SHOW GRANTS FOR 'analista_da'@'%';</pre>
+<pre class="fuente-script" data-sesion="3" data-archivo="01_alter_tables_sin_downtime.sql">-- Sesión 3: Cambios de estructura sin interrumpir el servicio ("evento de lanzamiento")
+-- Motor: MySQL 8.0.29+ / MariaDB 10.0.2+ (soportan ADD COLUMN IF NOT EXISTS)
+USE juego_online;
+
+-- Marca si un item es único (solo puede existir 1 en todo el juego, ej: skin legendaria de evento)
+ALTER TABLE Items
+    ADD COLUMN IF NOT EXISTS es_unico BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- Marca si el item único ya fue vendido (evita doble venta)
+ALTER TABLE Items
+    ADD COLUMN IF NOT EXISTS vendido BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- Nota: en InnoDB, agregar una columna con DEFAULT es una operación "instant" (ALGORITHM=INSTANT)
+-- desde MySQL 8.0.12+/MariaDB 10.3+, por lo que no bloquea la tabla ni la reescribe completa
+-- (el evento de lanzamiento puede seguir recibiendo tráfico mientras se aplica este cambio).
+-- Puedes forzarlo explícitamente así:
+-- ALTER TABLE Items ADD COLUMN es_unico BOOLEAN NOT NULL DEFAULT FALSE, ALGORITHM=INSTANT;
+
+-- Marcamos el item "Skin Dragon Dorado" como único para el evento de lanzamiento
+UPDATE Items SET es_unico = TRUE WHERE nombre = 'Skin Dragon Dorado';</pre>
+<pre class="fuente-script" data-sesion="3" data-archivo="02_control_transacciones_deadlocks.sql">-- Sesión 3: Control de transacciones para evitar doble compra de un item único
+-- Motor: MySQL 8.0+ / MariaDB (tablas InnoDB, requerido para SELECT ... FOR UPDATE)
+--
+-- El procedimiento maneja su propia transacción (START TRANSACTION / COMMIT / ROLLBACK),
+-- así que el bloqueo funciona aunque el autocommit del cliente esté activado (por defecto en MySQL).
+--
+-- Prueba de concurrencia: abre DOS pestañas/ventanas de phpMyAdmin (o dos sesiones de
+-- mysql CLI) y ejecuta el mismo CALL casi al mismo tiempo con jugadores distintos.
+
+USE juego_online;
+
+DROP PROCEDURE IF EXISTS comprar_item_unico;
+
+DELIMITER //
+
+CREATE PROCEDURE comprar_item_unico(
+    IN p_jugador_id INT,
+    IN p_item_id INT,
+    OUT p_resultado VARCHAR(255)
+)
+BEGIN
+    DECLARE v_vendido  BOOLEAN;
+    DECLARE v_precio   INT;
+    DECLARE v_monedas  INT;
+
+    START TRANSACTION;
+
+    -- FOR UPDATE bloquea la fila hasta que esta transacción termine (COMMIT/ROLLBACK),
+    -- evitando que dos compras concurrentes lean "vendido = false" al mismo tiempo.
+    SELECT vendido, precio_monedas INTO v_vendido, v_precio
+    FROM Items
+    WHERE item_id = p_item_id AND es_unico = TRUE
+    FOR UPDATE;
+
+    IF v_vendido THEN
+        SET p_resultado = 'RECHAZADO: el item único ya fue vendido a otro jugador.';
+        ROLLBACK;
+    ELSE
+        SELECT monedas INTO v_monedas FROM Jugadores WHERE jugador_id = p_jugador_id;
+
+        IF v_monedas &lt; v_precio THEN
+            SET p_resultado = 'RECHAZADO: monedas insuficientes.';
+            ROLLBACK;
+        ELSE
+            UPDATE Items SET vendido = TRUE WHERE item_id = p_item_id;
+            UPDATE Jugadores SET monedas = monedas - v_precio WHERE jugador_id = p_jugador_id;
+            INSERT INTO Inventario_Items (jugador_id, item_id, cantidad)
+                VALUES (p_jugador_id, p_item_id, 1)
+                ON DUPLICATE KEY UPDATE cantidad = cantidad + 1;
+
+            SET p_resultado = CONCAT('EXITO: item unico vendido al jugador ', p_jugador_id);
+            COMMIT;
+        END IF;
+    END IF;
+END //
+
+DELIMITER ;
+
+-- Prueba (ejecutar en dos pestañas de phpMyAdmin / dos sesiones mysql, casi al mismo tiempo,
+-- con jugador_id distinto y el MISMO item_id único = 1):
+CALL comprar_item_unico(2, 1, @resultado_a);
+SELECT @resultado_a AS resultado;
+
+-- En la otra sesión:
+-- CALL comprar_item_unico(5, 1, @resultado_b);
+-- SELECT @resultado_b AS resultado;
+-- Resultado esperado: solo una de las dos llamadas retorna EXITO.</pre>
+<pre class="fuente-script" data-sesion="4" data-archivo="01_integridad_restricciones.sql">-- Sesión 4: Integridad estructural y semántica (anti-trampas a nivel de datos)
+-- Motor: MySQL 8.0.16+ / MariaDB 10.2.1+ (restricciones CHECK aplicadas de verdad)
+USE juego_online;
+
+-- Integridad semántica: un jugador nunca puede tener monedas o experiencia negativas,
+-- ni un nivel menor a 1 (evita que un "hack" cliente-servidor deje datos inválidos).
+ALTER TABLE Jugadores
+    ADD CONSTRAINT chk_monedas_no_negativas CHECK (monedas &gt;= 0),
+    ADD CONSTRAINT chk_experiencia_no_negativa CHECK (experiencia &gt;= 0),
+    ADD CONSTRAINT chk_nivel_minimo CHECK (nivel &gt;= 1);
+
+-- Integridad estructural: un puntaje de partida no puede ser negativo,
+-- y el resultado debe ser uno de los valores válidos del dominio del juego.
+ALTER TABLE Partidas
+    ADD CONSTRAINT chk_puntaje_no_negativo CHECK (puntaje &gt;= 0),
+    ADD CONSTRAINT chk_resultado_valido CHECK (resultado IN ('victoria', 'derrota', 'jugada'));
+
+-- Prueba: esto debe fallar (viola integridad semántica) — intento de "hackear" monedas negativas
+-- UPDATE Jugadores SET monedas = -100 WHERE jugador_id = 1;</pre>
+<pre class="fuente-script" data-sesion="4" data-archivo="02_roles_permisos_jugador_moderador_admin.sql">-- Sesión 4: Roles de aplicación — jugador, moderador, administrador
+-- Motor: MySQL 8.0+ / MariaDB 10.5+ (soporte de CREATE ROLE)
+-- Requiere que la Sesión 1 (tablas y procedimiento subir_nivel_jugador) y la
+-- Sesión 3 (procedimiento comprar_item_unico) ya se hayan ejecutado.
+
+USE juego_online;
+
+-- Columna para banear jugadores (usada por moderadores)
+ALTER TABLE Jugadores ADD COLUMN IF NOT EXISTS baneado BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- Rol JUGADOR: solo puede ver y modificar su propio perfil (a través de
+-- procedimientos, nunca UPDATE directo sobre monedas o nivel).
+DROP ROLE IF EXISTS rol_jugador;
+CREATE ROLE rol_jugador;
+GRANT SELECT ON juego_online.Jugadores TO rol_jugador;
+GRANT SELECT ON juego_online.Items TO rol_jugador;
+GRANT SELECT ON juego_online.Juegos TO rol_jugador;
+GRANT SELECT, INSERT ON juego_online.Partidas TO rol_jugador;   -- puede registrar sus propias partidas
+GRANT EXECUTE ON PROCEDURE juego_online.subir_nivel_jugador TO rol_jugador;
+GRANT EXECUTE ON PROCEDURE juego_online.comprar_item_unico TO rol_jugador;
+-- Explícitamente NO se otorga UPDATE directo sobre Jugadores.monedas/nivel
+
+-- Rol MODERADOR: puede banear jugadores, no puede tocar monedas
+DROP ROLE IF EXISTS rol_moderador;
+CREATE ROLE rol_moderador;
+GRANT rol_jugador TO rol_moderador;   -- hereda los permisos de jugador
+GRANT UPDATE (baneado) ON juego_online.Jugadores TO rol_moderador;
+
+-- Rol ADMINISTRADOR: único que puede asignar monedas virtuales directamente
+DROP ROLE IF EXISTS rol_administrador;
+CREATE ROLE rol_administrador;
+GRANT rol_moderador TO rol_administrador;
+GRANT UPDATE (monedas, nivel, experiencia) ON juego_online.Jugadores TO rol_administrador;
+GRANT DELETE ON juego_online.Jugadores TO rol_administrador;
+GRANT DELETE ON juego_online.Partidas TO rol_administrador;
+
+FLUSH PRIVILEGES;
+
+-- Ejemplo: asignar el rol a una cuenta real y activarlo por defecto
+-- CREATE USER 'moderador1'@'%' IDENTIFIED BY 'ClaveSegura123';
+-- GRANT rol_moderador TO 'moderador1'@'%';
+-- SET DEFAULT ROLE rol_moderador TO 'moderador1'@'%';
+
+-- Verificación (phpMyAdmin → pestaña SQL, o "Cuentas de usuario" → Roles)
+-- SHOW GRANTS FOR rol_administrador;</pre>
+<pre class="fuente-script" data-sesion="4" data-archivo="03_prevencion_sql_injection.sql">-- Sesión 4: Simulador — identificar y frenar inyecciones SQL (MySQL / MariaDB)
+-- Reto: un "hacker" intenta usar el buscador de jugadores por nombre para robar items
+-- o alterar las notas de un torneo, inyectando SQL dentro del campo de búsqueda.
+
+USE juego_online;
+
+-- ============================================================
+-- VERSIÓN VULNERABLE (NO USAR — solo con fines educativos)
+-- ============================================================
+-- Si el backend arma la consulta concatenando texto del usuario, así:
+--
+--   texto_busqueda = "' OR '1'='1"
+--   sql = "SELECT * FROM Jugadores WHERE nombre_usuario = '" + texto_busqueda + "'"
+--
+-- La consulta final ejecutada sería:
+--   SELECT * FROM Jugadores WHERE nombre_usuario = '' OR '1'='1'
+-- Esto devuelve TODOS los jugadores, filtrando la condición de búsqueda.
+--
+-- Un payload más dañino podría ser:
+--   texto_busqueda = "'; UPDATE Jugadores SET monedas = 999999 WHERE nombre_usuario = 'NoobMaster'; --"
+-- que otorgaría monedas infinitas al atacante si el backend permite múltiples sentencias.
+
+-- ============================================================
+-- VERSIÓN SEGURA — procedimiento con parámetro tipado (no concatenación de texto)
+-- ============================================================
+DROP PROCEDURE IF EXISTS buscar_jugador_seguro;
+
+DELIMITER //
+
+CREATE PROCEDURE buscar_jugador_seguro(IN p_nombre_usuario VARCHAR(50))
+BEGIN
+    -- p_nombre_usuario siempre se trata como VALOR, nunca como código SQL,
+    -- sin importar qué texto contenga (comillas, ; --, OR '1'='1', etc.)
+    SELECT jugador_id, nombre_usuario, nivel, monedas
+    FROM Jugadores
+    WHERE nombre_usuario = p_nombre_usuario;
+END //
+
+DELIMITER ;
+
+-- Reto de clase: probar el payload malicioso contra el procedimiento seguro
+-- y comprobar que NO devuelve todos los jugadores ni ejecuta comandos extra.
+CALL buscar_jugador_seguro('\' OR \'1\'=\'1');
+-- Resultado esperado: 0 filas (porque ningún jugador se llama literalmente  ' OR '1'='1 )
+
+CALL buscar_jugador_seguro('DragonSlayer99');
+-- Resultado esperado: 1 fila, la del jugador real.
+
+-- Lección: en el backend de la aplicación, usar SIEMPRE consultas preparadas
+-- (prepared statements / placeholders ?, :nombre) y nunca concatenar texto del
+-- usuario directamente dentro de una sentencia SQL. Este mismo principio es el
+-- que aplica un ORM o un driver con parámetros vinculados (bound parameters).</pre>
+<pre class="fuente-script" data-sesion="5" data-archivo="01_fragmentacion_particiones_region.sql">-- Sesión 5: Fragmentación de tablas por región (Servidor América / Servidor Europa)
+-- Motor: MySQL 8.0+ / MariaDB 10.5+ (PARTITION BY LIST COLUMNS)
+--
+-- IMPORTANTE: MySQL/MariaDB NO permiten claves foráneas (FOREIGN KEY) hacia o desde
+-- una tabla particionada. Esto no es una limitación del script: es una restricción
+-- real del motor, y refleja un problema genuino de las bases de datos distribuidas
+-- (un fragmento en el "Servidor Europa" no puede validar en tiempo real una fila que
+-- vive físicamente en el "Servidor América"). La integridad referencial se controla
+-- en la capa de aplicación en vez de con FK.
+
+USE juego_online;
+
+DROP TABLE IF EXISTS Partidas_Fragmentada;
+
+CREATE TABLE Partidas_Fragmentada (
+    partida_id      INT AUTO_INCREMENT,
+    jugador_id      INT NOT NULL,
+    juego_id        INT NOT NULL,
+    region          VARCHAR(20) NOT NULL,
+    puntaje         INT NOT NULL DEFAULT 0 CHECK (puntaje &gt;= 0),
+    duracion_seg    INT NOT NULL DEFAULT 0,
+    resultado       VARCHAR(20) NOT NULL DEFAULT 'jugada',
+    fecha           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (partida_id, region)
+) ENGINE=InnoDB
+PARTITION BY LIST COLUMNS(region) (
+    PARTITION p_america VALUES IN ('AMERICA'),
+    PARTITION p_europa  VALUES IN ('EUROPA')
+);
+
+-- Migramos los datos históricos de Partidas hacia la tabla fragmentada,
+-- tomando la región desde el jugador (simulando la sincronización entre servidores)
+INSERT INTO Partidas_Fragmentada (jugador_id, juego_id, region, puntaje, duracion_seg, resultado, fecha)
+SELECT p.jugador_id, p.juego_id, j.region, p.puntaje, p.duracion_seg, p.resultado, p.fecha
+FROM Partidas p
+JOIN Jugadores j ON j.jugador_id = p.jugador_id;
+
+-- Verificar que las consultas filtradas por región solo tocan su fragmento
+-- (partition pruning): ejecutar y observar la columna "partitions" del plan
+-- (en MySQL 8 / MariaDB, EXPLAIN ya incluye esa columna por defecto)
+EXPLAIN SELECT * FROM Partidas_Fragmentada WHERE region = 'AMERICA';
+
+-- En MySQL 8.0.18+/MariaDB también puedes usar:
+-- EXPLAIN ANALYZE SELECT * FROM Partidas_Fragmentada WHERE region = 'AMERICA';</pre>
+<pre class="fuente-script" data-sesion="5" data-archivo="02_indices_matchmaking.sql">-- Sesión 5: Índices para que el matchmaking responda en milisegundos
+-- Motor: MySQL / MariaDB
+-- Nota: a diferencia de PostgreSQL, MySQL no soporta CREATE INDEX IF NOT EXISTS de forma
+-- universal (MariaDB sí, MySQL no). Si vuelves a ejecutar este script, borra antes los
+-- índices con DROP INDEX &lt;nombre&gt; ON &lt;tabla&gt;; para evitar el error "Duplicate key name".
+USE juego_online;
+
+-- El matchmaking busca jugadores de nivel similar dentro de la misma región,
+-- ordenando por su mejor puntaje reciente. Sin índice, esto obliga a un escaneo
+-- completo (ALL) sobre miles/millones de partidas.
+
+CREATE INDEX idx_partidas_frag_region_fecha
+    ON Partidas_Fragmentada (region, fecha DESC);
+
+CREATE INDEX idx_partidas_frag_jugador
+    ON Partidas_Fragmentada (jugador_id);
+
+CREATE INDEX idx_jugadores_region_nivel
+    ON Jugadores (region, nivel);
+
+-- Consulta típica de matchmaking: jugadores de nivel cercano en la misma región,
+-- con su mejor puntaje reciente
+EXPLAIN
+SELECT j.jugador_id, j.nombre_usuario, j.nivel, MAX(p.puntaje) AS mejor_puntaje_reciente
+FROM Jugadores j
+JOIN Partidas_Fragmentada p ON p.jugador_id = j.jugador_id AND p.region = j.region
+WHERE j.region = 'AMERICA'
+  AND j.nivel BETWEEN 10 AND 15
+GROUP BY j.jugador_id, j.nombre_usuario, j.nivel
+ORDER BY mejor_puntaje_reciente DESC
+LIMIT 10;
+
+-- Comparar el plan (columna "key" usada vs "type: ALL") antes y después de crear
+-- los índices ejecutando: DROP INDEX idx_jugadores_region_nivel ON Jugadores;
+-- y volviendo a correr el EXPLAIN.</pre>
+<pre class="fuente-script" data-sesion="5" data-archivo="03_etl_carga_masiva.sql">-- Sesión 5: Carga masiva tipo ETL — miles de registros de partidas históricas
+-- Motor: MySQL 8.0+ / MariaDB 10.2+ (WITH RECURSIVE)
+-- Simula la importación de un archivo externo (CSV) con historial de partidas
+-- desde la nube hacia el servidor regional correspondiente.
+
+USE juego_online;
+
+-- Solo en MySQL 8 (por defecto limita la recursión a 1000 niveles; MariaDB no
+-- tiene esta restricción y esta línea se puede omitir):
+-- SET SESSION cte_max_recursion_depth = 10000;
+
+-- 1) Generamos 5000 partidas históricas simuladas con una CTE recursiva
+--    (equivalente educativo a "importar un archivo CSV masivo" vía LOAD DATA INFILE)
+INSERT INTO Partidas_Fragmentada (jugador_id, juego_id, region, puntaje, duracion_seg, resultado, fecha)
+WITH RECURSIVE secuencia AS (
+    SELECT 1 AS n
+    UNION ALL
+    SELECT n + 1 FROM secuencia WHERE n &lt; 5000
+)
+SELECT
+    j.jugador_id,
+    FLOOR(RAND() * 2) + 1 AS juego_id,
+    j.region,
+    FLOOR(RAND() * 9000) AS puntaje,
+    FLOOR(RAND() * 900) + 60 AS duracion_seg,
+    ELT(FLOOR(RAND() * 2) + 1, 'victoria', 'derrota') AS resultado,
+    NOW() - INTERVAL FLOOR(RAND() * 180) DAY AS fecha
+FROM secuencia
+JOIN Jugadores j
+    ON j.jugador_id = ((secuencia.n MOD (SELECT COUNT(*) FROM Jugadores)) + 1);
+
+-- 2) Verificación del volumen cargado por región (extracción/transformación/carga completada)
+SELECT region, COUNT(*) AS total_partidas
+FROM Partidas_Fragmentada
+GROUP BY region
+ORDER BY region;
+
+-- Nota (equivalencia con herramientas reales de ETL/nube):
+--   - MySQL/MariaDB: LOAD DATA INFILE '/ruta/historico.csv' INTO TABLE Partidas_Fragmentada
+--       FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 ROWS;
+--   - phpMyAdmin: pestaña "Importar" de la tabla, formato CSV, mapeo de columnas.
+--   - Nube: AWS DMS, Azure Data Factory, o mysqldump/mysql para sincronizar
+--     entre el Servidor América y el Servidor Europa.</pre>
+<pre class="fuente-script" data-sesion="6" data-archivo="01_auditoria_trazas.sql">-- Sesión 6: Auditoría de datos — herramientas y trazas (MySQL / MariaDB)
+-- Registra cambios críticos sobre monedas de jugadores (compras, ajustes de admin)
+USE juego_online;
+
+CREATE TABLE IF NOT EXISTS Auditoria_Monedas (
+    auditoria_id    INT AUTO_INCREMENT PRIMARY KEY,
+    jugador_id      INT NOT NULL,
+    monedas_antes   INT NOT NULL,
+    monedas_despues INT NOT NULL,
+    operacion       VARCHAR(20) NOT NULL,
+    usuario_bd      VARCHAR(100) NOT NULL,
+    fecha           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+DROP TRIGGER IF EXISTS auditoria_monedas;
+
+DELIMITER //
+
+CREATE TRIGGER auditoria_monedas
+    AFTER UPDATE ON Jugadores
+    FOR EACH ROW
+BEGIN
+    -- MySQL no tiene "IS DISTINCT FROM"; se usa el operador NULL-safe negado
+    IF NOT (OLD.monedas &lt;=&gt; NEW.monedas) THEN
+        INSERT INTO Auditoria_Monedas (jugador_id, monedas_antes, monedas_despues, operacion, usuario_bd)
+        VALUES (OLD.jugador_id, OLD.monedas, NEW.monedas, 'UPDATE', CURRENT_USER());
+    END IF;
+END //
+
+DELIMITER ;
+
+-- Prueba de traza: cambiar monedas de un jugador y revisar la auditoría
+UPDATE Jugadores SET monedas = monedas + 100 WHERE jugador_id = 1;
+SELECT * FROM Auditoria_Monedas ORDER BY fecha DESC;</pre>
+<pre class="fuente-script" data-sesion="6" data-archivo="02_backup_completo.sh">#!/bin/bash
+# Sesión 6: Respaldo total (completo) de la base de datos del juego (MySQL / MariaDB)
+# Uso: bash 02_backup_completo.sh
+#
+# Nota: en phpMyAdmin este mismo respaldo se hace desde la interfaz gráfica:
+#   selecciona la base "juego_online" -&gt; pestaña "Exportar" -&gt; método "Personalizado"
+#   -&gt; formato SQL -&gt; Continuar. Este script es la vía por línea de comandos/automatizada.
+
+set -euo pipefail
+
+DB_NAME="juego_online"
+DB_USER="root"
+BACKUP_DIR="$(dirname "$0")/../respaldos"
+FECHA="$(date +%Y%m%d_%H%M%S)"
+ARCHIVO="${BACKUP_DIR}/juego_online_completo_${FECHA}.sql"
+
+mkdir -p "$BACKUP_DIR"
+
+echo "Generando respaldo total de ${DB_NAME}..."
+mysqldump -u "$DB_USER" -p --single-transaction --routines --triggers "$DB_NAME" &gt; "$ARCHIVO"
+
+echo "Respaldo completo generado en: $ARCHIVO"</pre>
+<pre class="fuente-script" data-sesion="6" data-archivo="03_backup_incremental_binlog.sh">#!/bin/bash
+# Sesión 6: Respaldo incremental mediante binary log (binlog) — equivalente en
+# MySQL/MariaDB al archivado de WAL en PostgreSQL. Documenta la configuración de
+# referencia; requiere permisos de administrador sobre el servidor (my.cnf/my.ini).
+
+set -euo pipefail
+
+BINLOG_ARCHIVE_DIR="$(dirname "$0")/../respaldos/binlog_archive"
+mkdir -p "$BINLOG_ARCHIVE_DIR"
+
+cat &lt;&lt;'EOF'
+Configuración de referencia para respaldos incrementales (PITR) en my.cnf:
+
+  [mysqld]
+  log_bin = /var/log/mysql/mysql-bin.log
+  server_id = 1
+  binlog_format = ROW
+  expire_logs_days = 7
+
+Con esto, cada cambio confirmado (INSERT/UPDATE/DELETE) queda registrado en el
+binlog. Un respaldo total (02_backup_completo.sh / mysqldump) + los binlogs
+generados después permiten restaurar la base de datos a CUALQUIER punto en el
+tiempo entre el último respaldo total y el momento justo antes del "ataque".
+
+Flujo del reto final (Sesión 6):
+  1. Respaldo base:        mysqldump ... &gt; base.sql          (02_backup_completo.sh)
+  2. Binlog continuo:      el servidor lo genera automáticamente con log_bin=ON
+  3. Incidente simulado:   se "cae" o corrompe la base de datos
+  4. Recuperación PITR:    restaurar base.sql y luego reproducir los binlogs
+                           hasta el instante previo al incidente:
+
+     mysqlbinlog --stop-datetime="2026-12-18 23:55:00" \
+       /var/log/mysql/mysql-bin.000123 | mysql -u root -p juego_online
+
+En phpMyAdmin puedes revisar los binlogs activos desde Panel principal -&gt;
+Estado -&gt; Binary log (si el usuario conectado tiene privilegio REPLICATION CLIENT,
+como el rol soporte_sa creado en la Sesión 2).
+EOF
+
+echo "Directorio de referencia para binlogs archivados: $BINLOG_ARCHIVE_DIR"</pre>
+<pre class="fuente-script" data-sesion="6" data-archivo="04_simulacro_desastre_recuperacion.sh">#!/bin/bash
+# Sesión 6: RETO FINAL — Simulacro de caída crítica del servidor y recuperación
+# Motor: MySQL / MariaDB
+# Simula un "ataque DDoS que tumba el centro de datos": se elimina la base de datos
+# por completo y se restaura desde el último respaldo, verificando que ningún
+# jugador perdió su inventario, monedas o progreso.
+
+set -euo pipefail
+
+DB_NAME="juego_online"
+DB_USER="root"
+BACKUP_DIR="$(dirname "$0")/../respaldos"
+ULTIMO_RESPALDO="$(ls -t "${BACKUP_DIR}"/juego_online_completo_*.sql 2&gt;/dev/null | head -n1)"
+
+if [[ -z "$ULTIMO_RESPALDO" ]]; then
+    echo "ERROR: no hay respaldos disponibles. Ejecuta primero 02_backup_completo.sh"
+    exit 1
+fi
+
+echo "=== Estado ANTES del incidente ==="
+mysql -u "$DB_USER" -p "$DB_NAME" \
+    -e "SELECT nombre_usuario, nivel, monedas FROM Jugadores ORDER BY jugador_id;" \
+    | tee "${BACKUP_DIR}/estado_antes.txt"
+
+echo ""
+echo "!!! SIMULANDO ATAQUE / CAÍDA CRÍTICA DEL SERVIDOR PRINCIPAL !!!"
+mysql -u "$DB_USER" -p -e "DROP DATABASE ${DB_NAME};"
+echo "Base de datos ${DB_NAME} eliminada (incidente simulado)."
+
+echo ""
+echo "=== Iniciando recuperación desde respaldo: $ULTIMO_RESPALDO ==="
+mysql -u "$DB_USER" -p -e "CREATE DATABASE ${DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u "$DB_USER" -p "$DB_NAME" &lt; "$ULTIMO_RESPALDO"
+
+echo ""
+echo "=== Estado DESPUÉS de la recuperación ==="
+mysql -u "$DB_USER" -p "$DB_NAME" \
+    -e "SELECT nombre_usuario, nivel, monedas FROM Jugadores ORDER BY jugador_id;" \
+    | tee "${BACKUP_DIR}/estado_despues.txt"
+
+echo ""
+if diff -q "${BACKUP_DIR}/estado_antes.txt" "${BACKUP_DIR}/estado_despues.txt" &gt; /dev/null; then
+    echo "RETO SUPERADO: los datos de todos los jugadores se recuperaron sin pérdidas."
+else
+    echo "ATENCION: hay diferencias entre el estado antes y después. Revisar el respaldo usado."
+fi
+
+# Alternativa 100% gráfica en phpMyAdmin (sin línea de comandos):
+#   1. Exportar (antes del "ataque"): base juego_online -&gt; pestaña Exportar -&gt; Continuar
+#   2. Simular el ataque: base juego_online -&gt; Operaciones -&gt; "Eliminar la base de datos (DROP)"
+#   3. Recuperar: crear la base juego_online de nuevo -&gt; pestaña Importar -&gt; subir el .sql exportado</pre>
+</div>
+
+<div class="tooltip-script" id="tooltip-script" hidden role="tooltip">
+  <div class="tooltip-script-titulo">
+    <span id="tooltip-script-titulo-texto"></span>
+    <button class="tooltip-script-cerrar" id="tooltip-script-cerrar" type="button" aria-label="Cerrar">✕</button>
+  </div>
+  <pre class="tooltip-script-cuerpo" id="tooltip-script-cuerpo"></pre>
+</div>
+
+<script>
+  function alternarTarjeta(idTarjeta, idBoton) {
+    const tarjeta = document.getElementById(idTarjeta);
+    const boton = document.getElementById(idBoton);
+    if (!boton.dataset.etiquetaOriginal) {
+      boton.dataset.etiquetaOriginal = boton.textContent;
+    }
+    const estaOculta = tarjeta.hasAttribute('hidden');
+    if (estaOculta) {
+      tarjeta.removeAttribute('hidden');
+      boton.textContent = '✖️ Ocultar';
+    } else {
+      tarjeta.setAttribute('hidden', '');
+      boton.textContent = boton.dataset.etiquetaOriginal;
+    }
+  }
+
+  const FUENTES_SCRIPTS = {};
+  document.querySelectorAll('#fuentes-scripts pre.fuente-script').forEach(function (pre) {
+    const sesion = pre.dataset.sesion;
+    const archivo = pre.dataset.archivo;
+    if (!FUENTES_SCRIPTS[sesion]) FUENTES_SCRIPTS[sesion] = {};
+    FUENTES_SCRIPTS[sesion][archivo] = pre.textContent;
+  });
+
+  const tooltipScript = document.getElementById('tooltip-script');
+  const tooltipScriptTituloTexto = document.getElementById('tooltip-script-titulo-texto');
+  const tooltipScriptCuerpo = document.getElementById('tooltip-script-cuerpo');
+  const tooltipScriptCerrar = document.getElementById('tooltip-script-cerrar');
+  let scriptRefActivo = null;
+  let scriptRefFijado = false;
+  let temporizadorOcultarScript = null;
+
+  function posicionarTooltipScript(x, y) {
+    tooltipScript.style.left = '0px';
+    tooltipScript.style.top = '0px';
+    const rect = tooltipScript.getBoundingClientRect();
+    let left = x + 16;
+    let top = y + 16;
+    if (left + rect.width > window.innerWidth - 8) left = window.innerWidth - rect.width - 8;
+    if (left < 8) left = 8;
+    if (top + rect.height > window.innerHeight - 8) top = y - rect.height - 16;
+    if (top < 8) top = 8;
+    tooltipScript.style.left = left + 'px';
+    tooltipScript.style.top = top + 'px';
+  }
+
+  function cancelarOcultarTooltipScript() {
+    if (temporizadorOcultarScript) {
+      clearTimeout(temporizadorOcultarScript);
+      temporizadorOcultarScript = null;
+    }
+  }
+
+  function mostrarTooltipScript(el, x, y) {
+    cancelarOcultarTooltipScript();
+    const sesion = el.dataset.sesion;
+    const archivo = el.dataset.archivo;
+    const contenido = FUENTES_SCRIPTS[sesion] && FUENTES_SCRIPTS[sesion][archivo];
+    if (contenido === undefined) return;
+    tooltipScriptTituloTexto.textContent = 'scripts/' + archivo;
+    tooltipScriptCuerpo.textContent = contenido;
+    tooltipScript.hidden = false;
+    posicionarTooltipScript(x, y);
+    scriptRefActivo = el;
+  }
+
+  function ocultarTooltipScriptYa() {
+    cancelarOcultarTooltipScript();
+    tooltipScript.hidden = true;
+    scriptRefActivo = null;
+    scriptRefFijado = false;
+  }
+
+  function programarOcultarTooltipScript() {
+    if (scriptRefFijado) return;
+    cancelarOcultarTooltipScript();
+    temporizadorOcultarScript = setTimeout(ocultarTooltipScriptYa, 250);
+  }
+
+  tooltipScriptCerrar.addEventListener('click', function (evento) {
+    evento.stopPropagation();
+    ocultarTooltipScriptYa();
+  });
+  tooltipScript.addEventListener('mouseenter', cancelarOcultarTooltipScript);
+  tooltipScript.addEventListener('mouseleave', programarOcultarTooltipScript);
+
+  document.querySelectorAll('[data-sesion]').forEach(function (contenedor) {
+    const sesion = contenedor.getAttribute('data-sesion');
+    if (!FUENTES_SCRIPTS[sesion]) return;
+    contenedor.querySelectorAll('code, strong').forEach(function (el) {
+      if (el.children.length > 0 || el.classList.contains('script-ref')) return;
+      const texto = el.textContent.trim();
+      const coincide = texto.match(/^(?:scripts\/)?(\d{2}_[A-Za-z0-9_]+\.(?:sql|sh))$/);
+      if (!coincide || !FUENTES_SCRIPTS[sesion][coincide[1]]) return;
+      el.classList.add('script-ref');
+      el.tabIndex = 0;
+      el.dataset.sesion = sesion;
+      el.dataset.archivo = coincide[1];
+
+      el.addEventListener('mouseenter', function (evento) {
+        if (scriptRefFijado) return;
+        mostrarTooltipScript(el, evento.clientX, evento.clientY);
+      });
+      el.addEventListener('mousemove', function (evento) {
+        if (scriptRefActivo === el && !scriptRefFijado) posicionarTooltipScript(evento.clientX, evento.clientY);
+      });
+      el.addEventListener('mouseleave', programarOcultarTooltipScript);
+      el.addEventListener('focus', function () {
+        if (scriptRefFijado) return;
+        const rect = el.getBoundingClientRect();
+        mostrarTooltipScript(el, rect.left, rect.bottom);
+      });
+      el.addEventListener('blur', programarOcultarTooltipScript);
+      el.addEventListener('click', function (evento) {
+        evento.stopPropagation();
+        if (scriptRefFijado && scriptRefActivo === el) {
+          ocultarTooltipScriptYa();
+        } else {
+          mostrarTooltipScript(el, evento.clientX, evento.clientY);
+          scriptRefFijado = true;
+        }
+      });
+    });
+  });
+
+  document.addEventListener('click', function (evento) {
+    if (scriptRefActivo && !tooltipScript.contains(evento.target) && !evento.target.classList.contains('script-ref')) {
+      ocultarTooltipScriptYa();
+    }
+  });
+  document.addEventListener('scroll', function (evento) {
+    if (tooltipScript.contains(evento.target)) return;
+    ocultarTooltipScriptYa();
+  }, true);
+</script>
+
+</body>
+</html>
