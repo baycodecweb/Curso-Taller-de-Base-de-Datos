@@ -1,0 +1,1907 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía de Scripts — Sesión 6</title>
+<style>
+:root {
+  --bg: #0f1115;
+  --panel: #171a21;
+  --panel-border: #262a33;
+  --text: #e8eaed;
+  --text-dim: #9aa0ac;
+  --accent: #7c5cff;
+  --accent-dim: #4b3aa8;
+  --code-bg: #0b0d12;
+  --success: #33c481;
+  --warn: #ffb454;
+  --warn-bg: rgba(255,180,84,0.08);
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.topbar {
+  border-bottom: 1px solid var(--panel-border);
+  padding: 2rem 1.5rem 1.5rem;
+  background: linear-gradient(180deg, rgba(124,92,255,0.08), transparent);
+}
+
+.topbar-inner { max-width: 1180px; margin: 0 auto; }
+
+.badge {
+  display: inline-block;
+  background: var(--accent);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+}
+
+.topbar h1 { margin: 0 0 0.3rem; font-size: 1.8rem; }
+.subtitle { margin: 0 0 0.9rem; color: var(--text-dim); }
+
+.real-world-btn {
+  background: linear-gradient(135deg, var(--accent), #5a3fd6);
+  color: white;
+  border: none;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(124,92,255,0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.real-world-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(124,92,255,0.45); }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6,7,10,0.72);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 100;
+}
+.modal-overlay[hidden] { display: none; }
+
+.modal {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  max-width: 720px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: modal-in 0.2s ease-out;
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.3rem;
+  border-bottom: 1px solid var(--panel-border);
+  flex-shrink: 0;
+}
+.modal-head h2 { margin: 0; font-size: 1.15rem; }
+
+.modal-close {
+  background: var(--panel-border);
+  color: var(--text);
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.modal-close:hover { background: var(--accent-dim); }
+
+.modal-body {
+  padding: 1.2rem 1.3rem 1.5rem;
+  overflow-y: auto;
+}
+.modal-body > p { color: var(--text-dim); font-size: 0.9rem; margin-top: 0; }
+
+.rw-card {
+  background: var(--code-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.8rem;
+}
+.rw-card h3 { margin: 0 0 0.5rem; font-size: 0.92rem; color: var(--accent); }
+.rw-card p { margin: 0 0 0.4rem; font-size: 0.85rem; color: var(--text); line-height: 1.5; }
+.rw-card p:last-child { margin-bottom: 0; }
+.rw-card .rw-why { color: var(--text-dim); }
+.rw-card.rw-closing { border-color: var(--accent-dim); background: rgba(124,92,255,0.06); }
+.rw-card.rw-closing h3 { color: var(--text); }
+
+.layout {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 720px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+.stepper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  position: sticky;
+  top: 1.5rem;
+  align-self: start;
+}
+
+@media (max-width: 720px) {
+  .stepper {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  color: var(--text-dim);
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.9rem;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+.step:hover { border-color: var(--accent-dim); color: var(--text); }
+
+.step.active {
+  background: rgba(124,92,255,0.12);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--panel-border);
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.step.active .step-num { background: var(--accent); color: white; }
+
+.content { min-width: 0; }
+
+.panel {
+  display: none;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  animation: fade 0.2s ease;
+}
+
+.panel.active { display: block; }
+
+@keyframes fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel-tag {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+  color: var(--accent);
+  background: rgba(124,92,255,0.1);
+  border: 1px solid var(--accent-dim);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  margin-bottom: 0.8rem;
+}
+
+.panel h2 { margin-top: 0; }
+
+.checklist {
+  padding-left: 1.2rem;
+  color: var(--text-dim);
+}
+.checklist li { margin-bottom: 0.35rem; }
+.checklist code { color: var(--text); }
+
+.steps-list {
+  padding-left: 1.2rem;
+  margin: 0.4rem 0;
+}
+.steps-list li { margin-bottom: 0.4rem; }
+.steps-list code { color: var(--accent); }
+
+.context-box {
+  background: rgba(124,92,255,0.05);
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  margin: 1rem 0 1.2rem;
+}
+
+.context-box h3 {
+  margin: 0 0 0.6rem;
+  font-size: 1rem;
+  color: var(--accent);
+}
+
+.context-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.2rem;
+}
+.context-head h3 { margin-bottom: 0; flex: 1 1 auto; min-width: 200px; }
+
+.scenario-toggle {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent-dim);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.scenario-toggle:hover { background: rgba(124,92,255,0.15); }
+
+.scenario[hidden] { display: none; }
+
+.context-box p {
+  margin: 0 0 0.7rem;
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.context-box ul {
+  margin: 0 0 0.9rem;
+  padding-left: 1.2rem;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+.context-box ul:last-child { margin-bottom: 0; }
+.context-box li { margin-bottom: 0.45rem; }
+.context-box li strong { color: var(--text); }
+.context-box code { color: var(--accent); }
+
+.codeblock {
+  background: var(--code-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.codeblock-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--panel-border);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.head-actions { display: flex; gap: 0.4rem; flex-shrink: 0; flex-wrap: wrap; }
+
+.copy-btn {
+  background: var(--panel-border);
+  color: var(--text);
+  border: none;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.copy-btn:hover { background: var(--accent-dim); }
+.copy-btn.copied { background: var(--success); color: #06251a; }
+
+.explain-btn {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent-dim);
+  padding: 0.24rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.explain-btn:hover { background: rgba(124,92,255,0.12); }
+.explain-btn[aria-expanded="true"] { background: var(--accent); color: white; border-color: var(--accent); }
+
+.explain-panel {
+  background: var(--code-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  margin: -0.4rem 0 1rem;
+  padding: 0.9rem 1rem;
+  max-height: 420px;
+  overflow-y: auto;
+}
+.explain-panel[hidden] { display: none; }
+
+.explain-toggle-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.8rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.explain-group + .explain-group { margin-top: 1rem; }
+
+.explain-group-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.explain-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 0.4rem 1rem;
+  padding: 0.35rem 0;
+  border-top: 1px solid var(--panel-border);
+  font-size: 0.82rem;
+}
+.explain-row:first-child { border-top: none; }
+
+@media (max-width: 640px) {
+  .explain-row { grid-template-columns: 1fr; gap: 0.15rem; }
+}
+
+.explain-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.76rem;
+  color: var(--accent);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.explain-note { color: var(--text-dim); }
+
+/* bloque SQL: la acción principal — esto SÍ se pega en el cuadro SQL de phpMyAdmin */
+.codeblock.sql { border-color: var(--accent-dim); }
+.codeblock.sql .codeblock-head {
+  background: rgba(124,92,255,0.08);
+  color: var(--accent);
+  font-weight: 600;
+}
+.codeblock.sql pre { max-height: 320px; overflow-y: auto; }
+
+/* bloque de terminal: acción alternativa — NUNCA se pega en phpMyAdmin */
+.codeblock.terminal { border-color: rgba(255,180,84,0.35); }
+.codeblock.terminal .codeblock-head {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.codeblock.terminal .warn-text {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--warn);
+  background: var(--warn-bg);
+  border-top: 1px solid rgba(255,180,84,0.25);
+  padding: 0.5rem 0.7rem;
+}
+
+pre {
+  margin: 0;
+  padding: 0.8rem;
+  overflow-x: auto;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+}
+
+p.note, p.expect {
+  font-size: 0.85rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  margin: 0.8rem 0;
+}
+
+p.note {
+  background: rgba(255,255,255,0.03);
+  color: var(--text-dim);
+  border: 1px solid var(--panel-border);
+}
+
+p.expect {
+  background: rgba(51,196,129,0.08);
+  border: 1px solid rgba(51,196,129,0.35);
+  color: var(--text);
+}
+
+/* Acordeón genérico (desplegable <details>/<summary>) — reutilizable en cualquier sesión */
+.accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0.9rem 0;
+}
+
+.accordion-item {
+  background: var(--code-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.accordion-item[open] { border-color: var(--accent-dim); }
+
+.accordion-summary {
+  cursor: pointer;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--text);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.accordion-summary::-webkit-details-marker { display: none; }
+
+.accordion-summary::after {
+  content: "+";
+  flex-shrink: 0;
+  color: var(--accent);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.accordion-item[open] .accordion-summary::after { content: "\2212"; }
+
+.accordion-summary:hover { color: var(--accent); }
+
+.accordion-tag {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.accordion-body {
+  padding: 0 1rem 1rem;
+  border-top: 1px solid var(--panel-border);
+  padding-top: 0.8rem;
+  animation: fade 0.15s ease;
+}
+
+.accordion-body p {
+  margin: 0 0 0.6rem;
+  font-size: 0.87rem;
+  color: var(--text-dim);
+  line-height: 1.55;
+}
+.accordion-body p:last-child { margin-bottom: 0; }
+.accordion-body strong { color: var(--text); }
+.accordion-body code { color: var(--accent); }
+
+.accordion-note {
+  margin: 0.8rem 0 0;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+/* Bloques lado a lado, para simular dos pestañas/sesiones concurrentes */
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin: 1rem 0;
+  align-items: start;
+  min-width: 0;
+}
+
+@media (max-width: 820px) {
+  .split { grid-template-columns: 1fr; }
+}
+
+.split-col { min-width: 0; }
+.split-col .codeblock { margin: 0; }
+
+.split-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  margin-bottom: 0.4rem;
+}
+
+/* Simulador de concurrencia interactivo (Paso 3) */
+.sim-box {
+  background: var(--code-bg);
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.2rem;
+  margin: 1.2rem 0;
+}
+
+.sim-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+.sim-head h3 { margin: 0; font-size: 1rem; color: var(--accent); }
+
+.sim-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.sim-toggle input { accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer; }
+.sim-toggle code { color: var(--accent); }
+.sim-toggle input:disabled { cursor: not-allowed; }
+
+.sim-intro {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  margin: 0 0 1rem;
+}
+
+.sim-code {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  margin-bottom: 0.6rem;
+  overflow-x: auto;
+}
+.sim-code pre {
+  margin: 0;
+  padding: 0.6rem;
+}
+.sim-code code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.76rem;
+  color: var(--text);
+  white-space: pre;
+}
+
+.sim-run-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent), #5a3fd6);
+  color: white;
+  border: none;
+  padding: 0.55rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s;
+}
+.sim-run-btn:hover:not(:disabled) { transform: translateY(-1px); }
+.sim-run-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.sim-result {
+  margin-top: 0.6rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--panel-border);
+  color: var(--text-dim);
+  min-height: 1.4em;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.sim-result.pending { color: var(--warn); border-color: rgba(255,180,84,0.35); background: var(--warn-bg); }
+.sim-result.success { color: var(--success); border-color: rgba(51,196,129,0.35); background: rgba(51,196,129,0.08); }
+.sim-result.rejected { color: #ff8080; border-color: rgba(255,92,92,0.35); background: rgba(255,92,92,0.08); }
+
+.sim-timeline {
+  margin-top: 1rem;
+  border-top: 1px solid var(--panel-border);
+  padding-top: 0.8rem;
+}
+
+.sim-timeline-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  margin-bottom: 0.5rem;
+}
+
+.sim-timeline-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.sim-timeline-log li {
+  font-size: 0.8rem;
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  line-height: 1.4;
+}
+.sim-timeline-log li .t { color: var(--accent); margin-right: 0.5rem; }
+.sim-timeline-log li.success { color: var(--success); }
+.sim-timeline-log li.rejected { color: #ff8080; }
+.sim-timeline-log:empty::after {
+  content: "Todavía no ejecutaste nada — pulsa \"Ejecutar\" en alguna columna.";
+  color: var(--text-dim);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.82rem;
+}
+
+.sim-reset-btn {
+  margin-top: 1rem;
+  background: transparent;
+  border: 1px solid var(--panel-border);
+  color: var(--text-dim);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.sim-reset-btn:hover { border-color: var(--accent-dim); color: var(--text); }
+
+.foot {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  padding: 2rem 1rem;
+}
+
+/* Tabla de datos genérica (resultados simulados) */
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 0.4rem; }
+.data-table th, .data-table td {
+  border-bottom: 1px solid var(--panel-border);
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+}
+.data-table th {
+  color: var(--text-dim);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+}
+.data-table td.diff { color: #ff8080; font-weight: 600; }
+
+/* Caja de mini-simulador genérica (Paso 1: trigger) */
+.check-sim-box {
+  background: var(--code-bg);
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  margin: 1.1rem 0;
+}
+.check-sim-box h3 { margin: 0 0 0.5rem; font-size: 0.95rem; color: var(--accent); }
+
+.check-sim {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0.6rem 0;
+}
+.check-sim input[type="number"] {
+  width: 140px;
+  background: var(--bg);
+  border: 1px solid var(--panel-border);
+  color: var(--text);
+  padding: 0.5rem 0.6rem;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+}
+.check-sim input[type="number"]:focus { outline: none; border-color: var(--accent); }
+.check-sim button {
+  background: var(--panel-border);
+  color: var(--text);
+  border: none;
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.check-sim button:hover { background: var(--accent-dim); }
+
+.injection-outcome {
+  padding: 0.6rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  margin-bottom: 0.6rem;
+  border: 1px solid var(--panel-border);
+  background: rgba(255,255,255,0.03);
+  color: var(--text-dim);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  white-space: pre-wrap;
+}
+.injection-outcome.critical { border-color: rgba(255,92,92,0.5); background: rgba(255,92,92,0.12); color: #ff8080; font-weight: 600; }
+.injection-outcome.ok { border-color: rgba(51,196,129,0.35); background: rgba(51,196,129,0.08); color: var(--success); }
+
+/* Simulador de nombre de archivo del respaldo (Paso 2) */
+.backup-sim {
+  background: var(--code-bg);
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.2rem;
+  margin: 1.2rem 0;
+}
+.backup-sim h3 { margin: 0 0 0.5rem; font-size: 1rem; color: var(--accent); }
+.backup-filename {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+  color: var(--success);
+  background: var(--bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  word-break: break-all;
+}
+
+/* Simulador de PITR con binlog (Paso 3) */
+.pitr-sim {
+  background: var(--code-bg);
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.2rem;
+  margin: 1.2rem 0;
+}
+.pitr-sim h3 { margin: 0 0 0.5rem; font-size: 1rem; color: var(--accent); }
+
+.pitr-slider { width: 100%; accent-color: var(--accent); margin: 0.8rem 0 1.2rem; cursor: pointer; }
+
+.pitr-timeline {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.pitr-event {
+  flex: 1 1 0;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  position: relative;
+  transition: color 0.2s;
+}
+.pitr-event .pitr-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--panel-border);
+  margin: 0 auto 0.4rem;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.pitr-event.recovered { color: var(--success); }
+.pitr-event.recovered .pitr-dot { background: var(--success); box-shadow: 0 0 0 4px rgba(51,196,129,0.15); }
+.pitr-event.lost { color: #ff8080; }
+.pitr-event.lost .pitr-dot { background: #ff8080; box-shadow: 0 0 0 4px rgba(255,92,92,0.15); }
+.pitr-event.incident { font-weight: 700; }
+
+.pitr-summary {
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  border: 1px solid var(--panel-border);
+  background: rgba(255,255,255,0.03);
+  color: var(--text-dim);
+}
+.pitr-summary.full { border-color: rgba(51,196,129,0.35); background: rgba(51,196,129,0.08); color: var(--success); }
+.pitr-summary.partial { border-color: rgba(255,180,84,0.35); background: var(--warn-bg); color: var(--warn); }
+
+/* Simulador del simulacro de desastre (Paso 4) */
+.disaster-sim {
+  background: var(--code-bg);
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.2rem;
+  margin: 1.2rem 0;
+}
+.disaster-sim h3 { margin: 0 0 0.5rem; font-size: 1rem; color: var(--accent); }
+
+.disaster-verdict {
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border: 1px solid var(--panel-border);
+  background: rgba(255,255,255,0.03);
+  color: var(--text-dim);
+}
+.disaster-verdict.success { border-color: rgba(51,196,129,0.4); background: rgba(51,196,129,0.08); color: var(--success); }
+.disaster-verdict.warning { border-color: rgba(255,180,84,0.4); background: var(--warn-bg); color: var(--warn); }
+
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <span class="badge">Sesión 6 · Reto final · MySQL / phpMyAdmin / terminal</span>
+    <h1>Respaldos y Recuperación ante Ataques</h1>
+    <p class="subtitle">Guía visual de uso de los scripts — auditoría, respaldo total, PITR con binlog y el simulacro final de desastre</p>
+    <button id="real-world-btn" class="real-world-btn" aria-haspopup="dialog">💼 ¿Dónde se usa esto en el mundo real?</button>
+  </div>
+</header>
+
+<div class="modal-overlay" id="real-world-modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="real-world-title">
+    <div class="modal-head">
+      <h2 id="real-world-title">💼 Estos conceptos, fuera del aula</h2>
+      <button class="modal-close" id="real-world-close" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>Ninguna plataforma real está exenta de un incidente grave. Lo que separa a las empresas que sobreviven de las que cierran no es evitar el desastre para siempre, sino haber practicado la recuperación ANTES de que ocurra de verdad.</p>
+
+      <div class="rw-card">
+        <h3>Auditoría — saber quién cambió qué, y cuándo</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> los bancos y las plataformas de pagos mantienen registros de auditoría inmutables de cada movimiento de saldo, exigidos incluso por regulación. Cuando algo sale mal (un fraude, un bug, un reclamo de un cliente), esa traza es la única forma de reconstruir exactamente qué pasó.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> sin auditoría, un incidente de seguridad se investiga a ciegas; con ella, se puede responder con precisión "quién", "qué" y "cuándo".</p>
+      </div>
+
+      <div class="rw-card">
+        <h3>Respaldos totales e incrementales — la regla 3-2-1</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> equipos de infraestructura siguen la llamada "regla 3-2-1": al menos 3 copias de los datos, en 2 tipos de medio distintos, con 1 copia fuera del sitio (por ejemplo, en la nube). Combinar un respaldo total periódico con binlogs continuos —igual que en este script— es exactamente esa estrategia aplicada a una base de datos.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> un respaldo que nunca se probó restaurar no es un respaldo, es una suposición — muchos incidentes reales se han agravado al descubrir, ya en plena crisis, que el backup estaba corrupto o incompleto.</p>
+      </div>
+
+      <div class="rw-card">
+        <h3>PITR (recuperación punto-en-el-tiempo) — no perder "casi nada"</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> plataformas de comercio electrónico y bancos usan recuperación punto-en-el-tiempo para restaurar el sistema al segundo exacto antes de un incidente, en vez de perder todo un día de transacciones desde el último respaldo total. GitLab documentó públicamente en 2017 un incidente donde la falta de un plan de backups y PITR bien probado les costó horas de datos de usuarios.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> la diferencia entre un respaldo diario y PITR puede ser la diferencia entre perder segundos de datos o perder un día entero.</p>
+      </div>
+
+      <div class="rw-card rw-closing">
+        <h3>Por qué el "reto final" de este curso es un simulacro</h3>
+        <p class="rw-case">Los equipos de infraestructura serios ejecutan "game days" o simulacros de desastre programados, exactamente como el script 4 de esta sesión: provocan una falla a propósito, en un entorno controlado, para comprobar que el plan de recuperación funciona de verdad — antes de que un incidente real los obligue a descubrirlo bajo presión.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="layout">
+  <nav class="stepper" id="stepper" aria-label="Pasos de la sesión">
+    <button class="step active" data-target="paso-0">
+      <span class="step-num">0</span>
+      <span class="step-label">Preparar el entorno</span>
+    </button>
+    <button class="step" data-target="paso-1">
+      <span class="step-num">1</span>
+      <span class="step-label">Auditoría (trigger)</span>
+    </button>
+    <button class="step" data-target="paso-2">
+      <span class="step-num">2</span>
+      <span class="step-label">Respaldo total</span>
+    </button>
+    <button class="step" data-target="paso-3">
+      <span class="step-num">3</span>
+      <span class="step-label">Binlog / PITR</span>
+    </button>
+    <button class="step" data-target="paso-calendarizado">
+      <span class="step-num">4</span>
+      <span class="step-label">Calendarizados, objetos, snapshots</span>
+    </button>
+    <button class="step" data-target="paso-4">
+      <span class="step-num">5</span>
+      <span class="step-label">Reto final: simulacro</span>
+    </button>
+  </nav>
+
+  <section class="content">
+
+    <article class="panel active" id="paso-0">
+      <h2>Paso 0 · Preparar el entorno</h2>
+      <p>A diferencia de las sesiones anteriores, aquí no todo se pega en la pestaña <strong>SQL</strong> de phpMyAdmin: los scripts 2, 3 y 4 son <strong>scripts de terminal (bash)</strong>, pensados para ejecutarse desde la línea de comandos del servidor, no dentro del navegador.</p>
+      <ul class="checklist">
+        <li>Necesitas acceso a una <strong>terminal</strong> con los clientes <code>mysql</code> y <code>mysqldump</code> instalados (vienen con cualquier instalación de MySQL/MariaDB).</li>
+        <li>El script del binlog (Paso 3) requiere permisos de <strong>administrador del servidor</strong> para editar <code>my.cnf</code>/<code>my.ini</code> — no es algo que se configure con una simple sentencia SQL.</li>
+        <li>La base <code>juego_online</code> de las Sesiones 1 a 5 debe existir y tener datos, para que el respaldo y el simulacro tengan algo real que proteger.</li>
+      </ul>
+      <p class="note" style="border-color: rgba(255,180,84,0.4); background: var(--warn-bg); color: var(--warn);">⚠️ <strong>Importante:</strong> el script del Paso 5 ejecuta un <code>DROP DATABASE</code> real. Practica todo este simulacro únicamente en un servidor <strong>local o de pruebas</strong> — nunca en un servidor de producción, y nunca sin haber verificado antes que el respaldo del Paso 2 se generó correctamente.</p>
+      <p class="note">Los bloques de código de esta guía usan dos estilos: <strong>SQL</strong> (morado, se pega en phpMyAdmin) y <strong style="color:var(--warn)">terminal</strong> (ámbar, se ejecuta con <code>bash</code> desde la consola). Nunca los confundas.</p>
+    </article>
+
+    <article class="panel" id="paso-1">
+      <div class="panel-tag">scripts/01_auditoria_trazas.sql</div>
+      <h2>Paso 1 · Auditoría de datos con un TRIGGER</h2>
+      <p>Antes de poder recuperarte de un incidente, necesitas saber qué pasó. Este script crea una tabla de auditoría y un <code>TRIGGER</code> que registra automáticamente cada vez que cambian las monedas de un jugador — sin que la aplicación tenga que acordarse de anotarlo.</p>
+      <div class="codeblock">
+        <div class="codeblock-head"><span>en phpMyAdmin</span></div>
+        <ol class="steps-list">
+          <li>Pestaña <strong>SQL</strong> → pega el bloque de abajo (botón <em>Copiar SQL</em>).</li>
+          <li>Pulsa <strong>Continuar</strong>.</li>
+        </ol>
+      </div>
+      <div class="codeblock sql">
+        <div class="codeblock-head">
+          <span>SQL — pégalo en la pestaña SQL de phpMyAdmin</span>
+          <span class="head-actions">
+            <button class="explain-btn" data-explain-target="#explain-paso1" aria-expanded="false">Explicar código</button>
+            <button class="copy-btn" data-copy-target="#sql-paso1">Copiar SQL</button>
+          </span>
+        </div>
+        <pre><code id="sql-paso1">-- Sesión 6: Auditoría de datos — herramientas y trazas (MySQL / MariaDB)
+-- Registra cambios críticos sobre monedas de jugadores (compras, ajustes de admin)
+USE juego_online;
+
+CREATE TABLE IF NOT EXISTS Auditoria_Monedas (
+    auditoria_id    INT AUTO_INCREMENT PRIMARY KEY,
+    jugador_id      INT NOT NULL,
+    monedas_antes   INT NOT NULL,
+    monedas_despues INT NOT NULL,
+    operacion       VARCHAR(20) NOT NULL,
+    usuario_bd      VARCHAR(100) NOT NULL,
+    fecha           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+DROP TRIGGER IF EXISTS auditoria_monedas;
+
+DELIMITER //
+
+CREATE TRIGGER auditoria_monedas
+    AFTER UPDATE ON Jugadores
+    FOR EACH ROW
+BEGIN
+    -- MySQL no tiene "IS DISTINCT FROM"; se usa el operador NULL-safe negado
+    IF NOT (OLD.monedas <=> NEW.monedas) THEN
+        INSERT INTO Auditoria_Monedas (jugador_id, monedas_antes, monedas_despues, operacion, usuario_bd)
+        VALUES (OLD.jugador_id, OLD.monedas, NEW.monedas, 'UPDATE', CURRENT_USER());
+    END IF;
+END //
+
+DELIMITER ;
+
+-- Prueba de traza: cambiar monedas de un jugador y revisar la auditoría
+UPDATE Jugadores SET monedas = monedas + 100 WHERE jugador_id = 1;
+SELECT * FROM Auditoria_Monedas ORDER BY fecha DESC;</code></pre>
+      </div>
+      <div class="explain-panel" id="explain-paso1" hidden></div>
+
+      <div class="check-sim-box">
+        <h3>🧪 Pruébalo tú mismo: ¿qué registraría el trigger?</h3>
+        <p class="sim-intro">El jugador 1 (DragonSlayer99) tiene actualmente <strong>1500 monedas</strong>. Simula un <code>UPDATE Jugadores SET monedas = &lt;valor&gt; WHERE jugador_id = 1;</code> y mira qué fila insertaría el trigger en <code>Auditoria_Monedas</code>.</p>
+        <form class="check-sim" id="trigger-sim-form">
+          <input type="number" id="trigger-sim-input" placeholder="ej. 1600" value="1600" required>
+          <button type="submit">Simular UPDATE</button>
+        </form>
+        <div class="injection-outcome" id="trigger-sim-output">Escribe un valor y pulsa "Simular UPDATE".</div>
+      </div>
+
+      <p class="expect"><strong>Resultado esperado:</strong> tras el <code>UPDATE</code> de prueba, <code>Auditoria_Monedas</code> tiene una fila nueva con <code>monedas_antes = 1500</code>, <code>monedas_despues = 1600</code>. Si el valor nuevo fuera idéntico al anterior, el trigger NO inserta nada.</p>
+    </article>
+
+    <article class="panel" id="paso-2">
+      <div class="panel-tag">scripts/02_backup_completo.sh</div>
+      <h2>Paso 2 · Respaldo total con mysqldump</h2>
+      <p>Un respaldo total es una fotografía completa de la base de datos en un instante dado. <code>mysqldump</code> es la herramienta de línea de comandos que hace exactamente lo mismo que la pestaña <strong>Exportar</strong> de phpMyAdmin, pero de forma automatizable (por ejemplo, para programarla con <code>cron</code>).</p>
+      <ul class="checklist">
+        <li><code>--single-transaction</code>: toma la fotografía sin bloquear las tablas InnoDB, para que el juego pueda seguir recibiendo tráfico mientras se genera el respaldo.</li>
+        <li><code>--routines --triggers</code>: incluye también los procedimientos almacenados y el trigger de auditoría del Paso 1 — no solo los datos.</li>
+        <li>El archivo se nombra con fecha y hora exactas, para poder identificar y ordenar respaldos.</li>
+      </ul>
+
+      <div class="codeblock terminal">
+        <div class="codeblock-head">
+          <span>terminal — ejecutar con bash, NUNCA pegar en phpMyAdmin</span>
+          <span class="head-actions">
+            <button class="explain-btn" data-explain-target="#explain-paso2" aria-expanded="false">Explicar código</button>
+            <button class="copy-btn" data-copy-target="#sh-paso2">Copiar script</button>
+          </span>
+        </div>
+        <pre><code id="sh-paso2">#!/bin/bash
+# Sesión 6: Respaldo total (completo) de la base de datos del juego (MySQL / MariaDB)
+# Uso: bash 02_backup_completo.sh
+#
+# Nota: en phpMyAdmin este mismo respaldo se hace desde la interfaz gráfica:
+#   selecciona la base "juego_online" -> pestaña "Exportar" -> método "Personalizado"
+#   -> formato SQL -> Continuar. Este script es la vía por línea de comandos/automatizada.
+
+set -euo pipefail
+
+DB_NAME="juego_online"
+DB_USER="root"
+BACKUP_DIR="$(dirname "$0")/../respaldos"
+FECHA="$(date +%Y%m%d_%H%M%S)"
+ARCHIVO="${BACKUP_DIR}/juego_online_completo_${FECHA}.sql"
+
+mkdir -p "$BACKUP_DIR"
+
+echo "Generando respaldo total de ${DB_NAME}..."
+mysqldump -u "$DB_USER" -p --single-transaction --routines --triggers "$DB_NAME" > "$ARCHIVO"
+
+echo "Respaldo completo generado en: $ARCHIVO"</code></pre>
+        <span class="warn-text">⚠️ Pide la contraseña de <code>root</code> de forma interactiva (<code>-p</code>) — no la escribas dentro del script.</span>
+      </div>
+      <div class="explain-panel" id="explain-paso2" hidden></div>
+
+      <div class="backup-sim">
+        <h3>🕐 ¿Qué nombre de archivo se generaría ahora mismo?</h3>
+        <p class="sim-intro">El script arma el nombre del archivo con <code>date +%Y%m%d_%H%M%S</code>, tomando la fecha y hora exactas de tu servidor en el momento de ejecutarlo. Este reloj usa la hora de tu propio navegador para mostrarte un ejemplo en vivo:</p>
+        <div class="backup-filename" id="backup-filename-output">calculando…</div>
+      </div>
+
+      <p class="expect"><strong>Resultado esperado:</strong> un archivo <code>.sql</code> dentro de <code>respaldos/</code> con todos los datos, procedimientos y triggers de <code>juego_online</code> — el mismo archivo que usará el simulacro del Paso 5 para recuperar la base.</p>
+      <p class="note">Alternativa 100% gráfica: base <code>juego_online</code> → pestaña <strong>Exportar</strong> → método "Personalizado" → formato SQL → <strong>Continuar</strong>.</p>
+    </article>
+
+    <article class="panel" id="paso-3">
+      <div class="panel-tag">scripts/03_backup_incremental_binlog.sh</div>
+      <h2>Paso 3 · Respaldo incremental con el binary log (PITR)</h2>
+      <p>Un respaldo total diario protege contra la pérdida total de datos, pero si el incidente ocurre a las 14:32, ¿qué pasa con todo lo que sucedió desde el respaldo de la medianoche? El <strong>binary log (binlog)</strong> registra continuamente cada cambio confirmado, permitiendo restaurar la base a <strong>cualquier instante exacto</strong> — esto se llama recuperación punto-en-el-tiempo (<em>Point-In-Time Recovery</em>, PITR).</p>
+
+      <div class="codeblock terminal">
+        <div class="codeblock-head">
+          <span>terminal — script de referencia/documentación, NUNCA pegar en phpMyAdmin</span>
+          <span class="head-actions">
+            <button class="explain-btn" data-explain-target="#explain-paso3" aria-expanded="false">Explicar código</button>
+            <button class="copy-btn" data-copy-target="#sh-paso3">Copiar script</button>
+          </span>
+        </div>
+        <pre><code id="sh-paso3">#!/bin/bash
+# Sesión 6: Respaldo incremental mediante binary log (binlog) — equivalente en
+# MySQL/MariaDB al archivado de WAL en PostgreSQL. Documenta la configuración de
+# referencia; requiere permisos de administrador sobre el servidor (my.cnf/my.ini).
+
+set -euo pipefail
+
+BINLOG_ARCHIVE_DIR="$(dirname "$0")/../respaldos/binlog_archive"
+mkdir -p "$BINLOG_ARCHIVE_DIR"
+
+cat &lt;&lt;'EOF'
+Configuración de referencia para respaldos incrementales (PITR) en my.cnf:
+
+  [mysqld]
+  log_bin = /var/log/mysql/mysql-bin.log
+  server_id = 1
+  binlog_format = ROW
+  expire_logs_days = 7
+
+Con esto, cada cambio confirmado (INSERT/UPDATE/DELETE) queda registrado en el
+binlog. Un respaldo total (02_backup_completo.sh / mysqldump) + los binlogs
+generados después permiten restaurar la base de datos a CUALQUIER punto en el
+tiempo entre el último respaldo total y el momento justo antes del "ataque".
+
+Flujo del reto final (Sesión 6):
+  1. Respaldo base:        mysqldump ... > base.sql          (02_backup_completo.sh)
+  2. Binlog continuo:      el servidor lo genera automáticamente con log_bin=ON
+  3. Incidente simulado:   se "cae" o corrompe la base de datos
+  4. Recuperación PITR:    restaurar base.sql y luego reproducir los binlogs
+                           hasta el instante previo al incidente:
+
+     mysqlbinlog --stop-datetime="2026-12-18 23:55:00" \
+       /var/log/mysql/mysql-bin.000123 | mysql -u root -p juego_online
+
+En phpMyAdmin puedes revisar los binlogs activos desde Panel principal ->
+Estado -> Binary log (si el usuario conectado tiene privilegio REPLICATION CLIENT,
+como el rol soporte_sa creado en la Sesión 2).
+EOF
+
+echo "Directorio de referencia para binlogs archivados: $BINLOG_ARCHIVE_DIR"</code></pre>
+        <span class="warn-text">⚠️ Requiere editar <code>my.cnf</code>/<code>my.ini</code> del servidor (acceso de administrador de infraestructura) — no es un cambio que se haga con SQL.</span>
+      </div>
+      <div class="explain-panel" id="explain-paso3" hidden></div>
+
+      <div class="pitr-sim">
+        <h3>⏱️ Simulador: elige tu punto de recuperación (PITR)</h3>
+        <p class="sim-intro">Arrastra el control para elegir el valor de <code>--stop-datetime</code> de <code>mysqlbinlog</code>. Todo lo que ocurrió <strong>antes</strong> de ese instante se recupera; todo lo que ocurrió <strong>después</strong> se pierde, aunque haya quedado registrado en el binlog.</p>
+
+        <input type="range" id="pitr-slider" min="0" max="100" value="100" class="pitr-slider">
+
+        <div class="pitr-timeline" id="pitr-timeline"></div>
+
+        <div class="pitr-summary" id="pitr-summary"></div>
+      </div>
+
+      <p class="expect"><strong>Resultado esperado:</strong> mover el control hasta el instante justo antes del incidente recupera el 100% de las transacciones reales; detenerse antes de tiempo pierde transacciones válidas innecesariamente; pasarse del incidente es imposible — no hay binlog después de la caída.</p>
+    </article>
+
+    <article class="panel" id="paso-calendarizado">
+      <h2>Paso 4 · Respaldos calendarizados, de objetos y discos de imagen</h2>
+      <p>Los respaldos de los Pasos 2 y 3 los ejecutaste tú, a mano, en un momento puntual. En producción, nadie confía en que una persona recuerde hacerlo todos los días — el respaldo tiene que pasar solo. Además, no siempre hace falta respaldar <em>toda</em> la base: a veces solo una tabla, o el propio disco completo.</p>
+
+      <div class="context-box">
+        <h3>Respaldos calendarizados: que el respaldo se ejecute solo</h3>
+        <p>Un respaldo <strong>calendarizado (programado)</strong> es exactamente el script del Paso 2, pero disparado automáticamente por el sistema operativo en vez de por una persona — con <code>cron</code> en Linux/macOS o el <strong>Programador de tareas</strong> en Windows.</p>
+        <div class="codeblock terminal">
+          <div class="codeblock-head">
+            <span>terminal (Linux/macOS) — programar el respaldo total cada noche a la 1:00 a.m.</span>
+          </div>
+          <pre><code># Editar el crontab del usuario que administra el servidor
+crontab -e
+
+# Agregar esta línea (formato: minuto hora día mes día-semana comando):
+0 1 * * * /bin/bash /ruta/al/curso/scripts/02_backup_completo.sh >> /var/log/backup_juego.log 2>&1
+
+# 0 1 * * *  =  todos los días, a la 1:00 a.m.
+# Verificar que quedó programado:
+crontab -l</code></pre>
+          <span class="warn-text">⚠️ Comando de terminal real — solo referencia conceptual, no forma parte de los scripts ejecutables del curso.</span>
+        </div>
+        <p class="note">En Windows, el equivalente es crear una tarea en el <strong>Programador de tareas</strong> que ejecute <code>02_backup_completo.sh</code> (vía WSL o Git Bash) todos los días a una hora fija. La idea es la misma: el respaldo deja de depender de que alguien se acuerde de hacerlo.</p>
+      </div>
+
+      <div class="context-box">
+        <h3>Respaldos de objetos de BD: no todo o nada</h3>
+        <p><code>mysqldump juego_online</code> (Paso 2) respalda <strong>toda</strong> la base. Pero <code>mysqldump</code> también permite respaldar un solo objeto — una tabla, o solo la estructura de un procedimiento — cuando restaurar todo sería exagerado para el problema real:</p>
+        <div class="codeblock terminal">
+          <div class="codeblock-head">
+            <span>terminal — respaldar objetos individuales, no toda la base</span>
+          </div>
+          <pre><code># Respaldar SOLO la tabla de auditoría (por ejemplo, antes de purgarla)
+mysqldump -u root -p juego_online Auditoria_Monedas > respaldo_auditoria.sql
+
+# Respaldar SOLO los procedimientos almacenados y triggers (sin datos)
+mysqldump -u root -p --no-data --routines --triggers juego_online > respaldo_objetos.sql
+
+# Restaurar solo esa tabla en la base (sin tocar el resto)
+mysql -u root -p juego_online < respaldo_auditoria.sql</code></pre>
+        </div>
+        <p class="note">Útil, por ejemplo, si <code>subir_nivel_jugador</code> (Sesión 1) se modifica por error: en vez de restaurar <em>toda</em> la base y perder partidas nuevas, se restaura solo ese procedimiento desde un respaldo de objetos.</p>
+      </div>
+
+      <div class="context-box">
+        <h3>Discos de imágenes (snapshots): otra forma de recuperación</h3>
+        <p>Todo lo anterior son <strong>respaldos lógicos</strong> (archivos <code>.sql</code> con sentencias que reconstruyen los datos). Un <strong>disco de imagen (snapshot)</strong> es un <strong>respaldo físico</strong>: una copia congelada de todo el disco o volumen donde vive la base de datos, tomada por la infraestructura (no por MySQL), por ejemplo un <em>snapshot</em> de Amazon EBS o de un disco administrado de Azure.</p>
+        <table class="data-table">
+          <thead><tr><th>Tipo de recuperación</th><th>Cómo se genera</th><th>Cuándo conviene</th></tr></thead>
+          <tbody>
+            <tr><td>Respaldo lógico total (Paso 2)</td><td><code>mysqldump</code> completo</td><td>Portable entre versiones/motores; más lento de restaurar en bases grandes</td></tr>
+            <tr><td>PITR con binlog (Paso 3)</td><td>Respaldo total + binary log</td><td>Recuperar hasta segundos antes del incidente</td></tr>
+            <tr><td>Respaldo de objetos (arriba)</td><td><code>mysqldump</code> de una tabla/rutina</td><td>Revertir un error puntual sin tocar el resto de la base</td></tr>
+            <tr><td>Disco de imagen (snapshot)</td><td>Snapshot del volumen/disco (EBS, Azure Disk)</td><td>Restaurar un servidor completo en minutos, tal como estaba en ese instante</td></tr>
+          </tbody>
+        </table>
+        <p class="note">Los snapshots son mucho más rápidos de restaurar que reproducir un <code>.sql</code> gigante, pero dependen de la infraestructura de nube o del sistema de discos (LVM), no de MySQL — por eso conviene combinarlos con los respaldos lógicos, nunca depender de un solo tipo.</p>
+      </div>
+    </article>
+
+    <article class="panel" id="paso-4">
+      <div class="panel-tag">scripts/04_simulacro_desastre_recuperacion.sh</div>
+      <h2>Paso 5 · Reto final — Simulacro de desastre y recuperación</h2>
+      <p>Este es el reto final del curso: el script elimina intencionalmente la base de datos completa (simulando una caída crítica del servidor) y la restaura desde el último respaldo, verificando automáticamente que ningún jugador perdió su inventario, monedas o progreso.</p>
+
+      <div class="codeblock terminal">
+        <div class="codeblock-head">
+          <span>terminal — contiene un DROP DATABASE real, solo en entorno local/pruebas</span>
+          <span class="head-actions">
+            <button class="explain-btn" data-explain-target="#explain-paso4" aria-expanded="false">Explicar código</button>
+            <button class="copy-btn" data-copy-target="#sh-paso4">Copiar script</button>
+          </span>
+        </div>
+        <pre><code id="sh-paso4">#!/bin/bash
+# Sesión 6: RETO FINAL — Simulacro de caída crítica del servidor y recuperación
+# Motor: MySQL / MariaDB
+# Simula un "ataque DDoS que tumba el centro de datos": se elimina la base de datos
+# por completo y se restaura desde el último respaldo, verificando que ningún
+# jugador perdió su inventario, monedas o progreso.
+
+set -euo pipefail
+
+DB_NAME="juego_online"
+DB_USER="root"
+BACKUP_DIR="$(dirname "$0")/../respaldos"
+ULTIMO_RESPALDO="$(ls -t "${BACKUP_DIR}"/juego_online_completo_*.sql 2>/dev/null | head -n1)"
+
+if [[ -z "$ULTIMO_RESPALDO" ]]; then
+    echo "ERROR: no hay respaldos disponibles. Ejecuta primero 02_backup_completo.sh"
+    exit 1
+fi
+
+echo "=== Estado ANTES del incidente ==="
+mysql -u "$DB_USER" -p "$DB_NAME" \
+    -e "SELECT nombre_usuario, nivel, monedas FROM Jugadores ORDER BY jugador_id;" \
+    | tee "${BACKUP_DIR}/estado_antes.txt"
+
+echo ""
+echo "!!! SIMULANDO ATAQUE / CAÍDA CRÍTICA DEL SERVIDOR PRINCIPAL !!!"
+mysql -u "$DB_USER" -p -e "DROP DATABASE ${DB_NAME};"
+echo "Base de datos ${DB_NAME} eliminada (incidente simulado)."
+
+echo ""
+echo "=== Iniciando recuperación desde respaldo: $ULTIMO_RESPALDO ==="
+mysql -u "$DB_USER" -p -e "CREATE DATABASE ${DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u "$DB_USER" -p "$DB_NAME" < "$ULTIMO_RESPALDO"
+
+echo ""
+echo "=== Estado DESPUÉS de la recuperación ==="
+mysql -u "$DB_USER" -p "$DB_NAME" \
+    -e "SELECT nombre_usuario, nivel, monedas FROM Jugadores ORDER BY jugador_id;" \
+    | tee "${BACKUP_DIR}/estado_despues.txt"
+
+echo ""
+if diff -q "${BACKUP_DIR}/estado_antes.txt" "${BACKUP_DIR}/estado_despues.txt" > /dev/null; then
+    echo "RETO SUPERADO: los datos de todos los jugadores se recuperaron sin pérdidas."
+else
+    echo "ATENCION: hay diferencias entre el estado antes y después. Revisar el respaldo usado."
+fi
+
+# Alternativa 100% gráfica en phpMyAdmin (sin línea de comandos):
+#   1. Exportar (antes del "ataque"): base juego_online -> pestaña Exportar -> Continuar
+#   2. Simular el ataque: base juego_online -> Operaciones -> "Eliminar la base de datos (DROP)"
+#   3. Recuperar: crear la base juego_online de nuevo -> pestaña Importar -> subir el .sql exportado</code></pre>
+        <span class="warn-text">🔥 <code>DROP DATABASE</code> es irreversible sin un respaldo válido. Verifica primero que el Paso 2 generó un archivo real antes de ejecutar esto.</span>
+      </div>
+      <div class="explain-panel" id="explain-paso4" hidden></div>
+
+      <div class="disaster-sim">
+        <h3>🧨 Simulador del simulacro (100% en tu navegador, no toca ninguna base real)</h3>
+        <p class="sim-intro">Reproduce, paso a paso, lo que hace el script: guarda el estado, "ataca" la base, la restaura desde el respaldo, y compara. Prueba primero sin la casilla marcada, y luego con ella, para ver ambos desenlaces posibles.</p>
+
+        <label class="sim-toggle" style="margin-bottom:0.8rem;">
+          <input type="checkbox" id="disaster-stale-toggle">
+          <span>🛒 RocketFox compró un item DESPUÉS del último respaldo (no capturado en el backup)</span>
+        </label>
+
+        <button type="button" class="etl-run-btn" id="disaster-run-btn">▶ Ejecutar simulacro</button>
+
+        <div class="sim-timeline" style="margin-top:1rem;">
+          <div class="sim-timeline-title">Registro del simulacro</div>
+          <ol class="sim-timeline-log" id="disaster-timeline-log"></ol>
+        </div>
+
+        <div class="split" id="disaster-tables" hidden>
+          <div class="split-col">
+            <div class="split-label">Estado ANTES del incidente</div>
+            <table class="data-table" id="disaster-table-antes"></table>
+          </div>
+          <div class="split-col">
+            <div class="split-label">Estado DESPUÉS de la recuperación</div>
+            <table class="data-table" id="disaster-table-despues"></table>
+          </div>
+        </div>
+
+        <div class="disaster-verdict" id="disaster-verdict" hidden></div>
+
+        <button type="button" class="sim-reset-btn" id="disaster-reset-btn">🔄 Reiniciar simulacro</button>
+      </div>
+
+      <p class="expect"><strong>Resultado esperado:</strong> con un respaldo actualizado, el reto se supera y el estado antes/después es idéntico. Con un respaldo desactualizado, la recuperación funciona igual, pero el simulacro señala correctamente las diferencias — la lección real: recuperar es fácil si el respaldo es bueno; lo difícil es no darte cuenta de que ya no lo era.</p>
+
+      <div class="accordion">
+        <details class="accordion-item">
+          <summary class="accordion-summary"><span>🤔 ¿Por qué la comparación usa <code>diff</code> en vez de solo "mirar"?</span><span class="accordion-tag">verificación automática</span></summary>
+          <div class="accordion-body">
+            <p>Con miles de jugadores, comparar el estado antes/después a simple vista no es viable ni confiable. <code>diff -q</code> compara los dos archivos de texto byte a byte y responde con un simple sí/no: son idénticos o no lo son. Automatizar la verificación es lo que permite ejecutar este mismo simulacro con una base de datos real de producción, en segundos, sin depender de que una persona revise fila por fila.</p>
+          </div>
+        </details>
+        <details class="accordion-item">
+          <summary class="accordion-summary"><span>🚨 ¿Qué se pierde si el respaldo está desactualizado?</span><span class="accordion-tag">ventana de pérdida de datos</span></summary>
+          <div class="accordion-body">
+            <p>Todo lo que haya cambiado entre el momento en que se generó el respaldo total y el momento del incidente. Es exactamente el problema que resuelve el binlog del Paso 3: en vez de aceptar esa "ventana de pérdida", PITR permite reproducir los cambios confirmados después del respaldo, minuto a minuto, hasta justo antes de la caída.</p>
+          </div>
+        </details>
+      </div>
+    </article>
+
+  </section>
+</main>
+
+<footer class="foot">
+  <p>Guía de uso — Sesión 6: Respaldos y Recuperación ante Ataques · Taller de Base de Datos (MySQL / phpMyAdmin / terminal)</p>
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const steps = document.querySelectorAll(".step");
+  const panels = document.querySelectorAll(".panel");
+
+  function activate(targetId) {
+    steps.forEach(s => s.classList.toggle("active", s.dataset.target === targetId));
+    panels.forEach(p => p.classList.toggle("active", p.id === targetId));
+    window.location.hash = targetId;
+  }
+
+  steps.forEach(step => {
+    step.addEventListener("click", () => activate(step.dataset.target));
+  });
+
+  const initial = window.location.hash.replace("#", "");
+  if (initial && document.getElementById(initial)) {
+    activate(initial);
+  }
+
+  /* ---------------------------------------------------------------
+     Modal: "¿Dónde se usa esto en el mundo real?"
+  --------------------------------------------------------------- */
+  const rwBtn = document.getElementById("real-world-btn");
+  const rwModal = document.getElementById("real-world-modal");
+  const rwClose = document.getElementById("real-world-close");
+
+  if (rwBtn && rwModal && rwClose) {
+    const openModal = () => {
+      rwModal.hidden = false;
+      rwClose.focus();
+    };
+    const closeModal = () => {
+      rwModal.hidden = true;
+      rwBtn.focus();
+    };
+
+    rwBtn.addEventListener("click", openModal);
+    rwClose.addEventListener("click", closeModal);
+    rwModal.addEventListener("click", (e) => {
+      if (e.target === rwModal) closeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !rwModal.hidden) closeModal();
+    });
+  }
+
+  /* ---------------------------------------------------------------
+     Explicación línea por línea del código
+  --------------------------------------------------------------- */
+  const explainData = {
+    paso1: [
+      {
+        title: "Encabezado y tabla de auditoría",
+        lines: [
+          ["-- Sesión 6: Auditoría de datos — herramientas y trazas (MySQL / MariaDB)", "Comentario descriptivo del archivo."],
+          ["-- Registra cambios críticos sobre monedas de jugadores (compras, ajustes de admin)", "Explica el alcance de esta auditoría: no todo cambio, solo los que afectan monedas."],
+          ["USE juego_online;", "Selecciona la base sobre la que se crea la auditoría."],
+          ["CREATE TABLE IF NOT EXISTS Auditoria_Monedas (", "Crea la tabla que guardará cada cambio, si no existía ya."],
+          ["auditoria_id    INT AUTO_INCREMENT PRIMARY KEY,", "Identificador único de cada registro de auditoría."],
+          ["jugador_id      INT NOT NULL,", "A qué jugador le cambiaron las monedas."],
+          ["monedas_antes   INT NOT NULL,", "Cuánto tenía antes del cambio."],
+          ["monedas_despues INT NOT NULL,", "Cuánto quedó después del cambio."],
+          ["operacion       VARCHAR(20) NOT NULL,", "Tipo de operación que originó el cambio (aquí siempre 'UPDATE')."],
+          ["usuario_bd      VARCHAR(100) NOT NULL,", "Qué cuenta de MySQL ejecutó el cambio — clave para saber \"quién\" lo hizo."],
+          ["fecha           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP", "Cuándo ocurrió, registrado automáticamente por el motor."],
+          [");", "Cierra la definición de la tabla."]
+        ]
+      },
+      {
+        title: "Crear el trigger",
+        lines: [
+          ["DROP TRIGGER IF EXISTS auditoria_monedas;", "Borra una versión anterior del trigger, si existía, para poder recrearlo sin error."],
+          ["DELIMITER //", "Cambia el separador de sentencias, porque el cuerpo del trigger tiene su propio ; interno."],
+          ["CREATE TRIGGER auditoria_monedas", "Crea el trigger con este nombre."],
+          ["AFTER UPDATE ON Jugadores", "Se dispara automáticamente DESPUÉS de cada UPDATE exitoso sobre la tabla Jugadores — sin que la aplicación tenga que llamarlo."],
+          ["FOR EACH ROW", "Se ejecuta una vez por cada fila afectada, no una sola vez por sentencia."],
+          ["BEGIN", "Empieza el cuerpo del trigger."],
+          ["-- MySQL no tiene \"IS DISTINCT FROM\"; se usa el operador NULL-safe negado", "Explica por qué la siguiente línea usa una sintaxis poco común."],
+          ["IF NOT (OLD.monedas <=> NEW.monedas) THEN", "OLD es la fila antes del cambio, NEW es la fila después. <=> compara de forma segura incluso si algún valor fuera NULL; NOT invierte la comparación para preguntar \"¿de verdad cambiaron las monedas?\"."],
+          ["INSERT INTO Auditoria_Monedas (jugador_id, monedas_antes, monedas_despues, operacion, usuario_bd)", "Si sí cambiaron, inserta una fila nueva en la auditoría."],
+          ["VALUES (OLD.jugador_id, OLD.monedas, NEW.monedas, 'UPDATE', CURRENT_USER());", "Guarda el valor anterior, el valor nuevo, y qué cuenta de MySQL hizo el cambio."],
+          ["END IF;", "Cierra el condicional."],
+          ["END //", "Cierra el cuerpo del trigger."],
+          ["DELIMITER ;", "Devuelve el delimitador normal (;)."]
+        ]
+      },
+      {
+        title: "Prueba de traza",
+        lines: [
+          ["-- Prueba de traza: cambiar monedas de un jugador y revisar la auditoría", "Explica el propósito del bloque de prueba."],
+          ["UPDATE Jugadores SET monedas = monedas + 100 WHERE jugador_id = 1;", "Provoca el cambio real que activará el trigger automáticamente."],
+          ["SELECT * FROM Auditoria_Monedas ORDER BY fecha DESC;", "Muestra la auditoría, más reciente primero — ahí debería aparecer el cambio recién hecho."]
+        ]
+      }
+    ],
+    paso2: [
+      {
+        title: "Encabezado",
+        lines: [
+          ["#!/bin/bash", "Le dice al sistema que este archivo se ejecuta con el intérprete bash."],
+          ["# Sesión 6: Respaldo total (completo) de la base de datos del juego (MySQL / MariaDB)", "Comentario descriptivo (en bash, # marca comentarios, igual que -- en SQL)."],
+          ["# Uso: bash 02_backup_completo.sh", "Recuerda cómo se ejecuta este archivo desde la terminal."],
+          ["set -euo pipefail", "Configuración de seguridad del script: se detiene ante el primer error (-e), ante variables no definidas (-u), y propaga errores dentro de tuberías (pipefail) — evita que un fallo silencioso pase desapercibido."]
+        ]
+      },
+      {
+        title: "Variables y nombre del archivo",
+        lines: [
+          ["DB_NAME=\"juego_online\"", "Nombre de la base a respaldar."],
+          ["DB_USER=\"root\"", "Usuario de MySQL que ejecutará el respaldo."],
+          ["BACKUP_DIR=\"$(dirname \"$0\")/../respaldos\"", "Carpeta donde se guardan los respaldos, relativa a la ubicación del propio script."],
+          ["FECHA=\"$(date +%Y%m%d_%H%M%S)\"", "Captura la fecha y hora actuales en un formato ordenable como texto (año-mes-día_hora-minuto-segundo)."],
+          ["ARCHIVO=\"${BACKUP_DIR}/juego_online_completo_${FECHA}.sql\"", "Arma el nombre final del archivo, combinando la carpeta, un prefijo fijo y la fecha/hora exacta."],
+          ["mkdir -p \"$BACKUP_DIR\"", "Crea la carpeta de respaldos si todavía no existe (-p evita error si ya existe)."]
+        ]
+      },
+      {
+        title: "Generar el respaldo",
+        lines: [
+          ["echo \"Generando respaldo total de ${DB_NAME}...\"", "Mensaje informativo en pantalla."],
+          ["mysqldump -u \"$DB_USER\" -p --single-transaction --routines --triggers \"$DB_NAME\" > \"$ARCHIVO\"", "El comando real: exporta toda la base a un archivo .sql. --single-transaction evita bloquear las tablas InnoDB mientras se genera; --routines y --triggers incluyen también procedimientos y triggers, no solo datos."],
+          ["echo \"Respaldo completo generado en: $ARCHIVO\"", "Confirma en pantalla dónde quedó el archivo, para que el siguiente paso (el simulacro) sepa dónde buscarlo."]
+        ]
+      }
+    ],
+    paso3: [
+      {
+        title: "Encabezado y preparación",
+        lines: [
+          ["#!/bin/bash", "Este archivo se ejecuta con bash."],
+          ["# Sesión 6: Respaldo incremental mediante binary log (binlog) — equivalente en", "Comentario descriptivo."],
+          ["# MySQL/MariaDB al archivado de WAL en PostgreSQL. Documenta la configuración de", "Traza un paralelo con PostgreSQL para quien ya conozca ese motor: el binlog cumple el mismo papel que el WAL (Write-Ahead Log)."],
+          ["# referencia; requiere permisos de administrador sobre el servidor (my.cnf/my.ini).", "Aclara que esto no se activa con SQL, sino editando el archivo de configuración del servidor."],
+          ["set -euo pipefail", "Mismo seguro de siempre: el script se detiene ante el primer error."],
+          ["BINLOG_ARCHIVE_DIR=\"$(dirname \"$0\")/../respaldos/binlog_archive\"", "Carpeta de referencia donde, en un caso real, se archivarían copias de los binlogs rotados."],
+          ["mkdir -p \"$BINLOG_ARCHIVE_DIR\"", "La crea si no existe."]
+        ]
+      },
+      {
+        title: "El bloque de documentación (heredoc)",
+        lines: [
+          ["cat <<'EOF'", "Un \"heredoc\": todo el texto hasta la línea EOF se imprime tal cual en pantalla. Las comillas simples alrededor de EOF evitan que bash intente interpretar $variables dentro del texto — se muestra literalmente."],
+          ["[mysqld]", "Sección de configuración del servidor MySQL dentro de my.cnf."],
+          ["log_bin = /var/log/mysql/mysql-bin.log", "Activa el binary log y le indica dónde guardarlo — sin esta línea, no existe binlog que reproducir."],
+          ["server_id = 1", "Identificador único del servidor, obligatorio para poder usar binlog (incluso en un servidor único, sin réplicas)."],
+          ["binlog_format = ROW", "Registra el binlog fila por fila (no solo la sentencia SQL), lo que hace la reproducción más precisa y confiable."],
+          ["expire_logs_days = 7", "Los binlogs se borran automáticamente después de 7 días, para no llenar el disco — en producción, esto se coordina con la frecuencia de los respaldos totales."],
+          ["mysqlbinlog --stop-datetime=\"2026-12-18 23:55:00\" \\", "El comando real de recuperación: lee un archivo de binlog y se detiene justo antes de la fecha/hora indicada."],
+          ["/var/log/mysql/mysql-bin.000123 | mysql -u root -p juego_online", "El resultado (los cambios reproducidos) se envía directamente al cliente mysql, que los aplica sobre la base ya restaurada desde el respaldo total."]
+        ]
+      },
+      {
+        title: "Mensaje final",
+        lines: [
+          ["EOF", "Cierra el heredoc — todo lo anterior era texto a mostrar, no comandos a ejecutar."],
+          ["echo \"Directorio de referencia para binlogs archivados: $BINLOG_ARCHIVE_DIR\"", "Mensaje final, recordando dónde se guardaría el archivado de binlogs en un entorno real."]
+        ]
+      }
+    ],
+    paso4: [
+      {
+        title: "Encabezado y ubicar el último respaldo",
+        lines: [
+          ["#!/bin/bash", "Este archivo se ejecuta con bash."],
+          ["# Sesión 6: RETO FINAL — Simulacro de caída crítica del servidor y recuperación", "Comentario descriptivo: este es el ejercicio culminante del curso."],
+          ["set -euo pipefail", "El script se detiene ante el primer error — importante en un script que hace un DROP DATABASE."],
+          ["DB_NAME=\"juego_online\"", "Base de datos objetivo del simulacro."],
+          ["DB_USER=\"root\"", "Usuario que ejecuta las operaciones."],
+          ["BACKUP_DIR=\"$(dirname \"$0\")/../respaldos\"", "Carpeta donde el Paso 2 dejó los respaldos."],
+          ["ULTIMO_RESPALDO=\"$(ls -t \"${BACKUP_DIR}\"/juego_online_completo_*.sql 2>/dev/null | head -n1)\"", "Busca todos los respaldos totales generados, los ordena del más reciente al más antiguo (ls -t) y se queda con el primero: el último respaldo disponible."],
+          ["if [[ -z \"$ULTIMO_RESPALDO\" ]]; then", "Si no se encontró ningún respaldo (la variable quedó vacía)..."],
+          ["echo \"ERROR: no hay respaldos disponibles. Ejecuta primero 02_backup_completo.sh\"", "...avisa con un mensaje claro..."],
+          ["exit 1", "...y detiene el script antes de arriesgarse a un DROP DATABASE sin ningún respaldo que lo respalde."],
+          ["fi", "Cierra el condicional."]
+        ]
+      },
+      {
+        title: "Capturar el estado antes del incidente",
+        lines: [
+          ["echo \"=== Estado ANTES del incidente ===\"", "Encabezado visual en la terminal."],
+          ["mysql -u \"$DB_USER\" -p \"$DB_NAME\" \\", "Conecta a la base actual, antes de tocar nada."],
+          ["-e \"SELECT nombre_usuario, nivel, monedas FROM Jugadores ORDER BY jugador_id;\" \\", "Consulta el estado de todos los jugadores — esta es la \"fotografía\" contra la que se comparará después."],
+          ["| tee \"${BACKUP_DIR}/estado_antes.txt\"", "tee muestra el resultado en pantalla Y lo guarda en un archivo, para poder compararlo más adelante con diff."]
+        ]
+      },
+      {
+        title: "Simular el incidente",
+        lines: [
+          ["echo \"!!! SIMULANDO ATAQUE / CAÍDA CRÍTICA DEL SERVIDOR PRINCIPAL !!!\"", "Aviso claro de que lo que sigue es intencional y destructivo."],
+          ["mysql -u \"$DB_USER\" -p -e \"DROP DATABASE ${DB_NAME};\"", "El comando real e irreversible: borra la base de datos completa. Sin un respaldo válido, esto sería una pérdida total."],
+          ["echo \"Base de datos ${DB_NAME} eliminada (incidente simulado).\"", "Confirma que el \"ataque\" se ejecutó."]
+        ]
+      },
+      {
+        title: "Recuperar desde el respaldo",
+        lines: [
+          ["echo \"=== Iniciando recuperación desde respaldo: $ULTIMO_RESPALDO ===\"", "Anuncia el inicio de la recuperación y qué archivo se va a usar."],
+          ["mysql -u \"$DB_USER\" -p -e \"CREATE DATABASE ${DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\"", "Recrea la base vacía, con la misma configuración de caracteres que se usó desde la Sesión 1."],
+          ["mysql -u \"$DB_USER\" -p \"$DB_NAME\" < \"$ULTIMO_RESPALDO\"", "Reproduce el archivo de respaldo dentro de la base recién creada — esto reconstruye tablas, datos, procedimientos y triggers."]
+        ]
+      },
+      {
+        title: "Verificar y dar el veredicto",
+        lines: [
+          ["echo \"=== Estado DESPUÉS de la recuperación ===\"", "Encabezado visual."],
+          ["mysql -u \"$DB_USER\" -p \"$DB_NAME\" \\", "Vuelve a consultar la base, ya restaurada."],
+          ["-e \"SELECT nombre_usuario, nivel, monedas FROM Jugadores ORDER BY jugador_id;\" \\", "La misma consulta exacta que se usó \"antes\", para que la comparación sea justa."],
+          ["| tee \"${BACKUP_DIR}/estado_despues.txt\"", "Guarda este segundo estado en su propio archivo."],
+          ["if diff -q \"${BACKUP_DIR}/estado_antes.txt\" \"${BACKUP_DIR}/estado_despues.txt\" > /dev/null; then", "Compara los dos archivos de texto byte a byte. Si son idénticos, diff no reporta diferencias."],
+          ["echo \"RETO SUPERADO: los datos de todos los jugadores se recuperaron sin pérdidas.\"", "Mensaje de éxito: la recuperación fue perfecta."],
+          ["else", "Si los archivos NO son idénticos..."],
+          ["echo \"ATENCION: hay diferencias entre el estado antes y después. Revisar el respaldo usado.\"", "...avisa que algo no coincide — normalmente porque el respaldo usado no era el más reciente, o hubo cambios entre el respaldo y el incidente que no quedaron capturados."],
+          ["fi", "Cierra el condicional final."]
+        ]
+      }
+    ]
+  };
+
+  document.querySelectorAll(".explain-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const panel = document.querySelector(btn.dataset.explainTarget);
+      if (!panel) return;
+
+      const isOpen = !panel.hidden;
+      if (isOpen) {
+        panel.hidden = true;
+        btn.setAttribute("aria-expanded", "false");
+        btn.textContent = "Explicar código";
+        return;
+      }
+
+      if (!panel.dataset.rendered) {
+        const key = btn.dataset.explainTarget.replace("#explain-", "");
+        const groups = explainData[key] || [];
+        groups.forEach(group => {
+          const groupEl = document.createElement("div");
+          groupEl.className = "explain-group";
+
+          const titleEl = document.createElement("div");
+          titleEl.className = "explain-group-title";
+          titleEl.textContent = group.title;
+          groupEl.appendChild(titleEl);
+
+          group.lines.forEach(([code, note]) => {
+            const row = document.createElement("div");
+            row.className = "explain-row";
+
+            const codeEl = document.createElement("div");
+            codeEl.className = "explain-code";
+            codeEl.textContent = code;
+
+            const noteEl = document.createElement("div");
+            noteEl.className = "explain-note";
+            noteEl.textContent = note;
+
+            row.appendChild(codeEl);
+            row.appendChild(noteEl);
+            groupEl.appendChild(row);
+          });
+
+          panel.appendChild(groupEl);
+        });
+        panel.dataset.rendered = "true";
+      }
+
+      panel.hidden = false;
+      btn.setAttribute("aria-expanded", "true");
+      btn.textContent = "Ocultar explicación";
+    });
+  });
+
+  document.querySelectorAll(".copy-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      let text = btn.dataset.copy;
+      if (text === undefined && btn.dataset.copyTarget) {
+        const target = document.querySelector(btn.dataset.copyTarget);
+        text = target ? target.textContent : "";
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (err) {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+      const original = btn.textContent;
+      btn.textContent = "Copiado";
+      btn.classList.add("copied");
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove("copied");
+      }, 1200);
+    });
+  });
+
+  /* ---------------------------------------------------------------
+     Simulador del trigger de auditoría (Paso 1)
+  --------------------------------------------------------------- */
+  const triggerForm = document.getElementById("trigger-sim-form");
+  if (triggerForm) {
+    const triggerInput = document.getElementById("trigger-sim-input");
+    const triggerOutput = document.getElementById("trigger-sim-output");
+    const MONEDAS_ACTUALES = 1500;
+
+    triggerForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const val = Number(triggerInput.value);
+      if (triggerInput.value.trim() === "" || Number.isNaN(val)) {
+        triggerOutput.textContent = "Escribe un número entero.";
+        triggerOutput.className = "injection-outcome";
+        return;
+      }
+      if (val === MONEDAS_ACTUALES) {
+        triggerOutput.textContent = `UPDATE Jugadores SET monedas = ${val} WHERE jugador_id = 1; → el UPDATE se ejecuta, pero OLD.monedas <=> NEW.monedas es verdadero (${MONEDAS_ACTUALES} = ${val}). El trigger NO inserta ninguna fila en Auditoria_Monedas.`;
+        triggerOutput.className = "injection-outcome";
+      } else {
+        const now = new Date().toISOString().slice(0, 19).replace("T", " ");
+        triggerOutput.textContent =
+          `INSERT INTO Auditoria_Monedas (jugador_id, monedas_antes, monedas_despues, operacion, usuario_bd, fecha) VALUES\n` +
+          `(1, ${MONEDAS_ACTUALES}, ${val}, 'UPDATE', 'root@localhost', '${now}');`;
+        triggerOutput.className = "injection-outcome ok";
+      }
+    });
+  }
+
+  /* ---------------------------------------------------------------
+     Reloj en vivo del nombre de archivo del respaldo (Paso 2)
+  --------------------------------------------------------------- */
+  const backupFilenameOutput = document.getElementById("backup-filename-output");
+  if (backupFilenameOutput) {
+    function pad(n) { return String(n).padStart(2, "0"); }
+
+    function renderBackupFilename() {
+      const d = new Date();
+      const fecha = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+      backupFilenameOutput.textContent = `respaldos/juego_online_completo_${fecha}.sql`;
+    }
+
+    renderBackupFilename();
+    setInterval(renderBackupFilename, 1000);
+  }
+
+  /* ---------------------------------------------------------------
+     Simulador de PITR con binlog (Paso 3)
+  --------------------------------------------------------------- */
+  const pitrSlider = document.getElementById("pitr-slider");
+  if (pitrSlider) {
+    const pitrTimeline = document.getElementById("pitr-timeline");
+    const pitrSummary = document.getElementById("pitr-summary");
+
+    const EVENTS = [
+      { label: "Respaldo total", time: "Lunes 00:00", pos: 0, type: "backup" },
+      { label: "Compra de item (jugador 3)", time: "Martes 10:15", pos: 25, type: "tx" },
+      { label: "Sube de nivel (jugador 1)", time: "Miércoles 09:00", pos: 50, type: "tx" },
+      { label: "Ajuste de monedas (jugador 5)", time: "Jueves 18:40", pos: 75, type: "tx" },
+      { label: "INCIDENTE", time: "Viernes 14:32", pos: 100, type: "incident" }
+    ];
+
+    function renderPitr(sliderValue) {
+      pitrTimeline.innerHTML = "";
+      let recovered = 0;
+      let lost = 0;
+
+      EVENTS.forEach(ev => {
+        const div = document.createElement("div");
+        div.className = "pitr-event";
+
+        if (ev.type === "tx") {
+          if (sliderValue >= ev.pos) {
+            div.classList.add("recovered");
+            recovered++;
+          } else {
+            div.classList.add("lost");
+            lost++;
+          }
+        } else if (ev.type === "incident") {
+          div.classList.add("incident");
+        }
+
+        const dot = document.createElement("div");
+        dot.className = "pitr-dot";
+        const label = document.createElement("div");
+        label.textContent = ev.label;
+        const time = document.createElement("div");
+        time.style.opacity = "0.7";
+        time.textContent = ev.time;
+
+        div.appendChild(dot);
+        div.appendChild(label);
+        div.appendChild(time);
+        pitrTimeline.appendChild(div);
+      });
+
+      if (sliderValue >= 100) {
+        pitrSummary.textContent = `✅ Recuperación completa: las ${recovered} transacciones registradas en el binlog se reprodujeron. Solo se pierde lo que ocurrió después de la caída (que no existe).`;
+        pitrSummary.className = "pitr-summary full";
+      } else if (lost === 0) {
+        pitrSummary.textContent = `✅ Se recuperaron las ${recovered} transacciones hasta este punto — todavía no se pierde ninguna.`;
+        pitrSummary.className = "pitr-summary full";
+      } else {
+        pitrSummary.textContent = `⚠️ Detuviste la recuperación antes del incidente: se perdieron ${lost} transacción(es) válida(s) que sí estaban en el binlog, aunque nunca hubo ningún ataque sobre ellas.`;
+        pitrSummary.className = "pitr-summary partial";
+      }
+    }
+
+    pitrSlider.addEventListener("input", () => renderPitr(Number(pitrSlider.value)));
+    renderPitr(Number(pitrSlider.value));
+  }
+
+  /* ---------------------------------------------------------------
+     Simulador del simulacro de desastre (Paso 4)
+  --------------------------------------------------------------- */
+  const disasterRunBtn = document.getElementById("disaster-run-btn");
+  if (disasterRunBtn) {
+    const staleToggle = document.getElementById("disaster-stale-toggle");
+    const timelineLog = document.getElementById("disaster-timeline-log");
+    const tablesWrap = document.getElementById("disaster-tables");
+    const tableAntes = document.getElementById("disaster-table-antes");
+    const tableDespues = document.getElementById("disaster-table-despues");
+    const verdictBox = document.getElementById("disaster-verdict");
+    const resetBtn = document.getElementById("disaster-reset-btn");
+
+    const JUGADORES_BASE = [
+      { nombre: "DragonSlayer99", nivel: 12, monedas: 1500 },
+      { nombre: "ShadowNinja",    nivel: 8,  monedas: 900  },
+      { nombre: "PixelQueen",     nivel: 20, monedas: 5000 },
+      { nombre: "NoobMaster",     nivel: 1,  monedas: 50   },
+      { nombre: "RocketFox",      nivel: 15, monedas: 2200 }
+    ];
+
+    function log(text, cls) {
+      const li = document.createElement("li");
+      if (cls) li.className = cls;
+      li.textContent = text;
+      timelineLog.appendChild(li);
+      timelineLog.scrollTop = timelineLog.scrollHeight;
+    }
+
+    function renderTable(container, rows, diffNames) {
+      container.innerHTML = "";
+      const thead = document.createElement("thead");
+      thead.innerHTML = "<tr><th>nombre_usuario</th><th>nivel</th><th>monedas</th></tr>";
+      container.appendChild(thead);
+      const tbody = document.createElement("tbody");
+      rows.forEach(j => {
+        const tr = document.createElement("tr");
+        const tdNombre = document.createElement("td");
+        tdNombre.textContent = j.nombre;
+        const tdNivel = document.createElement("td");
+        tdNivel.textContent = j.nivel;
+        const tdMonedas = document.createElement("td");
+        tdMonedas.textContent = j.monedas;
+        if (diffNames && diffNames.has(j.nombre)) tdMonedas.classList.add("diff");
+        tr.appendChild(tdNombre);
+        tr.appendChild(tdNivel);
+        tr.appendChild(tdMonedas);
+        tbody.appendChild(tr);
+      });
+      container.appendChild(tbody);
+    }
+
+    function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+
+    async function runDrill() {
+      disasterRunBtn.disabled = true;
+      staleToggle.disabled = true;
+      timelineLog.innerHTML = "";
+      tablesWrap.hidden = true;
+      verdictBox.hidden = true;
+
+      const stale = staleToggle.checked;
+
+      // Estado "antes": si RocketFox compró algo después del último respaldo,
+      // su estado EN VIVO ya refleja esa compra (monedas más bajas).
+      const antes = JUGADORES_BASE.map(j => ({ ...j }));
+      if (stale) {
+        const rf = antes.find(j => j.nombre === "RocketFox");
+        rf.monedas = rf.monedas - 500;
+      }
+
+      log("=== Estado ANTES del incidente ===");
+      await sleep(500);
+      renderTable(tableAntes, antes);
+      tablesWrap.hidden = false;
+
+      await sleep(700);
+      log("!!! SIMULANDO ATAQUE / CAÍDA CRÍTICA DEL SERVIDOR PRINCIPAL !!!", "rejected");
+      await sleep(700);
+      log("Base de datos juego_online eliminada (incidente simulado).", "rejected");
+
+      await sleep(700);
+      log("=== Iniciando recuperación desde el último respaldo ===");
+      await sleep(900);
+      log("Base de datos restaurada desde el archivo .sql del Paso 2.", "success");
+
+      // El respaldo SIEMPRE refleja el estado tal como estaba cuando se generó
+      // (antes de la compra no capturada, si el toggle está activo).
+      const despues = JUGADORES_BASE.map(j => ({ ...j }));
+
+      await sleep(500);
+      log("=== Estado DESPUÉS de la recuperación ===");
+
+      const diffNames = new Set();
+      antes.forEach((j, i) => {
+        if (j.monedas !== despues[i].monedas || j.nivel !== despues[i].nivel) {
+          diffNames.add(j.nombre);
+        }
+      });
+
+      renderTable(tableAntes, antes, diffNames);
+      renderTable(tableDespues, despues, diffNames);
+
+      await sleep(400);
+      if (diffNames.size === 0) {
+        log("RETO SUPERADO: los datos de todos los jugadores se recuperaron sin pérdidas.", "success");
+        verdictBox.textContent = "✅ RETO SUPERADO: los datos de todos los jugadores se recuperaron sin pérdidas.";
+        verdictBox.className = "disaster-verdict success";
+      } else {
+        log("ATENCION: hay diferencias entre el estado antes y después. Revisar el respaldo usado.", "rejected");
+        verdictBox.textContent = `⚠️ ATENCIÓN: hay diferencias en ${diffNames.size} jugador(es) (${Array.from(diffNames).join(", ")}) entre el estado antes y después — el respaldo usado no capturó la compra reciente. Revisar el respaldo usado o aplicar el binlog del Paso 3 para no perderla.`;
+        verdictBox.className = "disaster-verdict warning";
+      }
+      verdictBox.hidden = false;
+
+      disasterRunBtn.disabled = false;
+      staleToggle.disabled = false;
+    }
+
+    disasterRunBtn.addEventListener("click", runDrill);
+
+    resetBtn.addEventListener("click", () => {
+      timelineLog.innerHTML = "";
+      tablesWrap.hidden = true;
+      verdictBox.hidden = true;
+      disasterRunBtn.disabled = false;
+      staleToggle.disabled = false;
+    });
+  }
+});
+
+</script>
+</body>
+</html>
