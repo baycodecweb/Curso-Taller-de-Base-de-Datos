@@ -1,0 +1,1762 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía de Scripts — Sesión 4</title>
+<style>
+:root {
+  --bg: #0f1115;
+  --panel: #171a21;
+  --panel-border: #262a33;
+  --text: #e8eaed;
+  --text-dim: #9aa0ac;
+  --accent: #7c5cff;
+  --accent-dim: #4b3aa8;
+  --code-bg: #0b0d12;
+  --success: #33c481;
+  --warn: #ffb454;
+  --warn-bg: rgba(255,180,84,0.08);
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.topbar {
+  border-bottom: 1px solid var(--panel-border);
+  padding: 2rem 1.5rem 1.5rem;
+  background: linear-gradient(180deg, rgba(124,92,255,0.08), transparent);
+}
+
+.topbar-inner { max-width: 1180px; margin: 0 auto; }
+
+.badge {
+  display: inline-block;
+  background: var(--accent);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+}
+
+.topbar h1 { margin: 0 0 0.3rem; font-size: 1.8rem; }
+.subtitle { margin: 0 0 0.9rem; color: var(--text-dim); }
+
+.real-world-btn {
+  background: linear-gradient(135deg, var(--accent), #5a3fd6);
+  color: white;
+  border: none;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(124,92,255,0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.real-world-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(124,92,255,0.45); }
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6,7,10,0.72);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 100;
+}
+.modal-overlay[hidden] { display: none; }
+
+.modal {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  max-width: 720px;
+  width: 100%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: modal-in 0.2s ease-out;
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.3rem;
+  border-bottom: 1px solid var(--panel-border);
+  flex-shrink: 0;
+}
+.modal-head h2 { margin: 0; font-size: 1.15rem; }
+
+.modal-close {
+  background: var(--panel-border);
+  color: var(--text);
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.modal-close:hover { background: var(--accent-dim); }
+
+.modal-body {
+  padding: 1.2rem 1.3rem 1.5rem;
+  overflow-y: auto;
+}
+.modal-body > p { color: var(--text-dim); font-size: 0.9rem; margin-top: 0; }
+
+.rw-card {
+  background: var(--code-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.8rem;
+}
+.rw-card h3 { margin: 0 0 0.5rem; font-size: 0.92rem; color: var(--accent); }
+.rw-card p { margin: 0 0 0.4rem; font-size: 0.85rem; color: var(--text); line-height: 1.5; }
+.rw-card p:last-child { margin-bottom: 0; }
+.rw-card .rw-why { color: var(--text-dim); }
+.rw-card.rw-closing { border-color: var(--accent-dim); background: rgba(124,92,255,0.06); }
+.rw-card.rw-closing h3 { color: var(--text); }
+
+.layout {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 720px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+.stepper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  position: sticky;
+  top: 1.5rem;
+  align-self: start;
+}
+
+@media (max-width: 720px) {
+  .stepper {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  color: var(--text-dim);
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.9rem;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+.step:hover { border-color: var(--accent-dim); color: var(--text); }
+
+.step.active {
+  background: rgba(124,92,255,0.12);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--panel-border);
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.step.active .step-num { background: var(--accent); color: white; }
+
+.content { min-width: 0; }
+
+.panel {
+  display: none;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  animation: fade 0.2s ease;
+}
+
+.panel.active { display: block; }
+
+@keyframes fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel-tag {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+  color: var(--accent);
+  background: rgba(124,92,255,0.1);
+  border: 1px solid var(--accent-dim);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  margin-bottom: 0.8rem;
+}
+
+.panel h2 { margin-top: 0; }
+
+.checklist {
+  padding-left: 1.2rem;
+  color: var(--text-dim);
+}
+.checklist li { margin-bottom: 0.35rem; }
+.checklist code { color: var(--text); }
+
+.steps-list {
+  padding-left: 1.2rem;
+  margin: 0.4rem 0;
+}
+.steps-list li { margin-bottom: 0.4rem; }
+.steps-list code { color: var(--accent); }
+
+.context-box {
+  background: rgba(124,92,255,0.05);
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  margin: 1rem 0 1.2rem;
+}
+
+.context-box h3 {
+  margin: 0 0 0.6rem;
+  font-size: 1rem;
+  color: var(--accent);
+}
+
+.context-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.2rem;
+}
+.context-head h3 { margin-bottom: 0; flex: 1 1 auto; min-width: 200px; }
+
+.scenario-toggle {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent-dim);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.scenario-toggle:hover { background: rgba(124,92,255,0.15); }
+
+.scenario[hidden] { display: none; }
+
+.context-box p {
+  margin: 0 0 0.7rem;
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.context-box ul {
+  margin: 0 0 0.9rem;
+  padding-left: 1.2rem;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+.context-box ul:last-child { margin-bottom: 0; }
+.context-box li { margin-bottom: 0.45rem; }
+.context-box li strong { color: var(--text); }
+.context-box code { color: var(--accent); }
+
+.codeblock {
+  background: var(--code-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.codeblock-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid var(--panel-border);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.head-actions { display: flex; gap: 0.4rem; flex-shrink: 0; flex-wrap: wrap; }
+
+.copy-btn {
+  background: var(--panel-border);
+  color: var(--text);
+  border: none;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.copy-btn:hover { background: var(--accent-dim); }
+.copy-btn.copied { background: var(--success); color: #06251a; }
+
+.explain-btn {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent-dim);
+  padding: 0.24rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.explain-btn:hover { background: rgba(124,92,255,0.12); }
+.explain-btn[aria-expanded="true"] { background: var(--accent); color: white; border-color: var(--accent); }
+
+.explain-panel {
+  background: var(--code-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  margin: -0.4rem 0 1rem;
+  padding: 0.9rem 1rem;
+  max-height: 420px;
+  overflow-y: auto;
+}
+.explain-panel[hidden] { display: none; }
+
+.explain-toggle-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.8rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.explain-group + .explain-group { margin-top: 1rem; }
+
+.explain-group-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.explain-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 0.4rem 1rem;
+  padding: 0.35rem 0;
+  border-top: 1px solid var(--panel-border);
+  font-size: 0.82rem;
+}
+.explain-row:first-child { border-top: none; }
+
+@media (max-width: 640px) {
+  .explain-row { grid-template-columns: 1fr; gap: 0.15rem; }
+}
+
+.explain-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.76rem;
+  color: var(--accent);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.explain-note { color: var(--text-dim); }
+
+/* bloque SQL: la acción principal — esto SÍ se pega en el cuadro SQL de phpMyAdmin */
+.codeblock.sql { border-color: var(--accent-dim); }
+.codeblock.sql .codeblock-head {
+  background: rgba(124,92,255,0.08);
+  color: var(--accent);
+  font-weight: 600;
+}
+.codeblock.sql pre { max-height: 320px; overflow-y: auto; }
+
+/* bloque de terminal: acción alternativa — NUNCA se pega en phpMyAdmin */
+.codeblock.terminal { border-color: rgba(255,180,84,0.35); }
+.codeblock.terminal .codeblock-head {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.codeblock.terminal .warn-text {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--warn);
+  background: var(--warn-bg);
+  border-top: 1px solid rgba(255,180,84,0.25);
+  padding: 0.5rem 0.7rem;
+}
+
+pre {
+  margin: 0;
+  padding: 0.8rem;
+  overflow-x: auto;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+}
+
+p.note, p.expect {
+  font-size: 0.85rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  margin: 0.8rem 0;
+}
+
+p.note {
+  background: rgba(255,255,255,0.03);
+  color: var(--text-dim);
+  border: 1px solid var(--panel-border);
+}
+
+p.expect {
+  background: rgba(51,196,129,0.08);
+  border: 1px solid rgba(51,196,129,0.35);
+  color: var(--text);
+}
+
+/* Acordeón genérico (desplegable <details>/<summary>) — reutilizable en cualquier sesión */
+.accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0.9rem 0;
+}
+
+.accordion-item {
+  background: var(--code-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.accordion-item[open] { border-color: var(--accent-dim); }
+
+.accordion-summary {
+  cursor: pointer;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--text);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.accordion-summary::-webkit-details-marker { display: none; }
+
+.accordion-summary::after {
+  content: "+";
+  flex-shrink: 0;
+  color: var(--accent);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.accordion-item[open] .accordion-summary::after { content: "\2212"; }
+
+.accordion-summary:hover { color: var(--accent); }
+
+.accordion-tag {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.accordion-body {
+  padding: 0 1rem 1rem;
+  border-top: 1px solid var(--panel-border);
+  padding-top: 0.8rem;
+  animation: fade 0.15s ease;
+}
+
+.accordion-body p {
+  margin: 0 0 0.6rem;
+  font-size: 0.87rem;
+  color: var(--text-dim);
+  line-height: 1.55;
+}
+.accordion-body p:last-child { margin-bottom: 0; }
+.accordion-body strong { color: var(--text); }
+.accordion-body code { color: var(--accent); }
+
+.accordion-note {
+  margin: 0.8rem 0 0;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+/* Bloques lado a lado, para simular dos pestañas/sesiones concurrentes */
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin: 1rem 0;
+  align-items: start;
+  min-width: 0;
+}
+
+@media (max-width: 820px) {
+  .split { grid-template-columns: 1fr; }
+}
+
+.split-col { min-width: 0; }
+.split-col .codeblock { margin: 0; }
+
+.split-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  margin-bottom: 0.4rem;
+}
+
+/* Simulador de concurrencia interactivo (Paso 3) */
+.sim-box {
+  background: var(--code-bg);
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.2rem;
+  margin: 1.2rem 0;
+}
+
+.sim-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+.sim-head h3 { margin: 0; font-size: 1rem; color: var(--accent); }
+
+.sim-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.sim-toggle input { accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer; }
+.sim-toggle code { color: var(--accent); }
+.sim-toggle input:disabled { cursor: not-allowed; }
+
+.sim-intro {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  margin: 0 0 1rem;
+}
+
+.sim-code {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  margin-bottom: 0.6rem;
+  overflow-x: auto;
+}
+.sim-code pre {
+  margin: 0;
+  padding: 0.6rem;
+}
+.sim-code code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.76rem;
+  color: var(--text);
+  white-space: pre;
+}
+
+.sim-run-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent), #5a3fd6);
+  color: white;
+  border: none;
+  padding: 0.55rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s;
+}
+.sim-run-btn:hover:not(:disabled) { transform: translateY(-1px); }
+.sim-run-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.sim-result {
+  margin-top: 0.6rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--panel-border);
+  color: var(--text-dim);
+  min-height: 1.4em;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.sim-result.pending { color: var(--warn); border-color: rgba(255,180,84,0.35); background: var(--warn-bg); }
+.sim-result.success { color: var(--success); border-color: rgba(51,196,129,0.35); background: rgba(51,196,129,0.08); }
+.sim-result.rejected { color: #ff8080; border-color: rgba(255,92,92,0.35); background: rgba(255,92,92,0.08); }
+
+.sim-timeline {
+  margin-top: 1rem;
+  border-top: 1px solid var(--panel-border);
+  padding-top: 0.8rem;
+}
+
+.sim-timeline-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  margin-bottom: 0.5rem;
+}
+
+.sim-timeline-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.sim-timeline-log li {
+  font-size: 0.8rem;
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  line-height: 1.4;
+}
+.sim-timeline-log li .t { color: var(--accent); margin-right: 0.5rem; }
+.sim-timeline-log li.success { color: var(--success); }
+.sim-timeline-log li.rejected { color: #ff8080; }
+.sim-timeline-log:empty::after {
+  content: "Todavía no ejecutaste nada — pulsa \"Ejecutar\" en alguna columna.";
+  color: var(--text-dim);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.82rem;
+}
+
+.sim-reset-btn {
+  margin-top: 1rem;
+  background: transparent;
+  border: 1px solid var(--panel-border);
+  color: var(--text-dim);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.sim-reset-btn:hover { border-color: var(--accent-dim); color: var(--text); }
+
+.foot {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  padding: 2rem 1rem;
+}
+
+/* Tabla de roles (Paso 2) */
+.role-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.85rem;
+}
+.role-table th, .role-table td {
+  border-bottom: 1px solid var(--panel-border);
+  padding: 0.55rem 0.6rem;
+  text-align: left;
+  vertical-align: top;
+}
+.role-table th {
+  color: var(--text-dim);
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.role-table td code { color: var(--accent); }
+
+/* Mini-simulador de restricción CHECK (Paso 1) */
+.check-sim-box {
+  background: var(--code-bg);
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  margin: 1.1rem 0;
+}
+.check-sim-box h3 { margin: 0 0 0.5rem; font-size: 0.95rem; color: var(--accent); }
+
+.check-sim {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0.6rem 0;
+}
+.check-sim input[type="number"] {
+  width: 140px;
+  background: var(--bg);
+  border: 1px solid var(--panel-border);
+  color: var(--text);
+  padding: 0.5rem 0.6rem;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+}
+.check-sim input[type="number"]:focus { outline: none; border-color: var(--accent); }
+.check-sim button {
+  background: var(--panel-border);
+  color: var(--text);
+  border: none;
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.check-sim button:hover { background: var(--accent-dim); }
+
+/* Simulador de inyección SQL (Paso 3) */
+.injection-sim {
+  background: var(--code-bg);
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.2rem;
+  margin: 1.2rem 0;
+}
+.injection-sim h3 { margin: 0 0 0.5rem; font-size: 1rem; color: var(--accent); }
+.injection-intro { font-size: 0.88rem; color: var(--text-dim); margin: 0 0 1rem; }
+
+.payload-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+}
+.payload-btn {
+  background: transparent;
+  border: 1px solid var(--panel-border);
+  color: var(--text-dim);
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.payload-btn:hover { border-color: var(--accent-dim); color: var(--text); }
+
+.injection-input-row {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+  flex-wrap: wrap;
+}
+.injection-input-row input[type="text"] {
+  flex: 1 1 280px;
+  background: var(--bg);
+  border: 1px solid var(--panel-border);
+  color: var(--text);
+  padding: 0.55rem 0.7rem;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+}
+.injection-input-row input[type="text"]:focus { outline: none; border-color: var(--accent); }
+.injection-run-btn {
+  background: linear-gradient(135deg, var(--accent), #5a3fd6);
+  color: white;
+  border: none;
+  padding: 0.55rem 1.1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.injection-run-btn:hover { transform: translateY(-1px); }
+
+.injection-results {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+@media (max-width: 820px) {
+  .injection-results { grid-template-columns: 1fr; }
+}
+.injection-col { min-width: 0; }
+.injection-col h4 { margin: 0 0 0.5rem; font-size: 0.85rem; }
+.injection-col.vulnerable h4 { color: #ff8080; }
+.injection-col.safe h4 { color: var(--success); }
+
+.injection-query {
+  background: var(--bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  padding: 0.6rem 0.7rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.76rem;
+  color: var(--text-dim);
+  margin-bottom: 0.6rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 1.4em;
+}
+
+.injection-outcome {
+  padding: 0.6rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  margin-bottom: 0.6rem;
+  border: 1px solid var(--panel-border);
+  background: rgba(255,255,255,0.03);
+  color: var(--text-dim);
+}
+.injection-outcome.leak { border-color: rgba(255,92,92,0.35); background: rgba(255,92,92,0.08); color: #ff8080; }
+.injection-outcome.critical { border-color: rgba(255,92,92,0.5); background: rgba(255,92,92,0.12); color: #ff8080; font-weight: 600; }
+.injection-outcome.ok { border-color: rgba(51,196,129,0.35); background: rgba(51,196,129,0.08); color: var(--success); }
+.injection-outcome.empty { border-color: var(--panel-border); }
+
+.injection-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+.injection-table th, .injection-table td {
+  border-bottom: 1px solid var(--panel-border);
+  padding: 0.35rem 0.5rem;
+  text-align: left;
+}
+.injection-table th {
+  color: var(--text-dim);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.66rem;
+  letter-spacing: 0.03em;
+}
+
+.injection-challenge {
+  margin-top: 1rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--panel-border);
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+.injection-challenge.done {
+  border-color: rgba(51,196,129,0.4);
+  background: rgba(51,196,129,0.08);
+  color: var(--success);
+}
+
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <span class="badge">Sesión 4 · MySQL / phpMyAdmin</span>
+    <h1>Control de Accesos y Sistema Anti-Trampas</h1>
+    <p class="subtitle">Guía visual de uso de los scripts SQL — integridad de datos, roles de aplicación y defensa contra inyección SQL</p>
+    <button id="real-world-btn" class="real-world-btn" aria-haspopup="dialog">💼 ¿Dónde se usa esto en el mundo real?</button>
+  </div>
+</header>
+
+<div class="modal-overlay" id="real-world-modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="real-world-title">
+    <div class="modal-head">
+      <h2 id="real-world-title">💼 Estos conceptos, fuera del aula</h2>
+      <button class="modal-close" id="real-world-close" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>"Anti-trampas" no es solo cosa de videojuegos: proteger los datos de quién puede tocar qué, y de qué texto puede colarse como si fuera código, es uno de los trabajos más antiguos y más constantes de cualquier persona que administra una base de datos.</p>
+
+      <div class="rw-card">
+        <h3>Restricciones CHECK — el último muro cuando la aplicación falla</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> plataformas financieras y de trading añaden restricciones directamente en el motor de base de datos (no solo validaciones en el código de la aplicación) para que un balance nunca pueda quedar negativo, incluso si un bug en el backend o un cliente modificado intenta forzarlo.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> la validación del lado de la aplicación se puede saltar, tener bugs, o simplemente olvidarse en un endpoint nuevo; una restricción en el motor es la última línea de defensa que ningún cliente externo puede desactivar.</p>
+      </div>
+
+      <div class="rw-card">
+        <h3>Privilegio mínimo — dar solo el acceso que el rol necesita</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> varias filtraciones de datos ampliamente documentadas (incluida la de Capital One en 2019) se atribuyeron en parte a cuentas o roles con privilegios más amplios de lo que su función realmente requería. El principio de "privilegio mínimo" es la misma idea detrás de separar <code>rol_jugador</code>, <code>rol_moderador</code> y <code>rol_administrador</code>.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> si una cuenta de bajo privilegio se ve comprometida, el daño que un atacante puede causar queda limitado por lo que esa cuenta podía hacer en primer lugar.</p>
+      </div>
+
+      <div class="rw-card">
+        <h3>Inyección SQL — uno de los ataques más antiguos y más comunes</h3>
+        <p class="rw-case"><strong>En el mundo real:</strong> la inyección SQL lleva más de veinte años apareciendo en el OWASP Top 10 (la lista de referencia mundial de riesgos de seguridad web), y ha sido la causa raíz documentada de filtraciones masivas de datos en empresas de retail, banca y telecomunicaciones a lo largo de los años.</p>
+        <p class="rw-why"><strong>Por qué importa a futuro:</strong> es uno de los primeros ataques que se espera que cualquier desarrollador backend sepa reconocer y prevenir, sin importar el lenguaje o framework que use.</p>
+      </div>
+
+      <div class="rw-card rw-closing">
+        <h3>Por qué "funciona en la demo" no es suficiente</h3>
+        <p class="rw-case">Un formulario de búsqueda de jugadores puede parecer inofensivo, pero es exactamente el tipo de campo —pequeño, aparentemente inocuo— por el que han entrado muchos de los ataques más documentados de la historia. Tratar SIEMPRE la entrada de un usuario como un dato, nunca como código, es el hábito que separa un sistema seguro de uno vulnerable.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="layout">
+  <nav class="stepper" id="stepper" aria-label="Pasos de la sesión">
+    <button class="step active" data-target="paso-0">
+      <span class="step-num">0</span>
+      <span class="step-label">Abrir phpMyAdmin</span>
+    </button>
+    <button class="step" data-target="paso-1">
+      <span class="step-num">1</span>
+      <span class="step-label">Integridad (CHECK)</span>
+    </button>
+    <button class="step" data-target="paso-2">
+      <span class="step-num">2</span>
+      <span class="step-label">Roles y permisos</span>
+    </button>
+    <button class="step" data-target="paso-3">
+      <span class="step-num">3</span>
+      <span class="step-label">Anti-inyección SQL</span>
+    </button>
+  </nav>
+
+  <section class="content">
+
+    <article class="panel active" id="paso-0">
+      <h2>Paso 0 · Abrir phpMyAdmin</h2>
+      <p>Esta sesión continúa sobre la base <code>juego_online</code> de las Sesiones 1 a 3. El script de roles hace referencia a los procedimientos <code>subir_nivel_jugador</code> (Sesión 1) y <code>comprar_item_unico</code> (Sesión 3), así que deben existir antes de ejecutarlo.</p>
+      <ol class="steps-list">
+        <li>Entra a phpMyAdmin y selecciona la base <code>juego_online</code>.</li>
+        <li>Ve a la pestaña <strong>Rutinas</strong> y confirma que existen <code>subir_nivel_jugador</code> y <code>comprar_item_unico</code>. Si falta alguno, vuelve a ejecutar esa sesión primero.</li>
+        <li>Ve a la pestaña <strong>SQL</strong> para pegar los scripts de esta sesión.</li>
+      </ol>
+      <p class="note">Requiere <strong>MySQL 8.0.16+ / MariaDB 10.5+</strong> — versiones donde las restricciones <code>CHECK</code> se aplican de verdad y existe <code>CREATE ROLE</code>.</p>
+    </article>
+
+    <article class="panel" id="paso-1">
+      <div class="panel-tag">scripts/01_integridad_restricciones.sql</div>
+      <h2>Paso 1 · Integridad estructural y semántica</h2>
+      <p>Aunque un jugador logre "hackear" el cliente del juego y le pida al servidor un cambio imposible (monedas negativas, nivel 0), la base de datos misma se niega a guardarlo. Esa es la diferencia entre validar solo en la aplicación y validar también en el motor.</p>
+      <ul class="checklist">
+        <li><strong>Integridad semántica:</strong> <code>monedas</code> y <code>experiencia</code> nunca pueden ser negativas, y <code>nivel</code> nunca puede bajar de 1.</li>
+        <li><strong>Integridad estructural:</strong> <code>puntaje</code> nunca es negativo, y <code>resultado</code> solo puede ser uno de los valores válidos del dominio del juego (<code>victoria</code>, <code>derrota</code>, <code>jugada</code>).</li>
+        <li>Estas reglas se aplican con restricciones <code>CHECK</code> directamente en el motor: no dependen de que el código de la aplicación se acuerde de validarlas siempre, en todos los endpoints.</li>
+      </ul>
+      <div class="codeblock">
+        <div class="codeblock-head"><span>en phpMyAdmin</span></div>
+        <ol class="steps-list">
+          <li>Pestaña <strong>SQL</strong> → pega el bloque de abajo (botón <em>Copiar SQL</em>).</li>
+          <li>Pulsa <strong>Continuar</strong>.</li>
+        </ol>
+      </div>
+      <div class="codeblock sql">
+        <div class="codeblock-head">
+          <span>SQL — pégalo en la pestaña SQL de phpMyAdmin</span>
+          <span class="head-actions">
+            <button class="explain-btn" data-explain-target="#explain-paso1" aria-expanded="false">Explicar código</button>
+            <button class="copy-btn" data-copy-target="#sql-paso1">Copiar SQL</button>
+          </span>
+        </div>
+        <pre><code id="sql-paso1">-- Sesión 4: Integridad estructural y semántica (anti-trampas a nivel de datos)
+-- Motor: MySQL 8.0.16+ / MariaDB 10.2.1+ (restricciones CHECK aplicadas de verdad)
+USE juego_online;
+
+-- Integridad semántica: un jugador nunca puede tener monedas o experiencia negativas,
+-- ni un nivel menor a 1 (evita que un "hack" cliente-servidor deje datos inválidos).
+ALTER TABLE Jugadores
+    ADD CONSTRAINT chk_monedas_no_negativas CHECK (monedas >= 0),
+    ADD CONSTRAINT chk_experiencia_no_negativa CHECK (experiencia >= 0),
+    ADD CONSTRAINT chk_nivel_minimo CHECK (nivel >= 1);
+
+-- Integridad estructural: un puntaje de partida no puede ser negativo,
+-- y el resultado debe ser uno de los valores válidos del dominio del juego.
+ALTER TABLE Partidas
+    ADD CONSTRAINT chk_puntaje_no_negativo CHECK (puntaje >= 0),
+    ADD CONSTRAINT chk_resultado_valido CHECK (resultado IN ('victoria', 'derrota', 'jugada'));
+
+-- Prueba: esto debe fallar (viola integridad semántica) — intento de "hackear" monedas negativas
+-- UPDATE Jugadores SET monedas = -100 WHERE jugador_id = 1;</code></pre>
+      </div>
+      <div class="explain-panel" id="explain-paso1" hidden></div>
+
+      <div class="check-sim-box">
+        <h3>🧪 Pruébalo tú mismo: ¿el motor acepta este UPDATE?</h3>
+        <p class="sim-intro">Simula, sin tocar la base de datos real, qué pasaría al ejecutar <code>UPDATE Jugadores SET monedas = &lt;valor&gt; WHERE jugador_id = 1;</code> después de aplicar la restricción de arriba.</p>
+        <form class="check-sim" id="check-sim-form">
+          <input type="number" id="check-sim-input" placeholder="ej. -100" value="-100" required>
+          <button type="submit">Simular UPDATE</button>
+        </form>
+        <div class="injection-outcome" id="check-sim-output">Escribe un valor y pulsa "Simular UPDATE".</div>
+      </div>
+
+      <p class="expect"><strong>Resultado esperado:</strong> los <code>INSERT</code>/<code>UPDATE</code> que violen alguna condición (ej. <code>monedas = -100</code>) son rechazados por el motor con un error, sin necesitar código adicional en la aplicación.</p>
+      <p class="note">Requiere que la Sesión 1 se haya ejecutado antes (las tablas <code>Jugadores</code> y <code>Partidas</code> deben existir).</p>
+    </article>
+
+    <article class="panel" id="paso-2">
+      <div class="panel-tag">scripts/02_roles_permisos_jugador_moderador_admin.sql</div>
+      <h2>Paso 2 · Roles de aplicación: jugador, moderador, administrador</h2>
+      <p>Estos son distintos de los roles de administración de la Sesión 2 (DBA/SA/DA, quienes gestionan el servidor). Aquí se crean los roles que reflejan a los propios usuarios del juego, cada uno con exactamente los privilegios que su papel necesita — ni uno más. Esto es <strong>administración de usuarios, roles y grupos</strong>: en MySQL, un <code>ROLE</code> es literalmente un <strong>grupo de privilegios con nombre</strong> — en vez de otorgar permisos uno por uno a cada cuenta de jugador, se otorgan al grupo (<code>rol_jugador</code>, <code>rol_moderador</code>, <code>rol_administrador</code>) y luego cada cuenta real simplemente se agrega al grupo que le corresponde.</p>
+
+      <table class="role-table">
+        <thead>
+          <tr><th>Rol</th><th>Puede</th><th>No puede</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>rol_jugador</code></td>
+            <td>Ver su perfil, items y juegos; registrar sus propias partidas; ejecutar <code>subir_nivel_jugador</code> y <code>comprar_item_unico</code></td>
+            <td>Modificar <code>monedas</code> o <code>nivel</code> con un <code>UPDATE</code> directo</td>
+          </tr>
+          <tr>
+            <td><code>rol_moderador</code></td>
+            <td>Todo lo del jugador (lo hereda) + banear jugadores (<code>UPDATE (baneado)</code>)</td>
+            <td>Asignar monedas virtuales</td>
+          </tr>
+          <tr>
+            <td><code>rol_administrador</code></td>
+            <td>Todo lo del moderador (lo hereda) + asignar monedas/nivel/experiencia, borrar jugadores y partidas</td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="codeblock">
+        <div class="codeblock-head"><span>en phpMyAdmin</span></div>
+        <ol class="steps-list">
+          <li>Pestaña <strong>SQL</strong> → pega el bloque de abajo → <strong>Continuar</strong>.</li>
+          <li>Ve a <strong>Cuentas de usuario → Roles</strong> para ver <code>rol_jugador</code>, <code>rol_moderador</code> y <code>rol_administrador</code>.</li>
+        </ol>
+      </div>
+      <div class="codeblock sql">
+        <div class="codeblock-head">
+          <span>SQL — pégalo en la pestaña SQL de phpMyAdmin</span>
+          <span class="head-actions">
+            <button class="explain-btn" data-explain-target="#explain-paso2" aria-expanded="false">Explicar código</button>
+            <button class="copy-btn" data-copy-target="#sql-paso2">Copiar SQL</button>
+          </span>
+        </div>
+        <pre><code id="sql-paso2">-- Sesión 4: Roles de aplicación — jugador, moderador, administrador
+-- Motor: MySQL 8.0+ / MariaDB 10.5+ (soporte de CREATE ROLE)
+-- Requiere que la Sesión 1 (tablas y procedimiento subir_nivel_jugador) y la
+-- Sesión 3 (procedimiento comprar_item_unico) ya se hayan ejecutado.
+
+USE juego_online;
+
+-- Columna para banear jugadores (usada por moderadores)
+ALTER TABLE Jugadores ADD COLUMN IF NOT EXISTS baneado BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- Rol JUGADOR: solo puede ver y modificar su propio perfil (a través de
+-- procedimientos, nunca UPDATE directo sobre monedas o nivel).
+DROP ROLE IF EXISTS rol_jugador;
+CREATE ROLE rol_jugador;
+GRANT SELECT ON juego_online.Jugadores TO rol_jugador;
+GRANT SELECT ON juego_online.Items TO rol_jugador;
+GRANT SELECT ON juego_online.Juegos TO rol_jugador;
+GRANT SELECT, INSERT ON juego_online.Partidas TO rol_jugador;   -- puede registrar sus propias partidas
+GRANT EXECUTE ON PROCEDURE juego_online.subir_nivel_jugador TO rol_jugador;
+GRANT EXECUTE ON PROCEDURE juego_online.comprar_item_unico TO rol_jugador;
+-- Explícitamente NO se otorga UPDATE directo sobre Jugadores.monedas/nivel
+
+-- Rol MODERADOR: puede banear jugadores, no puede tocar monedas
+DROP ROLE IF EXISTS rol_moderador;
+CREATE ROLE rol_moderador;
+GRANT rol_jugador TO rol_moderador;   -- hereda los permisos de jugador
+GRANT UPDATE (baneado) ON juego_online.Jugadores TO rol_moderador;
+
+-- Rol ADMINISTRADOR: único que puede asignar monedas virtuales directamente
+DROP ROLE IF EXISTS rol_administrador;
+CREATE ROLE rol_administrador;
+GRANT rol_moderador TO rol_administrador;
+GRANT UPDATE (monedas, nivel, experiencia) ON juego_online.Jugadores TO rol_administrador;
+GRANT DELETE ON juego_online.Jugadores TO rol_administrador;
+GRANT DELETE ON juego_online.Partidas TO rol_administrador;
+
+FLUSH PRIVILEGES;
+
+-- Ejemplo: asignar el rol a una cuenta real y activarlo por defecto
+-- CREATE USER 'moderador1'@'%' IDENTIFIED BY 'ClaveSegura123';
+-- GRANT rol_moderador TO 'moderador1'@'%';
+-- SET DEFAULT ROLE rol_moderador TO 'moderador1'@'%';
+
+-- Verificación (phpMyAdmin → pestaña SQL, o "Cuentas de usuario" → Roles)
+-- SHOW GRANTS FOR rol_administrador;</code></pre>
+      </div>
+      <div class="explain-panel" id="explain-paso2" hidden></div>
+      <p class="expect"><strong>Resultado esperado:</strong> <code>SHOW GRANTS FOR rol_administrador;</code> muestra que hereda automáticamente los privilegios de <code>rol_moderador</code> y <code>rol_jugador</code>, además de los suyos propios.</p>
+      <p class="note">Requiere que los procedimientos <code>subir_nivel_jugador</code> (Sesión 1) y <code>comprar_item_unico</code> (Sesión 3) ya existan, porque el script les otorga <code>EXECUTE</code>.</p>
+      <p class="note">Así se ve la <strong>administración de usuarios y grupos</strong> en la práctica: crear una cuenta real (<code>CREATE USER</code>) y asignarla a uno de estos tres grupos (<code>GRANT rol_moderador TO 'usuario'@'%'</code>) — nunca configurando privilegios sueltos cuenta por cuenta.</p>
+    </article>
+
+    <article class="panel" id="paso-3">
+      <div class="panel-tag">scripts/03_prevencion_sql_injection.sql</div>
+      <h2>Paso 3 · Simulador anti-inyección SQL</h2>
+      <p>Una inyección SQL ocurre cuando el backend arma una consulta <strong>pegando (concatenando)</strong> el texto que escribió un usuario directamente dentro del SQL, en vez de tratarlo siempre como un simple dato. Si ese texto contiene comillas, punto y coma, o palabras clave de SQL, puede terminar cambiando el significado de la consulta.</p>
+
+      <div class="codeblock">
+        <div class="codeblock-head"><span>en phpMyAdmin</span></div>
+        <ol class="steps-list">
+          <li>Pestaña <strong>SQL</strong> → pega el bloque de abajo (crea el procedimiento seguro; el bloque "vulnerable" es solo un comentario educativo, nunca se ejecuta).</li>
+          <li>Pulsa <strong>Continuar</strong>.</li>
+        </ol>
+      </div>
+      <div class="codeblock sql">
+        <div class="codeblock-head">
+          <span>SQL — pégalo en la pestaña SQL de phpMyAdmin</span>
+          <span class="head-actions">
+            <button class="explain-btn" data-explain-target="#explain-paso3" aria-expanded="false">Explicar código</button>
+            <button class="copy-btn" data-copy-target="#sql-paso3">Copiar SQL</button>
+          </span>
+        </div>
+        <pre><code id="sql-paso3">-- Sesión 4: Simulador — identificar y frenar inyecciones SQL (MySQL / MariaDB)
+-- Reto: un "hacker" intenta usar el buscador de jugadores por nombre para robar items
+-- o alterar las notas de un torneo, inyectando SQL dentro del campo de búsqueda.
+
+USE juego_online;
+
+-- ============================================================
+-- VERSIÓN VULNERABLE (NO USAR — solo con fines educativos)
+-- ============================================================
+-- Si el backend arma la consulta concatenando texto del usuario, así:
+--
+--   texto_busqueda = "' OR '1'='1"
+--   sql = "SELECT * FROM Jugadores WHERE nombre_usuario = '" + texto_busqueda + "'"
+--
+-- La consulta final ejecutada sería:
+--   SELECT * FROM Jugadores WHERE nombre_usuario = '' OR '1'='1'
+-- Esto devuelve TODOS los jugadores, filtrando la condición de búsqueda.
+--
+-- Un payload más dañino podría ser:
+--   texto_busqueda = "'; UPDATE Jugadores SET monedas = 999999 WHERE nombre_usuario = 'NoobMaster'; --"
+-- que otorgaría monedas infinitas al atacante si el backend permite múltiples sentencias.
+
+-- ============================================================
+-- VERSIÓN SEGURA — procedimiento con parámetro tipado (no concatenación de texto)
+-- ============================================================
+DROP PROCEDURE IF EXISTS buscar_jugador_seguro;
+
+DELIMITER //
+
+CREATE PROCEDURE buscar_jugador_seguro(IN p_nombre_usuario VARCHAR(50))
+BEGIN
+    -- p_nombre_usuario siempre se trata como VALOR, nunca como código SQL,
+    -- sin importar qué texto contenga (comillas, ; --, OR '1'='1', etc.)
+    SELECT jugador_id, nombre_usuario, nivel, monedas
+    FROM Jugadores
+    WHERE nombre_usuario = p_nombre_usuario;
+END //
+
+DELIMITER ;
+
+-- Reto de clase: probar el payload malicioso contra el procedimiento seguro
+-- y comprobar que NO devuelve todos los jugadores ni ejecuta comandos extra.
+CALL buscar_jugador_seguro('\' OR \'1\'=\'1');
+-- Resultado esperado: 0 filas (porque ningún jugador se llama literalmente  ' OR '1'='1 )
+
+CALL buscar_jugador_seguro('DragonSlayer99');
+-- Resultado esperado: 1 fila, la del jugador real.
+
+-- Lección: en el backend de la aplicación, usar SIEMPRE consultas preparadas
+-- (prepared statements / placeholders ?, :nombre) y nunca concatenar texto del
+-- usuario directamente dentro de una sentencia SQL. Este mismo principio es el
+-- que aplica un ORM o un driver con parámetros vinculados (bound parameters).</code></pre>
+      </div>
+      <div class="explain-panel" id="explain-paso3" hidden></div>
+      <p class="expect"><strong>Resultado esperado:</strong> <code>buscar_jugador_seguro('\' OR \'1\'=\'1')</code> devuelve 0 filas, demostrando que el procedimiento neutraliza el intento de inyección.</p>
+
+      <div class="injection-sim">
+        <h3>🕵️ Simulador: brecha de seguridad simulada en tiempo real</h3>
+        <p class="injection-intro">Este es el <strong>reto de control de accesos</strong> de la sesión: escribe un texto de búsqueda (como si fueras el "hacker" probando el buscador de jugadores) y observa <strong>en tiempo real</strong> qué pasaría en un backend <strong>vulnerable</strong> (arma el SQL concatenando texto) contra el procedimiento <strong>seguro</strong> <code>buscar_jugador_seguro</code> — cada intento es una brecha simulada que puedes provocar y resolver tú mismo. Todo corre en tu navegador — no toca ninguna base de datos real.</p>
+
+        <div class="payload-row">
+          <button type="button" class="payload-btn" data-payload="DragonSlayer99">DragonSlayer99 (búsqueda normal)</button>
+          <button type="button" class="payload-btn" data-payload="' OR '1'='1">' OR '1'='1 (bypass clásico)</button>
+          <button type="button" class="payload-btn" data-payload="'; UPDATE Jugadores SET monedas = 999999 WHERE nombre_usuario = 'NoobMaster'; --">'; UPDATE ...; -- (comando extra)</button>
+          <button type="button" class="payload-btn" data-payload="admin'--">admin'-- (bypass de login clásico)</button>
+        </div>
+
+        <form class="injection-input-row" id="injection-form">
+          <input type="text" id="injection-input" placeholder="Escribe tu propio payload…" autocomplete="off">
+          <button type="submit" class="injection-run-btn">🔍 Probar búsqueda</button>
+        </form>
+
+        <div class="injection-results">
+          <div class="injection-col vulnerable">
+            <h4>🔓 Backend vulnerable (concatenación de texto)</h4>
+            <div class="injection-query" id="vuln-query"></div>
+            <div class="injection-outcome" id="vuln-outcome"></div>
+            <div id="vuln-table-wrap"></div>
+          </div>
+          <div class="injection-col safe">
+            <h4>🔒 buscar_jugador_seguro (parámetro tipado)</h4>
+            <div class="injection-query" id="safe-query"></div>
+            <div class="injection-outcome" id="safe-outcome"></div>
+            <div id="safe-table-wrap"></div>
+          </div>
+        </div>
+
+        <div class="injection-challenge" id="injection-challenge"></div>
+      </div>
+
+      <div class="accordion">
+        <details class="accordion-item">
+          <summary class="accordion-summary"><span>🤔 ¿Por qué "admin'--" no filtró nada aquí?</span><span class="accordion-tag">contexto importa</span></summary>
+          <div class="accordion-body">
+            <p>Ese payload es famoso porque, contra una consulta con <strong>dos condiciones</strong> (usuario Y contraseña), como <code>WHERE usuario = 'admin' AND password = '...'</code>, el <code>--</code> comenta todo lo que viene después, dejando solo <code>WHERE usuario = 'admin'</code> — es decir, entra sin necesitar la contraseña. Aquí el buscador de jugadores solo tiene <strong>una</strong> condición (el nombre), así que no hay nada que "comentar" para saltarse: si ningún jugador se llama literalmente <code>admin</code>, la búsqueda simplemente no encuentra a nadie. La lección: el mismo payload puede ser devastador en un contexto y no hacer nada en otro — por eso no basta con memorizar payloads, hay que entender el mecanismo.</p>
+          </div>
+        </details>
+
+        <details class="accordion-item">
+          <summary class="accordion-summary"><span>🚨 ¿Y si el conector bloquea varias sentencias con ";"?</span><span class="accordion-tag">no confíes en la configuración</span></summary>
+          <div class="accordion-body">
+            <p>Muchos drivers (como <code>mysqli</code> o <code>PDO</code> en modo por defecto) no ejecutan varias sentencias separadas por <code>;</code> en una sola llamada, lo que reduciría el riesgo del ejemplo de "comando extra". Pero <strong>no todos</strong> los conectores lo bloquean, y esa configuración puede cambiar entre entornos. Confiar en que "el driver no lo permite" no es una defensa real — la única defensa robusta es nunca concatenar texto del usuario dentro del SQL, sin importar qué conector se use.</p>
+          </div>
+        </details>
+
+        <details class="accordion-item">
+          <summary class="accordion-summary"><span>🌐 ¿Esto aplica igual en PHP, Node o Python?</span><span class="accordion-tag">mismo principio, otro lenguaje</span></summary>
+          <div class="accordion-body">
+            <p>Sí. <code>buscar_jugador_seguro(p_nombre_usuario)</code> es exactamente la misma idea que una <em>consulta preparada</em> (<code>prepared statement</code>) con <code>PDO</code> en PHP, un parámetro <code>$1</code>/<code>?</code> en Node con <code>pg</code>/<code>mysql2</code>, o un placeholder <code>%s</code> en Python con <code>psycopg2</code>: en todos los casos, el motor recibe el valor por un canal separado del texto del comando SQL, así que nunca puede "escaparse" y convertirse en código, sin importar qué comillas o punto y coma contenga.</p>
+          </div>
+        </details>
+
+        <details class="accordion-item">
+          <summary class="accordion-summary"><span>🎓 ¿Por qué la comilla simple es la clave del ataque?</span><span class="accordion-tag">el mecanismo</span></summary>
+          <div class="accordion-body">
+            <p>En SQL, una comilla simple <code>'</code> marca el inicio o el fin de un texto literal. Si el backend concatena el texto del usuario sin más, una comilla dentro de ese texto puede <strong>cerrar el literal antes de tiempo</strong>: todo lo que el atacante escriba después de esa comilla deja de ser "un dato" y pasa a ser interpretado como código SQL real. Por eso payloads como <code>' OR '1'='1</code> funcionan: la primera comilla cierra la cadena vacía que dejó la búsqueda, y <code>OR '1'='1</code> se convierte en una condición SQL de verdad, siempre verdadera.</p>
+          </div>
+        </details>
+      </div>
+
+      <p class="note">Tip para clase: pide a un estudiante que sea "el hacker" y a otro "el DBA" — uno intenta encontrar un payload que rompa el panel vulnerable, el otro explica en voz alta por qué el panel seguro no cae con el mismo texto.</p>
+    </article>
+
+  </section>
+</main>
+
+<footer class="foot">
+  <p>Guía de uso — Sesión 4: Control de Accesos y Sistema Anti-Trampas · Taller de Base de Datos (MySQL / phpMyAdmin)</p>
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const steps = document.querySelectorAll(".step");
+  const panels = document.querySelectorAll(".panel");
+
+  function activate(targetId) {
+    steps.forEach(s => s.classList.toggle("active", s.dataset.target === targetId));
+    panels.forEach(p => p.classList.toggle("active", p.id === targetId));
+    window.location.hash = targetId;
+  }
+
+  steps.forEach(step => {
+    step.addEventListener("click", () => activate(step.dataset.target));
+  });
+
+  const initial = window.location.hash.replace("#", "");
+  if (initial && document.getElementById(initial)) {
+    activate(initial);
+  }
+
+  /* ---------------------------------------------------------------
+     Modal: "¿Dónde se usa esto en el mundo real?"
+  --------------------------------------------------------------- */
+  const rwBtn = document.getElementById("real-world-btn");
+  const rwModal = document.getElementById("real-world-modal");
+  const rwClose = document.getElementById("real-world-close");
+
+  if (rwBtn && rwModal && rwClose) {
+    const openModal = () => {
+      rwModal.hidden = false;
+      rwClose.focus();
+    };
+    const closeModal = () => {
+      rwModal.hidden = true;
+      rwBtn.focus();
+    };
+
+    rwBtn.addEventListener("click", openModal);
+    rwClose.addEventListener("click", closeModal);
+    rwModal.addEventListener("click", (e) => {
+      if (e.target === rwModal) closeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !rwModal.hidden) closeModal();
+    });
+  }
+
+  /* ---------------------------------------------------------------
+     Explicación línea por línea del SQL
+  --------------------------------------------------------------- */
+  const explainData = {
+    paso1: [
+      {
+        title: "Encabezado",
+        lines: [
+          ["-- Sesión 4: Integridad estructural y semántica (anti-trampas a nivel de datos)", "Comentario descriptivo del archivo. Las líneas que empiezan con -- no se ejecutan."],
+          ["-- Motor: MySQL 8.0.16+ / MariaDB 10.2.1+ (restricciones CHECK aplicadas de verdad)", "Aviso técnico: en versiones anteriores, MySQL aceptaba la sintaxis CHECK pero la ignoraba silenciosamente — hace falta una versión moderna para que realmente bloquee datos inválidos."],
+          ["USE juego_online;", "Selecciona la base sobre la que se van a modificar las tablas."]
+        ]
+      },
+      {
+        title: "Integridad semántica: valores imposibles para un jugador",
+        lines: [
+          ["-- Integridad semántica: un jugador nunca puede tener monedas o experiencia negativas,", "Explica el objetivo: proteger el \"significado\" de los datos, no solo su forma (tipo de dato)."],
+          ["-- ni un nivel menor a 1 (evita que un \"hack\" cliente-servidor deje datos inválidos).", "Aclara el escenario real que se quiere prevenir: un cliente modificado que le pida al servidor un valor imposible."],
+          ["ALTER TABLE Jugadores", "ALTER TABLE significa \"le voy a agregar algo a esta tabla que ya existe\", en este caso a Jugadores."],
+          ["ADD CONSTRAINT chk_monedas_no_negativas CHECK (monedas >= 0),", "Crea una restricción con nombre propio (chk_monedas_no_negativas): cualquier INSERT o UPDATE que deje monedas por debajo de 0 será rechazado por el motor, sin excepción."],
+          ["ADD CONSTRAINT chk_experiencia_no_negativa CHECK (experiencia >= 0),", "Misma idea para experiencia: nunca puede quedar en negativo."],
+          ["ADD CONSTRAINT chk_nivel_minimo CHECK (nivel >= 1);", "Misma idea para nivel: el mínimo posible es 1, nunca 0 ni negativo."]
+        ]
+      },
+      {
+        title: "Integridad estructural: valores válidos para una partida",
+        lines: [
+          ["-- Integridad estructural: un puntaje de partida no puede ser negativo,", "Explica el objetivo de esta segunda tabla de reglas."],
+          ["-- y el resultado debe ser uno de los valores válidos del dominio del juego.", "Aclara que \"resultado\" no puede ser cualquier texto: solo un valor de una lista cerrada."],
+          ["ALTER TABLE Partidas", "Ahora se modifica la tabla Partidas."],
+          ["ADD CONSTRAINT chk_puntaje_no_negativo CHECK (puntaje >= 0),", "El puntaje de una partida nunca puede quedar en negativo."],
+          ["ADD CONSTRAINT chk_resultado_valido CHECK (resultado IN ('victoria', 'derrota', 'jugada'));", "El campo resultado solo acepta uno de estos tres textos exactos — cualquier otro valor (como 'empate' mal escrito o texto basura) es rechazado."]
+        ]
+      },
+      {
+        title: "Prueba comentada",
+        lines: [
+          ["-- Prueba: esto debe fallar (viola integridad semántica) — intento de \"hackear\" monedas negativas", "Explica qué demuestra la siguiente línea comentada."],
+          ["-- UPDATE Jugadores SET monedas = -100 WHERE jugador_id = 1;", "Ejemplo (apagado, no se ejecuta) de un comando que el motor rechazaría con un error, gracias a chk_monedas_no_negativas. Puedes probarlo tú mismo quitando los -- del inicio."]
+        ]
+      }
+    ],
+    paso2: [
+      {
+        title: "Encabezado",
+        lines: [
+          ["-- Sesión 4: Roles de aplicación — jugador, moderador, administrador", "Comentario descriptivo del archivo."],
+          ["-- Motor: MySQL 8.0+ / MariaDB 10.5+ (soporte de CREATE ROLE)", "Aviso técnico: CREATE ROLE es relativamente reciente; versiones viejas de MySQL/MariaDB no lo soportan."],
+          ["-- Requiere que la Sesión 1 (tablas y procedimiento subir_nivel_jugador) y la", "Recuerda una dependencia entre sesiones."],
+          ["-- Sesión 3 (procedimiento comprar_item_unico) ya se hayan ejecutado.", "Continúa la aclaración: este script otorga EXECUTE sobre procedimientos que deben existir de antemano."],
+          ["USE juego_online;", "Selecciona la base sobre la que se crearán los roles y privilegios."]
+        ]
+      },
+      {
+        title: "Columna nueva para moderación",
+        lines: [
+          ["-- Columna para banear jugadores (usada por moderadores)", "Explica para qué sirve la columna que se va a agregar."],
+          ["ALTER TABLE Jugadores ADD COLUMN IF NOT EXISTS baneado BOOLEAN NOT NULL DEFAULT FALSE;", "Agrega el interruptor baneado a cada jugador, empezando en FALSE (nadie está baneado por defecto). Es la única columna que rol_moderador podrá modificar."]
+        ]
+      },
+      {
+        title: "Rol jugador — el mínimo necesario para jugar",
+        lines: [
+          ["DROP ROLE IF EXISTS rol_jugador;", "Borra el rol si ya existía, para poder recrearlo sin error."],
+          ["CREATE ROLE rol_jugador;", "Crea un rol — un \"paquete\" de privilegios con nombre, que después se puede asignar a cuentas reales."],
+          ["GRANT SELECT ON juego_online.Jugadores TO rol_jugador;", "Puede leer la tabla de jugadores (su propio perfil y el de otros, para rankings), pero no modificarla directamente."],
+          ["GRANT SELECT ON juego_online.Items TO rol_jugador;", "Puede ver el catálogo de items disponibles."],
+          ["GRANT SELECT ON juego_online.Juegos TO rol_jugador;", "Puede ver el catálogo de juegos."],
+          ["GRANT SELECT, INSERT ON juego_online.Partidas TO rol_jugador;", "Puede ver partidas y crear registros nuevos — así se anota cuando juega una partida."],
+          ["GRANT EXECUTE ON PROCEDURE juego_online.subir_nivel_jugador TO rol_jugador;", "Puede ejecutar el procedimiento de la Sesión 1, que es la ÚNICA forma permitida de subir de nivel."],
+          ["GRANT EXECUTE ON PROCEDURE juego_online.comprar_item_unico TO rol_jugador;", "Puede ejecutar el procedimiento de la Sesión 3, la ÚNICA forma permitida de comprar el item único."],
+          ["-- Explícitamente NO se otorga UPDATE directo sobre Jugadores.monedas/nivel", "El punto clave de todo el diseño: como nunca se le da UPDATE sobre esas columnas, un jugador no puede asignarse monedas o nivel él mismo, ni siquiera con un cliente modificado — solo puede pasar por los procedimientos, que sí validan las reglas del juego."]
+        ]
+      },
+      {
+        title: "Rol moderador — hereda jugador, puede banear",
+        lines: [
+          ["DROP ROLE IF EXISTS rol_moderador;", "Borra el rol si ya existía."],
+          ["CREATE ROLE rol_moderador;", "Crea el rol moderador."],
+          ["GRANT rol_jugador TO rol_moderador;", "Esta línea es la clave de la jerarquía: le da a rol_moderador TODOS los privilegios de rol_jugador automáticamente, sin tener que repetirlos uno por uno."],
+          ["GRANT UPDATE (baneado) ON juego_online.Jugadores TO rol_moderador;", "Además de lo heredado, le da permiso de UPDATE pero solo sobre la columna baneado — no puede tocar monedas, nivel ni ninguna otra columna con este privilegio."]
+        ]
+      },
+      {
+        title: "Rol administrador — hereda moderador, controla monedas",
+        lines: [
+          ["DROP ROLE IF EXISTS rol_administrador;", "Borra el rol si ya existía."],
+          ["CREATE ROLE rol_administrador;", "Crea el rol administrador."],
+          ["GRANT rol_moderador TO rol_administrador;", "Hereda todo lo de rol_moderador (que a su vez ya incluye todo lo de rol_jugador) — una cadena de herencia de tres niveles."],
+          ["GRANT UPDATE (monedas, nivel, experiencia) ON juego_online.Jugadores TO rol_administrador;", "Es el ÚNICO rol con permiso para modificar monedas, nivel y experiencia directamente con UPDATE, sin pasar por un procedimiento."],
+          ["GRANT DELETE ON juego_online.Jugadores TO rol_administrador;", "Puede eliminar cuentas de jugadores."],
+          ["GRANT DELETE ON juego_online.Partidas TO rol_administrador;", "Puede eliminar registros de partidas (por ejemplo, para anular resultados de un torneo con evidencia de trampa)."]
+        ]
+      },
+      {
+        title: "Aplicar, ejemplo de uso y verificación",
+        lines: [
+          ["FLUSH PRIVILEGES;", "Recarga la tabla interna de privilegios para que todos los cambios queden activos de inmediato."],
+          ["-- Ejemplo: asignar el rol a una cuenta real y activarlo por defecto", "Introduce un ejemplo (comentado) de cómo se usaría esto con una cuenta de verdad."],
+          ["-- CREATE USER 'moderador1'@'%' IDENTIFIED BY 'ClaveSegura123';", "Crearía una cuenta real de MySQL para un moderador."],
+          ["-- GRANT rol_moderador TO 'moderador1'@'%';", "Le asignaría el rol (el paquete de privilegios) a esa cuenta."],
+          ["-- SET DEFAULT ROLE rol_moderador TO 'moderador1'@'%';", "Haría que el rol se active automáticamente cada vez que esa cuenta inicia sesión, sin tener que activarlo a mano con SET ROLE."],
+          ["-- SHOW GRANTS FOR rol_administrador;", "Comando (comentado) para listar todos los privilegios reales de este rol, incluidos los heredados."]
+        ]
+      }
+    ],
+    paso3: [
+      {
+        title: "Encabezado y planteamiento del reto",
+        lines: [
+          ["-- Sesión 4: Simulador — identificar y frenar inyecciones SQL (MySQL / MariaDB)", "Comentario descriptivo del archivo."],
+          ["-- Reto: un \"hacker\" intenta usar el buscador de jugadores por nombre para robar items", "Plantea el escenario educativo de esta sesión."],
+          ["-- o alterar las notas de un torneo, inyectando SQL dentro del campo de búsqueda.", "Continúa el planteamiento del reto."],
+          ["USE juego_online;", "Selecciona la base sobre la que se creará el procedimiento seguro."]
+        ]
+      },
+      {
+        title: "Versión vulnerable (documentada, nunca se ejecuta)",
+        lines: [
+          ["-- Si el backend arma la consulta concatenando texto del usuario, así:", "Introduce el error de diseño que se quiere evitar: pegar texto del usuario directamente dentro de una cadena SQL."],
+          ["--   texto_busqueda = \"' OR '1'='1\"", "Ejemplo de lo que un atacante escribiría en el campo de búsqueda."],
+          ["--   sql = \"SELECT * FROM Jugadores WHERE nombre_usuario = '\" + texto_busqueda + \"'\"", "Así es como un backend mal construido armaría la consulta: pegando texto sin validar."],
+          ["-- La consulta final ejecutada sería:", "Muestra el resultado de esa concatenación."],
+          ["--   SELECT * FROM Jugadores WHERE nombre_usuario = '' OR '1'='1'", "La comilla del atacante cerró el texto vacío antes de tiempo, y OR '1'='1' agregó una condición que siempre es verdadera."],
+          ["-- Esto devuelve TODOS los jugadores, filtrando la condición de búsqueda.", "Explica el impacto: la búsqueda deja de filtrar por nombre y expone toda la tabla."],
+          ["-- Un payload más dañino podría ser:", "Introduce un segundo ejemplo, más peligroso."],
+          ["--   texto_busqueda = \"'; UPDATE Jugadores SET monedas = 999999 WHERE nombre_usuario = 'NoobMaster'; --\"", "Si además el backend permitiera varias sentencias por llamada, este texto no solo buscaría: también modificaría datos."],
+          ["-- que otorgaría monedas infinitas al atacante si el backend permite múltiples sentencias.", "Aclara la condición para que ese segundo ejemplo funcione: depende de que el conector permita varias sentencias separadas por punto y coma."]
+        ]
+      },
+      {
+        title: "Versión segura: crear el procedimiento",
+        lines: [
+          ["DROP PROCEDURE IF EXISTS buscar_jugador_seguro;", "Borra una versión anterior si existía, para poder recrearlo sin error."],
+          ["DELIMITER //", "Cambia temporalmente el separador de sentencias, porque el cuerpo del procedimiento tiene su propio ; interno."],
+          ["CREATE PROCEDURE buscar_jugador_seguro(IN p_nombre_usuario VARCHAR(50))", "Crea el procedimiento con un único parámetro de entrada: el nombre a buscar."],
+          ["BEGIN", "Empieza el cuerpo del procedimiento."],
+          ["-- p_nombre_usuario siempre se trata como VALOR, nunca como código SQL,", "La idea central de toda la defensa: el parámetro nunca se \"pega\" como texto dentro del SQL."],
+          ["-- sin importar qué texto contenga (comillas, ; --, OR '1'='1', etc.)", "Refuerza que esto es válido sin importar qué caracteres especiales traiga el texto."],
+          ["SELECT jugador_id, nombre_usuario, nivel, monedas", "Columnas que devuelve la búsqueda."],
+          ["FROM Jugadores", "Tabla consultada."],
+          ["WHERE nombre_usuario = p_nombre_usuario;", "Compara el nombre guardado contra el parámetro recibido como un simple valor — el motor nunca lo reinterpreta como sintaxis SQL."],
+          ["END //", "Cierra el cuerpo del procedimiento."],
+          ["DELIMITER ;", "Devuelve el delimitador normal (;) para las siguientes instrucciones."]
+        ]
+      },
+      {
+        title: "Probar el reto",
+        lines: [
+          ["CALL buscar_jugador_seguro('\\' OR \\'1\\'=\\'1');", "Llama al procedimiento pasándole literalmente el texto ' OR '1'='1 como nombre de usuario a buscar (las barras invertidas solo escapan las comillas dentro de este script de ejemplo)."],
+          ["-- Resultado esperado: 0 filas (porque ningún jugador se llama literalmente  ' OR '1'='1 )", "Explica por qué no hay fuga de datos: el motor busca un jugador con ESE nombre exacto, que no existe."],
+          ["CALL buscar_jugador_seguro('DragonSlayer99');", "Prueba de control: una búsqueda normal, con un nombre real."],
+          ["-- Resultado esperado: 1 fila, la del jugador real.", "Confirma que el procedimiento sigue funcionando normalmente para búsquedas legítimas."]
+        ]
+      },
+      {
+        title: "Lección final",
+        lines: [
+          ["-- Lección: en el backend de la aplicación, usar SIEMPRE consultas preparadas", "Cierra el script con la recomendación general, más allá de este ejercicio puntual."],
+          ["-- (prepared statements / placeholders ?, :nombre) y nunca concatenar texto del", "Nombra las herramientas concretas que existen en la mayoría de lenguajes para lograr esto."],
+          ["-- usuario directamente dentro de una sentencia SQL. Este mismo principio es el", "Refuerza que el mecanismo (parámetro separado del texto SQL) es universal."],
+          ["-- que aplica un ORM o un driver con parámetros vinculados (bound parameters).", "Aclara que usar un ORM no es magia: por debajo, sigue dependiendo de este mismo principio de parámetros vinculados."]
+        ]
+      }
+    ]
+  };
+
+  document.querySelectorAll(".explain-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const panel = document.querySelector(btn.dataset.explainTarget);
+      if (!panel) return;
+
+      const isOpen = !panel.hidden;
+      if (isOpen) {
+        panel.hidden = true;
+        btn.setAttribute("aria-expanded", "false");
+        btn.textContent = "Explicar código";
+        return;
+      }
+
+      if (!panel.dataset.rendered) {
+        const key = btn.dataset.explainTarget.replace("#explain-", "");
+        const groups = explainData[key] || [];
+        groups.forEach(group => {
+          const groupEl = document.createElement("div");
+          groupEl.className = "explain-group";
+
+          const titleEl = document.createElement("div");
+          titleEl.className = "explain-group-title";
+          titleEl.textContent = group.title;
+          groupEl.appendChild(titleEl);
+
+          group.lines.forEach(([code, note]) => {
+            const row = document.createElement("div");
+            row.className = "explain-row";
+
+            const codeEl = document.createElement("div");
+            codeEl.className = "explain-code";
+            codeEl.textContent = code;
+
+            const noteEl = document.createElement("div");
+            noteEl.className = "explain-note";
+            noteEl.textContent = note;
+
+            row.appendChild(codeEl);
+            row.appendChild(noteEl);
+            groupEl.appendChild(row);
+          });
+
+          panel.appendChild(groupEl);
+        });
+        panel.dataset.rendered = "true";
+      }
+
+      panel.hidden = false;
+      btn.setAttribute("aria-expanded", "true");
+      btn.textContent = "Ocultar explicación";
+    });
+  });
+
+  document.querySelectorAll(".copy-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      let text = btn.dataset.copy;
+      if (text === undefined && btn.dataset.copyTarget) {
+        const target = document.querySelector(btn.dataset.copyTarget);
+        text = target ? target.textContent : "";
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (err) {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+      const original = btn.textContent;
+      btn.textContent = "Copiado";
+      btn.classList.add("copied");
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove("copied");
+      }, 1200);
+    });
+  });
+
+  /* ---------------------------------------------------------------
+     Mini-simulador de restricción CHECK (Paso 1)
+  --------------------------------------------------------------- */
+  const checkForm = document.getElementById("check-sim-form");
+  if (checkForm) {
+    const checkInput = document.getElementById("check-sim-input");
+    const checkOutput = document.getElementById("check-sim-output");
+
+    checkForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const val = Number(checkInput.value);
+      if (checkInput.value.trim() === "" || Number.isNaN(val)) {
+        checkOutput.textContent = "Escribe un número entero (puede ser negativo).";
+        checkOutput.className = "injection-outcome";
+        return;
+      }
+      if (val < 0) {
+        checkOutput.textContent = `UPDATE Jugadores SET monedas = ${val} WHERE jugador_id = 1; → ERROR 3819 (HY000): Check constraint 'chk_monedas_no_negativas' is violated. La fila NO se modifica.`;
+        checkOutput.className = "injection-outcome critical";
+      } else {
+        checkOutput.textContent = `UPDATE Jugadores SET monedas = ${val} WHERE jugador_id = 1; → 1 fila afectada. La restricción no se activa porque ${val} >= 0.`;
+        checkOutput.className = "injection-outcome ok";
+      }
+    });
+  }
+
+  /* ---------------------------------------------------------------
+     Simulador de inyección SQL (Paso 3): imita, en el navegador,
+     un backend vulnerable (concatenación de texto) contra el
+     procedimiento buscar_jugador_seguro (parámetro tipado).
+  --------------------------------------------------------------- */
+  const injectionForm = document.getElementById("injection-form");
+  if (injectionForm) {
+    const JUGADORES = [
+      { id: 1, nombre: "DragonSlayer99", nivel: 12, monedas: 1500 },
+      { id: 2, nombre: "ShadowNinja",    nivel: 8,  monedas: 900  },
+      { id: 3, nombre: "PixelQueen",     nivel: 20, monedas: 5000 },
+      { id: 4, nombre: "NoobMaster",     nivel: 1,  monedas: 50   },
+      { id: 5, nombre: "RocketFox",      nivel: 15, monedas: 2200 }
+    ];
+
+    const injectionInput = document.getElementById("injection-input");
+    const vulnQuery = document.getElementById("vuln-query");
+    const vulnOutcome = document.getElementById("vuln-outcome");
+    const vulnTableWrap = document.getElementById("vuln-table-wrap");
+    const safeQuery = document.getElementById("safe-query");
+    const safeOutcome = document.getElementById("safe-outcome");
+    const safeTableWrap = document.getElementById("safe-table-wrap");
+    const challengeBox = document.getElementById("injection-challenge");
+
+    function renderTable(container, rows) {
+      container.innerHTML = "";
+      if (!rows.length) return;
+      const table = document.createElement("table");
+      table.className = "injection-table";
+
+      const thead = document.createElement("thead");
+      const headRow = document.createElement("tr");
+      ["id", "nombre_usuario", "nivel", "monedas"].forEach(label => {
+        const th = document.createElement("th");
+        th.textContent = label;
+        headRow.appendChild(th);
+      });
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      rows.forEach(j => {
+        const tr = document.createElement("tr");
+        [j.id, j.nombre, j.nivel, j.monedas].forEach(val => {
+          const td = document.createElement("td");
+          td.textContent = val;
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      container.appendChild(table);
+    }
+
+    function detectTautology(text) {
+      return /'\s*or\s*'?[\w.]+'?\s*=\s*'?[\w.]+'?/i.test(text) || /\bor\s+1\s*=\s*1\b/i.test(text);
+    }
+
+    function extractStacked(text) {
+      const idx = text.indexOf(";");
+      if (idx === -1) return null;
+      let rest = text.slice(idx + 1);
+      const commentIdx = rest.indexOf("--");
+      if (commentIdx !== -1) rest = rest.slice(0, commentIdx);
+      rest = rest.trim();
+      return rest.length ? rest : null;
+    }
+
+    function exactMatches(text) {
+      const needle = text.trim().toLowerCase();
+      return JUGADORES.filter(j => j.nombre.toLowerCase() === needle);
+    }
+
+    function runSimulation(raw) {
+      const text = raw;
+
+      // --- Lado vulnerable: el backend "pega" el texto dentro del SQL ---
+      vulnQuery.textContent = `SELECT * FROM Jugadores WHERE nombre_usuario = '${text}'`;
+
+      const stacked = extractStacked(text);
+      const tautology = detectTautology(text);
+
+      if (stacked) {
+        vulnOutcome.textContent = `🚨 El backend intentaría ejecutar además: "${stacked}" — un comando extra oculto dentro del texto de búsqueda.`;
+        vulnOutcome.className = "injection-outcome critical";
+        const beforeSemicolon = text.slice(0, text.indexOf(";"));
+        renderTable(vulnTableWrap, tautology ? JUGADORES : exactMatches(beforeSemicolon));
+      } else if (tautology) {
+        vulnOutcome.textContent = `⚠️ Fuga de datos: la condición WHERE quedó siempre verdadera. Se devolvieron TODOS los jugadores (${JUGADORES.length} filas) en vez de uno solo.`;
+        vulnOutcome.className = "injection-outcome leak";
+        renderTable(vulnTableWrap, JUGADORES);
+      } else {
+        const rows = exactMatches(text);
+        vulnOutcome.textContent = rows.length
+          ? `${rows.length} fila(s) — coincidencia exacta con un jugador real.`
+          : "0 filas — ningún jugador se llama exactamente así.";
+        vulnOutcome.className = rows.length ? "injection-outcome ok" : "injection-outcome empty";
+        renderTable(vulnTableWrap, rows);
+      }
+
+      // --- Lado seguro: buscar_jugador_seguro trata el texto siempre como valor ---
+      safeQuery.textContent = `CALL buscar_jugador_seguro('${text}');  -- tratado como VALOR, nunca como código SQL`;
+      const safeRows = exactMatches(text);
+      safeOutcome.textContent = safeRows.length
+        ? `${safeRows.length} fila(s) — coincidencia exacta con un jugador real.`
+        : "0 filas — ningún jugador se llama literalmente así.";
+      safeOutcome.className = safeRows.length ? "injection-outcome ok" : "injection-outcome empty";
+      renderTable(safeTableWrap, safeRows);
+
+      // --- Reto: encontrar un payload que rompa el vulnerable pero no el seguro ---
+      const brokeVulnerable = tautology || Boolean(stacked);
+      if (brokeVulnerable && safeRows.length === 0) {
+        challengeBox.textContent = "✅ ¡Objetivo del reto cumplido! Encontraste un payload que rompe el backend vulnerable, y buscar_jugador_seguro lo neutralizó por completo (0 filas).";
+        challengeBox.className = "injection-challenge done";
+      } else {
+        challengeBox.textContent = "🎯 Reto: escribe un payload que haga que el panel VULNERABLE filtre datos (todos los jugadores, o un comando extra) mientras el panel SEGURO sigue devolviendo 0 filas.";
+        challengeBox.className = "injection-challenge";
+      }
+    }
+
+    injectionForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      runSimulation(injectionInput.value);
+    });
+
+    document.querySelectorAll(".payload-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        injectionInput.value = btn.dataset.payload;
+        runSimulation(injectionInput.value);
+      });
+    });
+
+    // Estado inicial: una búsqueda normal, para que los paneles no arranquen vacíos
+    runSimulation("DragonSlayer99");
+  }
+});
+
+</script>
+</body>
+</html>
